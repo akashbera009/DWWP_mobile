@@ -11,4 +11,9 @@ export const localImages = {
     homeTabSelected: require('../assets/images/homeTabSelected.png'),
     orderTabSelected: require('../assets/images/ordersTabSelected.png'),
     profileTabSelected: require('../assets/images/profileTabSelected.png'),
+
+    wifi_disconnected: require('../assets/images/wifi-disconnected.png'),
+    wifi_new_white: require('../assets/images/wifi-new-white.png'),
+    rupee_indian: require('../assets/images/rupee-indian.png'),
+    
 }

@@ -11,6 +11,7 @@ export const screenNames = {
     PaymentDashBoard: 'PaymentDashBoard',
     Analytics: 'Analytics',
 
+    SelectAddress : 'SelectAddress' 
 } as const;
 
 export type ScreenNames = keyof typeof screenNames;

@@ -72,7 +72,7 @@ export const CustomButton: React.FC<CustomButtonProps> = ({
 
   const handlePress = () => {
     // Add subtle vibration feedback
-    Vibration.vibrate(50); // 50ms vibration
+    // Vibration.vibrate(50); // 50ms vibration
     onPress();
   };
 

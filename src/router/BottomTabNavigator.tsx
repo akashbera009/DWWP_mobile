@@ -9,7 +9,7 @@ import { normalize, vh, vw } from '@dwwp/utils/dimensions';
 import fonts from '@dwwp/utils/fonts';
 
 import DashBoardPage from '@dwwp/modules/dashboard/DashBoardPage';
-import ServoControlPage from '@dwwp/modules/servoControl/ServoCOntrolPage';
+import ServoControlPage from '@dwwp/modules/servoControl/ServoControlPage';
 import PasymentsDashboard from '@dwwp/modules/paymentsDashboard/PaymentsDashboard';
 import Analytics from '@dwwp/modules/analytics/Analytics';
 import { screenNames } from '@dwwp/utils/screenNames';
@@ -114,6 +114,7 @@ const BottomTabNavigator = () => {
         //   : { display: 'none' },
         headerShown: false,
         tabBarShowLabel: false,
+        animation: 'shift',
         // tabBarHideOnKeyboard: true,
         tabBarBackground: TabBarBackground,
       })}
@@ -125,13 +126,13 @@ const BottomTabNavigator = () => {
           tabBarIcon: HomeTabIcon,
         }}
       />
-      {/* <Tab.Screen
+      <Tab.Screen
         name={screenNames.ServoControl}
         component={ServoControlPage}
         options={{
-          tabBarIcon: OrdersTabIcon,
+          tabBarIcon: AccountTabIcon,
         }}
-      /> */}
+      />
       <Tab.Screen
         name={screenNames.PaymentDashBoard}
         component={PasymentsDashboard}
@@ -139,13 +140,7 @@ const BottomTabNavigator = () => {
           tabBarIcon: AccountTabIcon,
         }}
       />
-      <Tab.Screen
-        name={screenNames.Analytics}
-        component={Analytics}
-        options={{
-          tabBarIcon: AccountTabIcon,
-        }}
-      />
+
     </Tab.Navigator>
   );
 };
@@ -202,7 +197,7 @@ const styles = StyleSheet.create({
   iconWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: vh(5),
+    paddingTop: vh(25),
     width: vw(25),
   },
   iconContainer: {
@@ -214,6 +209,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   dot: {
+    paddingTop: vh(10),
     width: normalize(6),
     height: normalize(6),
     borderRadius: normalize(3),

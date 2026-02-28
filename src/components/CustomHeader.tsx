@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import colors from '@dwwp/utils/colors';
 import fonts from '@dwwp/utils/fonts';
 import { normalize, vh, vw } from '@dwwp/utils/dimensions';
-import { localImages } from '@dwwp/utils/localImages';
+import { localImages } from '@dwwp/utils/localimages';
 
 interface CustomHeaderProps {
   title: string;

@@ -11,6 +11,7 @@ import store, { persister } from './src/store';
 import { navigationRef } from '@dwwp/utils/navigationService';
 import { RootNavigator } from "@dwwp/router";
 import { ToastContainer } from "@dwwp/components/ToastContainer";
+import SafeAreaContainer from "@dwwp/components/SafeAreaContainer";
 function App() {
   return (
     <GestureHandlerRootView style={styles.container}>
@@ -25,10 +26,11 @@ function App() {
               console.log(' NavigationContainer is ready');
             }}
           >
-            <RootNavigator />
-            <Text>hiiiii </Text>
-            {/* <ToastContainer /> */}
-            <PortalHost name="safe" />
+            <SafeAreaContainer>
+              <RootNavigator />
+              {/* <ToastContainer /> */}
+              <PortalHost name="safe" />
+            </SafeAreaContainer>
           </NavigationContainer>
           {/* </PersistGate> */}
           {/* </Provider> */}
