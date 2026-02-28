@@ -1,0 +1,37 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "src/assets/fonts/ReadexPro-Regular.ttf",
+      "sha1": "9b58fad52f8e11c8efa5135f27a48790e6f45eeb"
+    },
+    {
+      "path": "src/assets/fonts/MaterialDesignIcons.ttf",
+      "sha1": "4f51a4dc75a68d3e57321c448efddea23c8a9db0"
+    },
+    {
+      "path": "src/assets/fonts/ReadexPro-SemiBold.ttf",
+      "sha1": "afdcd36cb43e76ae36297eab1bab8039d114e1a3"
+    },
+    {
+      "path": "src/assets/fonts/fonts.ttf",
+      "sha1": "3a656ee69b64ccb1e57f1721f7659b50c1fb56ef"
+    },
+    {
+      "path": "src/assets/fonts/ReadexPro-Light.ttf",
+      "sha1": "0a7495c2524824bfa41ec16719a1b661e8b403d6"
+    },
+    {
+      "path": "src/assets/fonts/ReadexPro-Bold.ttf",
+      "sha1": "b70df0d84cb0f2dca6d19990b43116541c15ec51"
+    },
+    {
+      "path": "src/assets/fonts/ReadexPro-ExtraLight.ttf",
+      "sha1": "d21e2ae838f9a0e7651f4163020a912060f41432"
+    },
+    {
+      "path": "src/assets/fonts/ReadexPro-Medium.ttf",
+      "sha1": "ae736e03d2175672041ba79b94d309781b92addb"
+    }
+  ]
+}
