@@ -7,6 +7,7 @@ import { strings } from '@dwwp/utils/strings'
 import { Portal } from '@gorhom/portal'
 import SwitchModal from './SwitchModal'
 import { CustomButton } from '@dwwp/components/CustomButton'
+import { NormalWave } from '../dashboard/NormalWave'
 
 const ServoControlPage = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -15,8 +16,8 @@ const ServoControlPage = () => {
             <View style={styles.homeHeaderContainer}>
                 <Text style={styles.homeHeaderText}>{strings.gateControl}</Text>
             </View>
+            <NormalWave />
             <View style={styles.servoPageContainer}>
-
                 {/* <Text style={styles.homeHeaderText}>{strings.gateControl}</Text>
                 <CustomButton
                     title='open sheet'
@@ -30,7 +31,7 @@ const ServoControlPage = () => {
                     </Portal>
                 </View> */}
 
-                
+
             </View>
         </View>
     )

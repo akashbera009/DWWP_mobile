@@ -20,6 +20,7 @@ export const strings = {
     logout: 'Log Out',
 
     gateControl: 'Gate Control',
+    rechargesAndPayments:'Recharges & Payments',
 
     pay: 'Pay',
     verify: 'verify',

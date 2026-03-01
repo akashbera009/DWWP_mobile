@@ -17,7 +17,7 @@ const { width, height } = Dimensions.get("window");
 const FREQUENCY = 2;
 const STEP = 2;
 
-export const Profile = () => {
+export const NormalWave = () => {
   const amplitude = useSharedValue(20);
   const verticalOffset = useSharedValue(height * 0.4);
   const phase = useSharedValue(0);

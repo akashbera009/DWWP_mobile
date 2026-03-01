@@ -34,7 +34,7 @@ const TabIcon = ({ routeName, focused }: TabIconProps) => {
             style={[styles.iconImage]}
           />
         );
-      case 'Servo':
+      case 'Payment':
         return (
           <View style={styles.iconContainer}>
             <Image
@@ -91,10 +91,9 @@ const TabBarBackground = () => (
 const HomeTabIcon = (props: TabIconProps) => (
   <TabIcon {...props} routeName="Home" />
 );
-
-// Home tab icon component
-const OrdersTabIcon = (props: TabIconProps) => (
-  <TabIcon {...props} routeName="Orders" />
+// PaymentTabIcon tab icon component
+const PaymentTabIcon = (props: TabIconProps) => (
+  <TabIcon {...props} routeName="Payment" />
 );
 
 // Profile tab icon component
@@ -127,19 +126,19 @@ const BottomTabNavigator = () => {
         }}
       />
       <Tab.Screen
-        name={screenNames.ServoControl}
-        component={ServoControlPage}
-        options={{
-          tabBarIcon: AccountTabIcon,
-        }}
-      />
-      <Tab.Screen
         name={screenNames.PaymentDashBoard}
         component={PasymentsDashboard}
         options={{
-          tabBarIcon: AccountTabIcon,
+          tabBarIcon: PaymentTabIcon,
         }}
       />
+        <Tab.Screen
+          name={screenNames.ServoControl}
+          component={ServoControlPage}
+          options={{
+            tabBarIcon: AccountTabIcon,
+          }}
+        />
 
     </Tab.Navigator>
   );
