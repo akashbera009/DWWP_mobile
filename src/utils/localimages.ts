@@ -2,6 +2,7 @@ export const localImages = {
     eyeSlash: require('../assets/images/eye-slash.png'),
     eye: require('../assets/images/eye.png'),
     backArrow: require('../assets/images/backArrow.png'),
+    downarrow: require('../assets/images/downarrow.png'),
     tick: require('../assets/images/tick.png'),
     verified: require('../assets/images/verified.png'),
 
@@ -15,5 +16,10 @@ export const localImages = {
     wifi_disconnected: require('../assets/images/wifi-disconnected.png'),
     wifi_new_white: require('../assets/images/wifi-new-white.png'),
     rupee_indian: require('../assets/images/rupee-indian.png'),
+
+    logout: require('../assets/images/logout.png'),
+    user: require('../assets/images/user.png'),
+    settings: require('../assets/images/settings.png'),
+    report: require('../assets/images/report.png'),
     
 }

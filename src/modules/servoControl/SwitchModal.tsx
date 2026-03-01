@@ -1,27 +1,31 @@
 import colors from "@dwwp/utils/colors";
 import BottomSheet, { BottomSheetView, TouchableWithoutFeedback } from "@gorhom/bottom-sheet";
 import { useCallback, useRef } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-export default function SwitchModal() {
+type SwitchModalPropType = {
+    handleCloseModal: () => void;
+}
+export default function SwitchModal({ handleCloseModal }: SwitchModalPropType) {
     const bottomSheetRef = useRef<BottomSheet>(null)
     const handleSheetChanges = useCallback((index: number) => {
         if (index === -1) {
-            // Sheet is closed, navigate back
-            // navigation.goBack();
-            bottomSheetRef?.current?.close()
+            // bottomSheetRef?.current?.close()
+            handleCloseModal?.()
         }
     }, [],
     )
-    const handleCloseModal = () => {
-        bottomSheetRef?.current?.close()
-    }
-
+    const handleSheetClose = useCallback(async () => {
+        await bottomSheetRef?.current?.close()
+        setTimeout(() => {
+            handleCloseModal?.()
+        }, 300);
+    }, [handleCloseModal])
     return (
         <>
-            < TouchableWithoutFeedback onPress={handleCloseModal} >
-                <View style={styles.overlay} />
-            </TouchableWithoutFeedback>
+            <View style={StyleSheet.absoluteFill}>
+                <Pressable style={styles.overlay} onPress={handleSheetClose} />
+            </View>
             <BottomSheet
                 ref={bottomSheetRef}
                 onChange={handleSheetChanges}
@@ -31,7 +35,6 @@ export default function SwitchModal() {
                 keyboardBlurBehavior="restore"
                 android_keyboardInputMode="adjustResize"
             >
-
                 <BottomSheetView
                     style={[styles.content]}
                 >
@@ -49,10 +52,10 @@ export default function SwitchModal() {
 const styles = StyleSheet.create({
     overlay: {
         backgroundColor: colors.transparentBackground07,
-        flexGrow : 1 
+        flexGrow: 1
     },
     content: {
-        flex : 1 
+        flex: 1
     },
     bottomSheetBackground: {
 

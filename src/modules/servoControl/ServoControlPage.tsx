@@ -23,11 +23,11 @@ const ServoControlPage = () => {
                     onPress={() => setIsModalOpen(prev => !prev)}
                 />
                 <View style={styles.scrollContainer}>
-                    {isModalOpen &&
-                        <Portal hostName='safe'>
-                            <SwitchModal />
-                        </Portal>
-                    }
+                    <Portal hostName='safe'>
+                        {isModalOpen &&
+                            <SwitchModal handleCloseModal={() => setIsModalOpen(false)} />
+                        }
+                    </Portal>
                 </View>
             </View>
         </View>

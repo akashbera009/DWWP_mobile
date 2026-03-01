@@ -11,7 +11,7 @@ import {
 import colors from '@dwwp/utils/colors';
 import fonts from '@dwwp/utils/fonts';
 import { normalize, vw } from '@dwwp/utils/dimensions';
-import { localImages } from '@dwwp/utils/localImages';
+import { localImages } from '@dwwp/utils/localimages';
 
 interface ToastProps {
   message: string;

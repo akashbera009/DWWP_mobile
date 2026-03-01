@@ -37,6 +37,7 @@ const UsagesComponent = () => {
     }))
     return (
         <View>
+            <Text style={styles.userDashBoardHeader}>{strings.userDashboard}</Text>
             <View style={styles.usagesContainer}>
                 <View style={styles.upperUsagesContainer}>
                     <View style={styles.upperUsagesLeft}>
@@ -87,6 +88,12 @@ const UsagesComponent = () => {
 export default UsagesComponent
 
 const styles = StyleSheet.create({
+    userDashBoardHeader:{
+        fontFamily : fonts.Bold,
+        fontSize : normalize(18),
+        color : colors.primary,
+        marginHorizontal : vw(16)
+    },
     usagesContainer: {
         marginHorizontal: vw(16),
         marginVertical: vh(10),
@@ -208,7 +215,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.transparentBackground,
         minHeight: vh(16),
         borderRadius: normalize(20),
-        marginVertical: vh(16)
+        marginVertical: vh(8)
     },
     fillingBar: {
         borderRadius: normalize(20),

@@ -1,14 +1,20 @@
 export const strings = {
     dwwp: 'DWWP',
-
-    today :'Today',
-    totalPrice : 'Total Price',
+    userDashboard: 'User Dashboard',
+    deviceControl: 'Device Control',
+    today: 'Today',
+    totalPrice: 'Total Price',
     regularPrice: 'Regular Price',
-    penalty : 'Penalty',
+    penalty: 'Penalty',
     thisMonth: 'This Month',
-    Limit:'Limit',
-    pricePerLtr :'Price/Ltr :',
-    penaltyPerLtr : 'Penalty/Ltr :',
+    Limit: 'Limit :',
+    pricePerLtr: 'Price/Ltr :',
+    penaltyPerLtr: 'Penalty/Ltr :',
+
+    viewProfile: 'View Profile',
+    settings: 'Settings',
+    raiseComplaint : 'Raise Complaint',
+    logout: 'Log Out',
 
     gateControl: 'Gate Control',
 

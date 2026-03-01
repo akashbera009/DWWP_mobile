@@ -71,6 +71,8 @@ export default {
   successToastBackground: '#E2F6EC',
   successToastBorder: 'rgba(39, 131, 45, 0.15)',
   errorBackground: '#E74C3C',
+  warningBackground: '#FFF4E5',
+  infoBackground: '#E8F4FD',
 
   // Help & Support
   helpIconBackground: 'rgba(43, 101, 104, 0.1)',

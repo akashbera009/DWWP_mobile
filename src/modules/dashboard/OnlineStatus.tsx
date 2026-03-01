@@ -125,7 +125,7 @@ export const OnlineStatus: React.FC<Props> = ({ lastSeen }) => {
 
 const styles = StyleSheet.create({
     cardBg:{
-        marginTop:vh(16)
+        // marginTop:vh(16)
     },
     // card: {
     //     width: 200,

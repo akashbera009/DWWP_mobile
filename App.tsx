@@ -28,7 +28,7 @@ function App() {
           >
             <SafeAreaContainer>
               <RootNavigator />
-              {/* <ToastContainer /> */}
+              <ToastContainer />
               <PortalHost name="safe" />
             </SafeAreaContainer>
           </NavigationContainer>
