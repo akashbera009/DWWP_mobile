@@ -1,4 +1,4 @@
-import { ImageBackground, ScrollView, StyleSheet, Text, View, Image } from 'react-native'
+import { ImageBackground, ScrollView, StyleSheet, Text, View, Image, Pressable } from 'react-native'
 import React, { useState } from 'react'
 import { HomeHeader } from '@dwwp/components/HomeHeader'
 import colors from '@dwwp/utils/colors'
@@ -14,15 +14,22 @@ import { Portal } from '@gorhom/portal'
 import SwitchModal from '../servoControl/SwitchModal'
 import { showSnackbar } from '@dwwp/utils/showSnackBar'
 import { localImages } from '@dwwp/utils/localimages'
+import NotificationComponent from './NotificationComponent'
 
 const DashBoardPage = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     const [isProfileBadgeOpen, setIsProfileBadgeOpen] = useState<boolean>(false)
+    const [isNotificationTabOpen, setIsNotificationTabOpen] = useState<boolean>(false)
     return (
         <View style={styles.container}>
             <View style={styles.homeHeaderContainer}>
                 <Text style={styles.homeHeaderText}>{strings.dwwp}</Text>
                 <View style={styles.profileContainer}>
+                    < NotificationComponent
+                        isNotificationTabOpen={isNotificationTabOpen}
+                        onClose={() => setIsNotificationTabOpen(false)}
+                        onOpen={() => setIsNotificationTabOpen(true)}
+                    />
                     <UserProfileBadge
                         onClose={() => setIsProfileBadgeOpen(false)}
                         onOpen={() => setIsProfileBadgeOpen(true)}
@@ -90,7 +97,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     profileContainer: {
-        marginRight: vw(16)
+        marginRight: vw(16),
+        flexDirection: 'row',
+        alignItems: 'center'
     },
     homeHeaderText: {
         fontFamily: fonts.Bold,

@@ -10,6 +10,9 @@ export const strings = {
     Limit: 'Limit :',
     pricePerLtr: 'Price/Ltr :',
     penaltyPerLtr: 'Penalty/Ltr :',
+    waterControlheader: 'Water Supply Control',
+    waterControlDescription : 'This Switch is designed to control water supply through DWWP device,',
+    waterControlDescriptionInfo : 'This will not work if DWWP Divice is not connected to Internet or your quota has ended',
 
     viewProfile: 'View Profile',
     settings: 'Settings',

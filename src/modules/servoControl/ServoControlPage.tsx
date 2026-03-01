@@ -17,7 +17,7 @@ const ServoControlPage = () => {
             </View>
             <View style={styles.servoPageContainer}>
 
-                <Text style={styles.homeHeaderText}>{strings.gateControl}</Text>
+                {/* <Text style={styles.homeHeaderText}>{strings.gateControl}</Text>
                 <CustomButton
                     title='open sheet'
                     onPress={() => setIsModalOpen(prev => !prev)}
@@ -28,7 +28,9 @@ const ServoControlPage = () => {
                             <SwitchModal handleCloseModal={() => setIsModalOpen(false)} />
                         }
                     </Portal>
-                </View>
+                </View> */}
+
+                
             </View>
         </View>
     )

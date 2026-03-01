@@ -21,5 +21,9 @@ export const localImages = {
     user: require('../assets/images/user.png'),
     settings: require('../assets/images/settings.png'),
     report: require('../assets/images/report.png'),
+    info: require('../assets/images/info.png'),
+    bell: require('../assets/images/bell.png'),
+    bell_full: require('../assets/images/bell_full.png'),
+    close: require('../assets/images/close.png'),
     
 }

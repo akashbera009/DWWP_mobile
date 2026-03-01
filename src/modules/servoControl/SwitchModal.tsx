@@ -1,12 +1,19 @@
 import colors from "@dwwp/utils/colors";
 import BottomSheet, { BottomSheetView, TouchableWithoutFeedback } from "@gorhom/bottom-sheet";
 import { useCallback, useRef } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import ToggleSwitch from "./ToggleSwitch";
+import { strings } from "@dwwp/utils/strings";
+import fonts from "@dwwp/utils/fonts";
+import { normalize, vh, vw } from "@dwwp/utils/dimensions";
+import { localImages } from "@dwwp/utils/localimages";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type SwitchModalPropType = {
     handleCloseModal: () => void;
 }
 export default function SwitchModal({ handleCloseModal }: SwitchModalPropType) {
+    const { bottom } = useSafeAreaInsets()
     const bottomSheetRef = useRef<BottomSheet>(null)
     const handleSheetChanges = useCallback((index: number) => {
         if (index === -1) {
@@ -36,12 +43,17 @@ export default function SwitchModal({ handleCloseModal }: SwitchModalPropType) {
                 android_keyboardInputMode="adjustResize"
             >
                 <BottomSheetView
-                    style={[styles.content]}
+                    style={[styles.content, { paddingBottom: bottom }]}
                 >
                     <View>
-                        <Text>
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis reiciendis, perspiciatis, laudantium aut totam ullam nam impedit mollitia deleniti nihil vel dignissimos magni rem ipsam quam, voluptatem fugiat dicta hic libero illum deserunt? Veniam magni, sed tenetur quas quae accusantium optio perspiciatis eius totam neque, voluptates, maiores vero ullam distinctio reprehenderit cupiditate tempora quam architecto quod quibusdam! Culpa cumque fuga dignissimos eaque quis, amet magnam tenetur magni adipisci consectetur totam odio officiis itaque corporis et odit neque, quam eligendi vero ex sed nihil quo iusto harum. Eius eveniet praesentium ab fugiat, obcaecati eligendi quisquam quod ex possimus unde deserunt vero?
-                        </Text>
+                        <Text style={styles.waterControlheader}>{strings.waterControlheader}</Text>
+                        <ToggleSwitch userId="ab@gmail.com" />
+                        <Text style={styles.waterControlDescription}>{strings.waterControlDescription}</Text>
+                        <View style={styles.infoContainer}>
+                            <Image source={localImages.info}
+                                style={styles.infoIcon} />
+                            <Text style={styles.waterControlDescriptionInfo}>{strings.waterControlDescriptionInfo}</Text>
+                        </View>
                     </View>
                 </BottomSheetView>
             </BottomSheet>
@@ -55,9 +67,39 @@ const styles = StyleSheet.create({
         flexGrow: 1
     },
     content: {
-        flex: 1
+        flex: 1,
     },
     bottomSheetBackground: {
 
-    }
+    },
+    waterControlheader: {
+        fontFamily: fonts.Bold,
+        fontSize: normalize(18),
+        textAlign: 'center',
+        color: colors.primary
+    },
+    waterControlDescription: {
+        fontFamily: fonts.Regular,
+        fontSize: normalize(14),
+        textAlign: 'center',
+        color: colors.secondary,
+        marginHorizontal: vw(16)
+    },
+    infoContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginHorizontal: vw(30)
+    },
+    infoIcon: {
+        height: vh(20),
+        width: vh(20),
+        tintColor: colors.warning
+    },
+    waterControlDescriptionInfo: {
+        fontFamily: fonts.Medium,
+        fontSize: normalize(10),
+        color: colors.warning,
+        textAlign: 'left',
+        marginHorizontal: vw(8)
+    },
 })
