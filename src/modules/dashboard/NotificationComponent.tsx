@@ -59,7 +59,8 @@ const NotificationComponent = ({ isNotificationTabOpen, onOpen, onClose }: UserN
                 <Image source={localImages.bell_full}
                     style={styles.notificationIcon} />
                 {isUnreadNotification !== 0 && (
-                    <Text style={styles.unreadNotificaiton}>{isUnreadNotification}</Text>
+                    // <Text style={styles.unreadNotificaiton}>{isUnreadNotification}</Text>
+                    <View style={styles.unreadNotificaiton}/>
                 )}
             </Pressable>
             {isNotificationTabOpen && (
@@ -116,11 +117,16 @@ const styles = StyleSheet.create({
     },
     unreadNotificaiton: {
         fontSize: normalize(14),
-        color: colors.warning,
+        color: colors.white,
         fontFamily: fonts.Regular,
         position: 'absolute',
-        top: vh(-10),
-        left: vw(32)
+        top: vh(-6),
+        left: vw(32),
+        backgroundColor: colors.warning,
+        height : vh(8),
+        width: vh(8),
+        borderRadius:normalize(10),
+        padding : normalize(0)
     },
     overlay: {
         flex: 1,

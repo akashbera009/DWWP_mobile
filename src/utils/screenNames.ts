@@ -4,13 +4,15 @@ export const screenNames = {
     AuthNavigator : 'AuthNavigator',
     
     LoginScreen:'LoginScreen',
+    SignUpScreen:'SignUpScreen',
     
     AuthScreen: 'AuthScreen',
     DashBoard: 'DashBoard',
     ServoControl: 'ServoControl',
     PaymentDashBoard: 'PaymentDashBoard',
-    Analytics: 'Analytics',
+    AnalyticsPage: 'AnalyticsPage',
 
+    ViewProfileScreen:'ViewProfileScreen',
     SelectAddress : 'SelectAddress' 
 } as const;
 

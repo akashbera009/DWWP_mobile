@@ -23,7 +23,10 @@ const DashBoardPage = () => {
     return (
         <View style={styles.container}>
             <View style={styles.homeHeaderContainer}>
-                <Text style={styles.homeHeaderText}>{strings.dwwp}</Text>
+                <View style={styles.logoContainer}>
+                    <Image source={localImages.dwwp_logo} style={styles.logo} />
+                    <Text style={styles.homeHeaderText}>{strings.dwwp}</Text>
+                </View>
                 <View style={styles.profileContainer}>
                     < NotificationComponent
                         isNotificationTabOpen={isNotificationTabOpen}
@@ -101,16 +104,26 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center'
     },
+    logoContainer:{
+        flexDirection : 'row', 
+        alignItems : 'center'
+    },
+    logo: {
+        height: vh(30),
+        width: vw(30),
+        resizeMode: 'contain',
+        borderRadius : normalize(10),
+        marginLeft: vw(16)
+    },
     homeHeaderText: {
         fontFamily: fonts.Bold,
-        fontSize: normalize(20),
+        fontSize: normalize(24),
         color: colors.white,
-        marginHorizontal: vw(16),
+        marginHorizontal: vw(8),
         marginVertical: vh(6)
     },
     scrollContainer: {
         flexGrow: 1,
-        // backgroundColor: colors.overlayBackground // unnecessaruy
         paddingBottom: vh(50)// unnecessary 
     },
     welcomeContainer: {

@@ -1,3 +1,5 @@
+import { Transaction } from "@react-native-firebase/app/dist/module/internal/web/firebaseFirestore";
+
 export const strings = {
     dwwp: 'DWWP',
     userDashboard: 'User Dashboard',
@@ -11,20 +13,29 @@ export const strings = {
     pricePerLtr: 'Price/Ltr :',
     penaltyPerLtr: 'Penalty/Ltr :',
     waterControlheader: 'Water Supply Control',
-    waterControlDescription : 'This Switch is designed to control water supply through DWWP device,',
-    waterControlDescriptionInfo : 'This will not work if DWWP Divice is not connected to Internet or your quota has ended',
+    waterControlDescription: 'This Switch is designed to control water supply through DWWP device,',
+    waterControlDescriptionInfo: 'This will not work if DWWP Divice is not connected to Internet or your quota has ended',
+    lWater : 'L Water',
+    perPack: 'per pack',
+    total : 'Total:',
+    add: '+ Add',
 
     viewProfile: 'View Profile',
     settings: 'Settings',
-    raiseComplaint : 'Raise Complaint',
+    raiseComplaint: 'Raise Complaint',
     logout: 'Log Out',
 
     gateControl: 'Gate Control',
-    rechargesAndPayments:'Recharges & Payments',
+    rechargesAndPayments: 'Recharges & Payments',
 
     pay: 'Pay',
     verify: 'verify',
     address: 'address',
     noLocationProvided: 'noLocationProvided',
-    Subscription: 'Subscription'
+    Subscription: 'Subscription',
+
+    TransactionHistory: 'Transaction History',
+    planSelectorHeading: 'Choose Your Plan',
+    maxLimitReached: 'Maximum Selectable quantity is 10',
+    minLimitReached : 'Minimum Selectable quantity is 1',
 }

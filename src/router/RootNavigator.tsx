@@ -1,28 +1,22 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 //Import navigators
-// import AuthNavigator from './AuthNavigator';
 import { RootStackParamList } from '../utils/types';
 //Custom Imports
-import { screenNames } from '@dwwp/utils/screenNames';
-import BottomTabNavigator from './BottomTabNavigator';
-import AuthNavigator from './AuthNavigator';
+import MainStackNavigator from './MainStack';
+import AuthStackNavigator from './AuthStackNavigator';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const RootNavigator = () => {
+  const [isAuthenticated, setIsAuthenticated] = React.useState(false); // Replace with actual auth logic
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name={screenNames.BottomTabNavigator}
-        component={BottomTabNavigator}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name={screenNames.AuthNavigator}
-        component={AuthNavigator}
-        options={{ headerShown: false }}
-      />
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {isAuthenticated ? (
+        <Stack.Screen name="MainStack" component={MainStackNavigator} />
+      ) : (
+        <Stack.Screen name="AuthStack" component={AuthStackNavigator} />
+      )}
     </Stack.Navigator>
   );
 };

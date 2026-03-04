@@ -11,8 +11,10 @@ import fonts from '@dwwp/utils/fonts';
 import DashBoardPage from '@dwwp/modules/dashboard/DashBoardPage';
 import ServoControlPage from '@dwwp/modules/servoControl/ServoControlPage';
 import PasymentsDashboard from '@dwwp/modules/paymentsDashboard/PaymentsDashboard';
-import Analytics from '@dwwp/modules/analytics/Analytics';
+import Analytics from '@dwwp/modules/analytics/AnalyticsPage';
 import { screenNames } from '@dwwp/utils/screenNames';
+import { getFocusedRouteNameFromRoute, Route } from '@react-navigation/native';
+import AnalyticsPage from '@dwwp/modules/analytics/AnalyticsPage';
 
 // Tab Navigator
 const Tab = createBottomTabNavigator<BottomTabParamList>();
@@ -105,18 +107,28 @@ const BottomTabNavigator = () => {
 
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.primaryBlack,
-        // tabBarStyle: hideBottomTab(route)
-        //   ? [styles.tabBar]
-        //   : { display: 'none' },
-        headerShown: false,
-        tabBarShowLabel: false,
-        animation: 'shift',
-        // tabBarHideOnKeyboard: true,
-        tabBarBackground: TabBarBackground,
-      })}
+      screenOptions={({ route }) => {
+        const routeName = getFocusedRouteNameFromRoute(route);
+
+        const tabBarVisible =
+          routeName === undefined || // root screen
+          routeName === screenNames.DashBoard ||
+          routeName === screenNames.PaymentDashBoard ||
+          routeName === screenNames.AnalyticsPage;
+
+        return {
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.primaryBlack,
+          // tabBarStyle: tabBarVisible
+          //   ? [styles.tabBar]
+          //   : { display: 'none' },
+          headerShown: false,
+          tabBarShowLabel: false,
+          animation: 'shift',
+          // tabBarHideOnKeyboard: true,
+          tabBarBackground: TabBarBackground,
+        };
+      }}
     >
       <Tab.Screen
         name={screenNames.DashBoard}
@@ -132,13 +144,13 @@ const BottomTabNavigator = () => {
           tabBarIcon: PaymentTabIcon,
         }}
       />
-        <Tab.Screen
-          name={screenNames.ServoControl}
-          component={ServoControlPage}
-          options={{
-            tabBarIcon: AccountTabIcon,
-          }}
-        />
+      <Tab.Screen
+        name={screenNames.AnalyticsPage}
+        component={AnalyticsPage}
+        options={{
+          tabBarIcon: AccountTabIcon,
+        }}
+      />
 
     </Tab.Navigator>
   );

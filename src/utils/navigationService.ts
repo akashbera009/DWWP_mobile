@@ -9,13 +9,18 @@ import { RootStackParamList } from './types';
 export const navigationRef =
   React.createRef<NavigationContainerRef<RootStackParamList>>();
 
-export function navigate(
-  routeName: keyof RootStackParamList,
-  params?: RootStackParamList[keyof RootStackParamList],
-): void {
-  navigationRef.current?.navigate(routeName, params);
-}
-
+// export function navigate(
+//   routeName: keyof RootStackParamList,
+//   params?: RootStackParamList[keyof RootStackParamList],
+// ): void {
+//   navigationRef.current?.navigate(routeName, params);
+// }
+// export function navigate<RouteName extends keyof RootStackParamList>(
+//   routeName: RouteName,
+//   params?: RootStackParamList[RouteName]
+// ) {
+//   navigationRef.current?.navigate(routeName, params);
+// }
 export function currentRoute() {
   return navigationRef?.current?.getCurrentRoute();
 }

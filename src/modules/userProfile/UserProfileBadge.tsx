@@ -5,6 +5,8 @@ import colors from '@dwwp/utils/colors';
 import { localImages } from '@dwwp/utils/localimages';
 import { strings } from '@dwwp/utils/strings';
 import fonts from '@dwwp/utils/fonts';
+// import { navigate } from '@dwwp/utils/navigationService';
+import { screenNames } from '@dwwp/utils/screenNames';
 type UserProfileBadgePropType = {
     isProfileBadgeOpen: boolean;
     onOpen: () => void
@@ -18,7 +20,12 @@ type user = {
 const UserProfileBadge = ({ isProfileBadgeOpen, onOpen, onClose }: UserProfileBadgePropType) => {
     const [userDetails, setUserDetails] = useState<user | null>(null)
     const useProfileMenuItem = [
-        { title: strings.viewProfile, imageUrl: localImages.user },
+        {
+            title: strings.viewProfile,
+            imageUrl: localImages.user,
+            // onClickEvent: () =>
+            //     navigate(screenNames),
+        },
         { title: strings.settings, imageUrl: localImages.settings },
         { title: strings.raiseComplaint, imageUrl: localImages.report },
         { title: strings.logout, imageUrl: localImages.logout }
@@ -73,8 +80,8 @@ const UserProfileBadge = ({ isProfileBadgeOpen, onOpen, onClose }: UserProfileBa
                         </View>
                         {useProfileMenuItem.map((item, idx) => (
                             <TouchableOpacity
-                                style={[styles.individualContainer, idx === useProfileMenuItem?.length -1  && styles.borderTop]}
-                                // onPress={()=> item.pressEvent}
+                                style={[styles.individualContainer, idx === useProfileMenuItem?.length - 1 && styles.borderTop]}
+                                // onPress={() => item?.onClickEvent?.()}
                                 key={idx}
                             >
                                 <Image source={item?.imageUrl} style={styles.clickIcon} />
@@ -159,7 +166,7 @@ const styles = StyleSheet.create({
     borderTop: {
         borderTopWidth: normalize(1),
         borderTopColor: colors.border,
-        paddingTop : vh(10)
+        paddingTop: vh(10)
     },
     clickText: {
         fontSize: normalize(14),
