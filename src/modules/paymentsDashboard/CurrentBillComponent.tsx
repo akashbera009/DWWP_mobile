@@ -1,4 +1,5 @@
 import colors from "@dwwp/utils/colors";
+import { displayNOtification } from "@dwwp/utils/displayNotification";
 import React from "react";
 import {
     View,
@@ -19,13 +20,14 @@ const isLastDayOfMonth = () => {
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
-    return tomorrow.getDate() === 1;
+    // return tomorrow.getDate() === 1;
+    return true 
 };
 const CurrentBillComponent = () => {
     const dummyBillObject ={
         amount: 250.75,
         usage: 120,
-        dueDate: "2026-03-31",
+        dueDate: "2026-03-04",
         isPaid: false,
     }
 
@@ -35,6 +37,10 @@ const CurrentBillComponent = () => {
     const statusColor = dummyBillObject.isPaid ? "#2ecc71" : "#f39c12";
     const statusText = dummyBillObject.isPaid ? "Paid" : "Pending";
 
+
+    const payCurrentBill =()=>{
+         displayNOtification({ title: "Payment Successful", body: "Your payment has been processed successfully." })
+    }
     return (
         <View style={styles.card}>
 
@@ -71,7 +77,7 @@ const CurrentBillComponent = () => {
                     isDisabled && styles.disabledButton,
                 ]}
                 disabled={isDisabled}
-                onPress={()=> {}}
+                onPress={payCurrentBill}
             >
                 <Text style={styles.buttonText}>
                     {dummyBillObject.isPaid
@@ -144,7 +150,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     disabledButton: {
-        backgroundColor:colors.primaryDisabled,
+        backgroundColor:colors.darkGray,
     },
     buttonText: {
         color: "#fff",

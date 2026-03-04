@@ -10,7 +10,7 @@ import DWWPSplash from '@dwwp/modules/splashScreen/DWWPSplash';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const RootNavigator = () => {
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false); // Replace with actual auth logic
+  const [isAuthenticated, setIsAuthenticated] = React.useState(true); // Replace with actual auth logic
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
