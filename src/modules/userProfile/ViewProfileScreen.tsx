@@ -11,9 +11,11 @@ import colors from '@dwwp/utils/colors'
 import fonts from '@dwwp/utils/fonts'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import { CustomHeader } from '@dwwp/components/CustomHeader';
-import { goBack } from '@dwwp/utils/navigationService';
+import { goBack, navigationRef } from '@dwwp/utils/navigationService';
 import { strings } from '@dwwp/utils/strings';
 import { localImages } from '@dwwp/utils/localimages';
+import { Screen } from 'react-native-screens';
+import { screenNames } from '@dwwp/utils/screenNames';
 const ViewProfileScreen = () => {
   // Dummy user data (replace with real data later)
   const user = {
@@ -38,36 +40,44 @@ const ViewProfileScreen = () => {
         </TouchableOpacity>
         <Text style={styles.homeHeaderText}>{strings.viewProfile}</Text>
       </View>
+      <View style={styles.content}>
 
-      <View style={styles.header}>
-        <Image
-          source={{ uri: 'https://i.pravatar.cc/150?img=12' }}
-          style={styles.avatar}
-        />
-        <Text style={styles.name}>{user.name}</Text>
-        <Text style={styles.email}>{user.email}</Text>
+        <View style={styles.header}>
+          <Image
+            source={{ uri: 'https://i.pravatar.cc/150?img=12' }}
+            style={styles.avatar}
+          />
+          <Text style={styles.name}>{user.name}</Text>
+          <Text style={styles.email}>{user.email}</Text>
+        </View>
+
+        {/* Info Card */}
+        <View style={styles.card}>
+          <ProfileRow label="Phone" value={user.phone} />
+          <ProfileRow label="User ID" value={user.userId} />
+          <ProfileRow label="Address" value={user.address} />
+          <ProfileRow
+            label="Account Status"
+            value={user.status}
+            valueStyle={{ color: '#10B981' }}
+          />
+        </View>
+
+        {/* Buttons */}
+        <TouchableOpacity style={styles.editButton}>
+          <Text style={styles.editButtonText}>Edit Profile</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => navigationRef.current?.reset({
+            index: 0,
+            routes: [{ name: screenNames.AuthStack }],
+          })}
+          style={styles.logoutButton}>
+          <Text style={styles.logoutButtonText}>Logout</Text>
+        </TouchableOpacity>
+
       </View>
-
-      {/* Info Card */}
-      <View style={styles.card}>
-        <ProfileRow label="Phone" value={user.phone} />
-        <ProfileRow label="User ID" value={user.userId} />
-        <ProfileRow label="Address" value={user.address} />
-        <ProfileRow
-          label="Account Status"
-          value={user.status}
-          valueStyle={{ color: '#10B981' }}
-        />
-      </View>
-
-      {/* Buttons */}
-      <TouchableOpacity style={styles.editButton}>
-        <Text style={styles.editButtonText}>Edit Profile</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.logoutButton}>
-        <Text style={styles.logoutButtonText}>Logout</Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -96,20 +106,22 @@ const styles = StyleSheet.create({
   homeHeaderContainer: {
     backgroundColor: colors.primary,
     flexDirection: 'row',
-    alignItems : 'center'
+    alignItems: 'center'
   },
-  backArrow:{
-    height : vh(16),
-    width : vw(16),
-    tintColor : colors.white,
-    marginHorizontal : vw(16)
+  backArrow: {
+    height: vh(16),
+    width: vw(16),
+    tintColor: colors.white,
+    marginHorizontal: vw(16)
   },
   homeHeaderText: {
     fontFamily: fonts.Bold,
     fontSize: normalize(20),
     color: colors.white,
-    // marginHorizontal: vw(16),
     marginVertical: vh(6)
+  },
+  content: {
+    marginHorizontal: vw(16)
   },
   header: {
     alignItems: 'center',

@@ -47,11 +47,11 @@ const TabIcon = ({ routeName, focused }: TabIconProps) => {
             />
           </View>
         );
-      case 'Profile':
+      case 'Analytics':
         return (
           <Image
             source={
-              focused ? localImages.profileTabSelected : localImages.profileTab
+              focused ? localImages.analytics_fill : localImages.analytics_blank
             }
             style={[styles.iconImage]}
           />
@@ -100,7 +100,7 @@ const PaymentTabIcon = (props: TabIconProps) => (
 
 // Profile tab icon component
 const AccountTabIcon = (props: TabIconProps) => (
-  <TabIcon {...props} routeName="Profile" />
+  <TabIcon {...props} routeName="Analytics" />
 );
 
 const BottomTabNavigator = () => {
@@ -108,13 +108,14 @@ const BottomTabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => {
-        const routeName = getFocusedRouteNameFromRoute(route);
+        // const routeName = getFocusedRouteNameFromRoute(route);
+// console.log('routename ' , routeName);
 
-        const tabBarVisible =
-          routeName === undefined || // root screen
-          routeName === screenNames.DashBoard ||
-          routeName === screenNames.PaymentDashBoard ||
-          routeName === screenNames.AnalyticsPage;
+        // const tabBarVisible =
+        //   routeName === undefined || // root screen
+        //   routeName === screenNames.DashBoard ||
+        //   routeName === screenNames.PaymentDashBoard ||
+        //   routeName === screenNames.AnalyticsPage;
 
         return {
           tabBarActiveTintColor: colors.primary,

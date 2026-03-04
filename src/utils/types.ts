@@ -19,23 +19,24 @@ import { NavigatorScreenParams } from '@react-navigation/native';
 
 
 export type AuthStackParamList = {
-  LoginScreen: undefined;
-  SignUpScreen: undefined;
+    LoginScreen: undefined;
+    SignUpScreen: undefined;
 };
 export type BottomTabParamList = {
-  DashBoard: undefined;
-  PaymentDashBoard: undefined;
-  AnalyticsPage: undefined;
+    DashBoard: undefined;
+    PaymentDashBoard: undefined;
+    AnalyticsPage: undefined;
 };
 
 export type MainStackParamList = {
-  BottomTabs: NavigatorScreenParams<BottomTabParamList>;
+    BottomTabs: NavigatorScreenParams<BottomTabParamList>;
 
-  ViewProfileScreen: undefined;
-  SettingsScreen: undefined;
-  RaiseComplaintScreen: undefined;
+    ViewProfileScreen: undefined;
+    SettingsScreen: undefined;
+    RaiseComplaintScreen: undefined;
 };
 export type RootStackParamList = {
-  AuthStack: NavigatorScreenParams<AuthStackParamList>;
-  MainStack: NavigatorScreenParams<MainStackParamList>;
+    SplashScreen: undefined;
+    AuthStack: NavigatorScreenParams<AuthStackParamList>;
+    MainStack: NavigatorScreenParams<MainStackParamList>;
 };

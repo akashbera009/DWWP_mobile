@@ -19,7 +19,7 @@ export default function MainStackNavigator() {
         component={BottomTabNavigator}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="ViewProfileScreen" component={ViewProfileScreen} />
+      <Stack.Screen name="ViewProfileScreen" component={ViewProfileScreen}  options={{headerShown: false}}/>
       <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
       <Stack.Screen name="RaiseComplaintScreen" component={RaiseComplaintScreen} />
     </Stack.Navigator>

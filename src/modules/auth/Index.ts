@@ -1,2 +1,2 @@
-export *  from './LoginPage'
-export *  from './SignUpPage'
+export *  from './LoginScreen'
+export *  from './SignUpScreen'

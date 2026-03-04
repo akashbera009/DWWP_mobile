@@ -14,7 +14,7 @@ import Animated, {
     withSpring,
 } from 'react-native-reanimated';
 import LinearGradient from 'react-native-linear-gradient';
-import WaveBackground from './WaveBackground';
+import WaveBackground from '../../components/WaveBackground';
 import { localImages } from '@dwwp/utils/localimages';
 import { vh } from '@dwwp/utils/dimensions';
 

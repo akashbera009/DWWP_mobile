@@ -5,8 +5,11 @@ import colors from '@dwwp/utils/colors';
 import { localImages } from '@dwwp/utils/localimages';
 import { strings } from '@dwwp/utils/strings';
 import fonts from '@dwwp/utils/fonts';
-// import { navigate } from '@dwwp/utils/navigationService';
+
 import { screenNames } from '@dwwp/utils/screenNames';
+import { useNavigation } from '@react-navigation/native';
+import { MainStackParamList, RootStackParamList } from '@dwwp/utils/types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 type UserProfileBadgePropType = {
     isProfileBadgeOpen: boolean;
     onOpen: () => void
@@ -18,13 +21,19 @@ type user = {
     email: string
 }
 const UserProfileBadge = ({ isProfileBadgeOpen, onOpen, onClose }: UserProfileBadgePropType) => {
+    type MainStackNavigationProp =
+        NativeStackNavigationProp<MainStackParamList>;
+
+    const navigation = useNavigation<MainStackNavigationProp>();
     const [userDetails, setUserDetails] = useState<user | null>(null)
     const useProfileMenuItem = [
         {
             title: strings.viewProfile,
             imageUrl: localImages.user,
-            // onClickEvent: () =>
-            //     navigate(screenNames),
+            onClickEvent: () =>{
+                navigation.navigate(screenNames.ViewProfileScreen),
+                onClose?.()
+            }
         },
         { title: strings.settings, imageUrl: localImages.settings },
         { title: strings.raiseComplaint, imageUrl: localImages.report },
@@ -81,7 +90,7 @@ const UserProfileBadge = ({ isProfileBadgeOpen, onOpen, onClose }: UserProfileBa
                         {useProfileMenuItem.map((item, idx) => (
                             <TouchableOpacity
                                 style={[styles.individualContainer, idx === useProfileMenuItem?.length - 1 && styles.borderTop]}
-                                // onPress={() => item?.onClickEvent?.()}
+                                onPress={() => item?.onClickEvent?.()}
                                 key={idx}
                             >
                                 <Image source={item?.imageUrl} style={styles.clickIcon} />

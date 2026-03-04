@@ -1,5 +1,7 @@
 // Desc: Screen names used in navigation
 export const screenNames = {
+    MainStack: 'MainStack',
+    AuthStack: 'AuthStack',
     BottomTabNavigator: 'BottomTabNavigator',
     AuthNavigator : 'AuthNavigator',
     

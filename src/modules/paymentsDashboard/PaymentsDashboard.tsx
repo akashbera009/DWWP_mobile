@@ -8,6 +8,7 @@ import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
 import PlanSelector from './Planselector'
 import TransactionHistory from './TransactionHistory'
+import CurrentBillComponent from './CurrentBillComponent'
 
 const PaymentsDashboard = () => {
   return (
@@ -22,8 +23,10 @@ const PaymentsDashboard = () => {
           <Text style={styles.totalAmount}>₹ 300</Text>
         </View>
 
+        <CurrentBillComponent />
+
         <TransactionHistory />
-        
+
         <PlanSelector
           defaultSelected="premium"
           onSelect={(plan) => console.log(plan)}

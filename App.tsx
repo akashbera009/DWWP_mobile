@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
@@ -12,7 +12,23 @@ import { navigationRef } from '@dwwp/utils/navigationService';
 import { RootNavigator } from "@dwwp/router";
 import { ToastContainer } from "@dwwp/components/ToastContainer";
 import SafeAreaContainer from "@dwwp/components/SafeAreaContainer";
+
+import notifee, { EventType } from '@notifee/react-native';
 function App() {
+  useEffect(() => {
+    const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
+      switch (type) {
+        case EventType.DISMISSED:
+          console.log('User dismissed notification', detail.notification);
+          break;
+        case EventType.PRESS:
+          console.log('User pressed notification', detail.notification);
+          break;
+      }
+    });
+    return unsubscribe
+  }, []);
+
   return (
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaProvider>

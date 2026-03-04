@@ -1,5 +1,8 @@
 export const localImages = {
     dwwp_logo : require('../assets/images/DWWP LOGO.png'),
+    analytics_blank : require('../assets/images/analytics_blank.png'),
+    analytics_fill : require('../assets/images/analytics_fill.png'),
+    
     eyeSlash: require('../assets/images/eye-slash.png'),
     eye: require('../assets/images/eye.png'),
     backArrow: require('../assets/images/backArrow.png'),
