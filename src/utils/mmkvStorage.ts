@@ -1,8 +1,6 @@
-import { MMKV } from 'react-native-mmkv';
+import { createMMKV } from "react-native-mmkv";
 
-// Create MMKV instance
-const mmkv = new MMKV();
-
+export const mmkv = createMMKV();
 // Storage adapter for redux-persist
 export const mmkvStorage = {
   setItem: (key: string, value: string): Promise<void> => {
@@ -21,24 +19,10 @@ export const mmkvStorage = {
 
   removeItem: (key: string): Promise<void> => {
     return new Promise(resolve => {
-      mmkv.delete(key);
+      mmkv.remove(key);
       resolve();
     });
   },
-};
-
-export const ONBOARDING_COMPLETED_KEY = 'onboarding_completed';
-
-export const markOnboardingCompleted = () => {
-  mmkv.set(ONBOARDING_COMPLETED_KEY, 'true');
-};
-
-export const isOnboardingCompleted = (): boolean => {
-  return mmkv.getBoolean(ONBOARDING_COMPLETED_KEY) || false;
-};
-
-export const resetOnboarding = () => {
-  mmkv.delete(ONBOARDING_COMPLETED_KEY);
 };
 
 export default mmkvStorage;

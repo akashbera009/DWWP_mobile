@@ -2,7 +2,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { screenNames } from '../utils/screenNames';
 import { AuthStackParamList } from '../utils/types';
 
-import ViewProfileScreen from '../modules/userProfile/ViewProfileScreen'; // import need to be fixed
 import SignUpPage from '@dwwp/modules/auth/SignUpScreen';
 import LoginPage from '@dwwp/modules/auth/LoginScreen';
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();

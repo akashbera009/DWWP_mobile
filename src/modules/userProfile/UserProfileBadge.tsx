@@ -7,9 +7,11 @@ import { strings } from '@dwwp/utils/strings';
 import fonts from '@dwwp/utils/fonts';
 
 import { screenNames } from '@dwwp/utils/screenNames';
-import { useNavigation } from '@react-navigation/native';
+import { CommonActions, useNavigation } from '@react-navigation/native';
 import { MainStackParamList, RootStackParamList } from '@dwwp/utils/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { navigationRef } from '@dwwp/utils/navigationService';
+import { mmkvStorage } from '@dwwp/utils/mmkvStorage';
 type UserProfileBadgePropType = {
     isProfileBadgeOpen: boolean;
     onOpen: () => void
@@ -30,14 +32,24 @@ const UserProfileBadge = ({ isProfileBadgeOpen, onOpen, onClose }: UserProfileBa
         {
             title: strings.viewProfile,
             imageUrl: localImages.user,
-            onClickEvent: () =>{
+            onClickEvent: () => {
                 navigation.navigate(screenNames.ViewProfileScreen),
-                onClose?.()
+                    onClose?.()
             }
         },
         { title: strings.settings, imageUrl: localImages.settings },
         { title: strings.raiseComplaint, imageUrl: localImages.report },
-        { title: strings.logout, imageUrl: localImages.logout }
+        {
+            title: strings.logout,
+            imageUrl: localImages.logout,
+            onClickEvent: async() => { 
+                await mmkvStorage.removeItem("USER_EMAIL");
+                navigationRef?.current?.getParent()?.dispatch(CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: 'AuthStack' }],
+                }))
+            }
+        }
     ]
     useEffect(() => {
         setUserDetails(

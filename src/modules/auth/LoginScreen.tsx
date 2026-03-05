@@ -7,15 +7,89 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator
 } from "react-native";
-import { CommonActions } from '@react-navigation/native';
 
-type LoginScreenProps = {
-  navigation: any; // Replace with proper type if using TypeScript
-}
-export default function LoginScreen({ navigation }: LoginScreenProps) {
+import { FirebaseAuthTypes, getAuth, signInWithEmailAndPassword } from "@react-native-firebase/auth";
+import mmkvStorage from "@dwwp/utils/mmkvStorage";
+import { navigationRef } from "@dwwp/utils/navigationService";
+
+import { useNavigation } from '@react-navigation/native';
+
+export default function LoginScreen() {
+  const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState<boolean>(false)
+  const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null)
+
+  const [loading, setLoading] = useState<boolean>(false)
+  const handleLogin = async () => {
+    console.log('initiating login');
+    setLoading(true)
+    try {
+      const res = await signInWithEmailAndPassword(
+        getAuth(),
+        email,
+        password
+      );
+
+      const resUser = res.user;
+      console.log('user resposne ', resUser);
+
+      if (resUser) {
+        setUser(resUser);
+
+        // store in MMKV
+        const userEmail = resUser.email ?? "";
+        if (userEmail !== "") {
+          await mmkvStorage.setItem("USER_EMAIL", userEmail);
+          await mmkvStorage.setItem("USER_UID", resUser.uid);
+        }
+
+        // navigation.getParent()?.dispatch(
+        //   CommonActions.reset({
+        //     index: 0,
+        //     routes: [{ name: 'MainStack' }],
+        //   })
+        // );
+        // navigation.navigate(screenNames.MainStack,{
+        //   screen: screenNames.DashBoard,
+        // });
+        console.log("User logged in:", resUser.email);
+      } else {
+        console.log("Login failed: No user returned");
+      }
+    } catch (e) {
+      console.error("Login error:", e);
+    } finally {
+      console.log('login process completed');
+      setLoading(false)
+    }
+  };
+  const handleGotoSignUpScreen = () => {
+    // navigation.navigate(screenNames.SignUpScreen)
+  }
+  const handleSkip = () => {
+    navigationRef?.current?.reset({
+      index: 0,
+      routes: [
+        {
+          name: 'MainStack',
+          state: {
+            routes: [
+              {
+                name: 'BottomTabs',
+                state: {
+                  routes: [{ name: 'DashBoard' }],
+                },
+              },
+            ],
+          },
+        },
+      ],
+    });
+  }
 
   return (
     <View style={styles.container}>
@@ -34,31 +108,26 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         style={styles.input}
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
+        secureTextEntry={showPassword}
       />
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Sign In</Text>
+      <TouchableOpacity style={styles.button}
+        onPress={handleLogin}>
+        {!loading ?
+          <Text style={styles.buttonText}>Sign In</Text>
+          :
+          <ActivityIndicator size='small' color={colors.white} />
+        }
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate(screenNames.SignUpScreen)}
+        onPress={handleGotoSignUpScreen}
       >
         <Text style={styles.link}>Don't have an account? Sign Up</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() =>
-          navigation.getParent()?.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{ name: 'MainStack' }],
-            })
-          )
-          // navigation.navigate(screenNames.MainStack,{
-          //   screen: 'BottomTabs'
-          // })
-        }
+        onPress={handleSkip}
       >
         <Text style={styles.skip}>Skip</Text>
       </TouchableOpacity>

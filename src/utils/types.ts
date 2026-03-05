@@ -40,3 +40,9 @@ export type RootStackParamList = {
     AuthStack: NavigatorScreenParams<AuthStackParamList>;
     MainStack: NavigatorScreenParams<MainStackParamList>;
 };
+
+
+export type StoredUser = {
+    uid: string;
+    email: string;
+};
