@@ -12,7 +12,7 @@ type Props = {
 const SafeAreaContainer = ({ children, ignoreTop: ignoreTopProp }: Props) => {
 //   const { color, ignoreTop: ignoreTopFromCtx } = useSafeAreaColor();
 
-  const ignoreTop = false 
+  const ignoreTop = false
     // typeof ignoreTopProp === 'boolean' ? ignoreTopProp : ignoreTopFromCtx;
 //    ignoreTopProp
 

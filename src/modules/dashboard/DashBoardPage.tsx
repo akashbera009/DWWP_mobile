@@ -1,166 +1,166 @@
-import { ImageBackground, ScrollView, StyleSheet, Text, View, Image, Pressable } from 'react-native'
 import React, { useState } from 'react'
-import { HomeHeader } from '@dwwp/components/HomeHeader'
-import colors from '@dwwp/utils/colors'
-import { strings } from '@dwwp/utils/strings'
-import fonts from '@dwwp/utils/fonts'
-import { normalize, vh, vw } from '@dwwp/utils/dimensions'
-import { OnlineStatus } from './OnlineStatus'
-import UsagesComponent from './UsagesComponent'
-import FixedPricesComponent from './FixedPricesComponent'
-import UserProfileBadge from '../userProfile/UserProfileBadge'
-import { CustomButton } from '@dwwp/components/CustomButton'
+import {
+    View, StyleSheet, ScrollView,
+    Pressable,
+    RefreshControl,
+} from 'react-native'
+
 import { Portal } from '@gorhom/portal'
-import SwitchModal from '../servoControl/SwitchModal'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+// utils 
+import { vh, vw } from '@dwwp/utils/dimensions'
 import { showSnackbar } from '@dwwp/utils/showSnackBar'
-import { localImages } from '@dwwp/utils/localimages'
-import NotificationComponent from './NotificationComponent'
+import colors from '@dwwp/utils/colors'
 
+// components
+import FixedCharges from './FixedCharges'
+import WelcomeBanner from './WelcomeBanner'
+import HeroSummaryCard from './HeroSummaryCard'
+import UsageChart from './components/UsageChart'
+import StatGrid from './StatGrid'
+import Header from './components/Header'
+import ProfilePanel from './components/ProfilePanel'
+import NotificationPanel from './components/NotificationPanel'
+
+import SwitchModal from './components/SwitchModal'
+import DeviceSection from './DeviceSection'
+
+
+// ─── Mock Data ────────────────────────────────────────────────────────────────
+const DEVICES_INITIAL = [
+    { id: 1, name: 'Pump Station #1', status: 'online', load: 74, location: 'Zone A' },
+    { id: 2, name: 'Main Controller', status: 'online', load: 42, location: 'Zone B' },
+    { id: 3, name: 'Servo Unit #4', status: 'offline', load: 0, location: 'Zone C' },
+    { id: 4, name: 'Flow Sensor', status: 'online', load: 91, location: 'Zone A' },
+]
+
+// ─── Main Dashboard ───────────────────────────────────────────────────────────
 const DashBoardPage = () => {
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-    const [isProfileBadgeOpen, setIsProfileBadgeOpen] = useState<boolean>(false)
-    const [isNotificationTabOpen, setIsNotificationTabOpen] = useState<boolean>(false)
+    const [notifOpen, setNotifOpen] = useState(false)
+    const [profileOpen, setProfileOpen] = useState(false)
+    const [deviceList, setDeviceList] = useState(DEVICES_INITIAL)
+    const [activeTab, setActiveTab] = useState<'overview' | 'device' | 'usages'>('overview')
+    const [refreshing, setRefreshing] = React.useState(false);
+
+    const [servoState, setServoState] = useState<boolean>(false)
+    const [lastSeen, setLastSeen] = useState<number | undefined>(undefined)
+    const [limitExceeded, setLimitExceeded] = useState<boolean>(false)
+    const [isSwitchOpen, setIsSwitchOpen] = useState<boolean>(false)
+
+    const { top } = useSafeAreaInsets()
+    const onlineCount = deviceList.filter(d => d.status === 'online').length
+
+    const closeDropdowns = () => { setNotifOpen(false); setProfileOpen(false) }
+
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        setTimeout(() => {
+            showSnackbar({ message: 'Data refreshed!', type: 'success' })
+            setRefreshing(false);
+        }, 1000);
+    }, []);
+
+    // Derive device online level from lastSeen
+    const deviceOffline = lastSeen !== undefined
+        ? Math.floor((Date.now() - lastSeen) / 1000) > 60
+        : false
+
     return (
-        <View style={styles.container}>
-            <View style={styles.homeHeaderContainer}>
-                <View style={styles.logoContainer}>
-                    <Image source={localImages.dwwp_logo} style={styles.logo} />
-                    <Text style={styles.homeHeaderText}>{strings.dwwp}</Text>
-                </View>
-                <View style={styles.profileContainer}>
-                    < NotificationComponent
-                        isNotificationTabOpen={isNotificationTabOpen}
-                        onClose={() => setIsNotificationTabOpen(false)}
-                        onOpen={() => setIsNotificationTabOpen(true)}
-                    />
-                    <UserProfileBadge
-                        onClose={() => setIsProfileBadgeOpen(false)}
-                        onOpen={() => setIsProfileBadgeOpen(true)}
-                        isProfileBadgeOpen={isProfileBadgeOpen}
-                    />
-                </View>
-            </View>
-            <View style={styles.scrollContainer}>
-                <ScrollView>
-                    <View style={styles.welcomeContainer}>
-                        <Text style={styles.welcomeText}>Welcome Back Akash Bera </Text>
-                        <Text style={[styles.welcomeText, { color: colors.black }]}>x </Text>
-                    </View>
+        <View style={[styles.safeArea, { paddingTop: top, }]} >
 
-                    <UsagesComponent />
-                    <FixedPricesComponent />
+            {/* ── Header ── */}
+            <Header activeTab={activeTab} setActiveTab={setActiveTab} setProfileOpen={setProfileOpen} setNotifOpen={setNotifOpen} />
 
-                    <View style={styles.sectionHeader}>
-                        <Text style={styles.userDashBoardHeader}>{strings.deviceControl}</Text>
-                        <Image source={localImages.backArrow} style={styles.sectionHeaderBackArrow} />
-                    </View>
-                    <View style={styles.deviceControlSection}>
-                        <OnlineStatus />
-                        <View style={styles.deviceControlRightSection}>
-                            <CustomButton
-                                title='open sheet'
-                                onPress={() => setIsModalOpen(prev => !prev)}
-                                variant='secondary'
-                            />
-                            <CustomButton
-                                title='call toaster '
-                                onPress={() => {
-                                    showSnackbar({ message: 'hi', type: 'success' })
-                                }}
-                                style={{ marginTop: vh(10) }}
-                                variant='outline'
-                            />
-                        </View>
-                    </View>
-
-                </ScrollView>
-
-                {/* portals  */}
-                <Portal hostName='safe'>
-                    {isModalOpen &&
-                        <SwitchModal handleCloseModal={() => setIsModalOpen(false)} />
-                    }
+            {/* ── Dropdowns ── */}
+            {notifOpen && (
+                <Portal hostName="safe">
+                    <Pressable style={styles.dropdownBackdrop} onPress={closeDropdowns}>
+                        <NotificationPanel onClose={closeDropdowns} />
+                    </Pressable>
                 </Portal>
-            </View>
-        </View>
+            )}
+            {profileOpen && (
+                <Portal hostName="safe">
+                    <Pressable style={styles.dropdownBackdrop} onPress={closeDropdowns}>
+                        <ProfilePanel onClose={closeDropdowns} />
+                    </Pressable>
+                </Portal>
+            )}
+            {/* ── Switch Modal ── */}
+            {isSwitchOpen && (
+                <SwitchModal
+                    servoState={servoState}
+                    onToggle={(next) => {
+                        setServoState(next)
+                        // TODO: write to Firebase:
+                        // firestore().doc(`users/${email}`).update({ servoState: next })
+                    }}
+                    onClose={() => setIsSwitchOpen(false)}
+                    quotaExceeded={limitExceeded}
+                    deviceOffline={deviceOffline}
+                />
+            )}
+
+            {/* ── Scrollable Content ── */}
+            <ScrollView
+                style={styles.scroll}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }
+            >
+                {/* Welcome Row */}
+                <WelcomeBanner userName={'Akash Bera'} />
+
+                {/* Hero Summary Card */}
+                <HeroSummaryCard onlineCount={onlineCount} total={deviceList.length} />
+
+                {/* 2×2 Stat Grid */}
+                <StatGrid />
+
+                {/* Usage Chart */}
+                <UsageChart />
+
+                {/* Fixed Charges */}
+                <FixedCharges />
+
+                {/* Device Control */}
+                <DeviceSection lastSeen={lastSeen} servoState={servoState} setIsSwitchOpen={() => setIsSwitchOpen(true)} />
+
+            </ScrollView >
+
+
+        </View >
     )
 }
 
 export default DashBoardPage
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-    container: {
+    safeArea: {
         flex: 1,
-        // flexGrow : 1 , 
-    },
-    homeHeaderContainer: {
         backgroundColor: colors.primary,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between'
     },
-    profileContainer: {
-        marginRight: vw(16),
-        flexDirection: 'row',
-        alignItems: 'center'
+    dropdownBackdrop: {
+        position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
+        zIndex: 300,
     },
-    logoContainer:{
-        flexDirection : 'row', 
-        alignItems : 'center'
+    // Scroll
+    scroll: {
+        flex: 1,
+        backgroundColor: colors.overlayBackground,
     },
-    logo: {
-        height: vh(30),
-        width: vw(30),
-        resizeMode: 'contain',
-        borderRadius : normalize(10),
-        marginLeft: vw(16)
+    scrollContent: {
+        paddingHorizontal: vw(16),
+        paddingTop: vh(16),
+        paddingBottom: vh(90),
+        gap: vh(14),
     },
-    homeHeaderText: {
-        fontFamily: fonts.Bold,
-        fontSize: normalize(24),
-        color: colors.white,
-        marginHorizontal: vw(8),
-        marginVertical: vh(6)
-    },
-    scrollContainer: {
-        flexGrow: 1,
-        paddingBottom: vh(50)// unnecessary 
-    },
-    welcomeContainer: {
-        backgroundColor: colors.lightGreen,
-        marginHorizontal: vw(16),
-        marginVertical: vh(10),
-        padding: normalize(10),
-        borderRadius: normalize(20),
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-    },
-    welcomeText: {
-        fontFamily: fonts.Medium,
-        fontSize: normalize(16),
-        color: colors.primary
-    },
-    sectionHeader: {
-        marginVertical: vh(8),
-        flexDirection: 'row',
-        alignItems: 'center'
-    },
-    userDashBoardHeader: {
-        fontFamily: fonts.Bold,
-        fontSize: normalize(16),
-        color: colors.primary,
-        marginHorizontal: vw(16)
-    },
-    sectionHeaderBackArrow: {
-        transform: [{ rotate: '180deg' }]
-    },
-    deviceControlSection: {
-        flexDirection: 'row',
-        marginHorizontal: vw(16),
-        marginVertical: vh(8)
-    },
-    deviceControlRightSection: {
-        margin: normalize(8)
-    }
+
 })

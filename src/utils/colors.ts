@@ -13,6 +13,8 @@ export default {
   // Primary colors
   primary: '#2B6568',
   primaryDisabled: '#4A8A8D',
+  primaryLight: 'rgba(43,101,104,0.12)',
+  primaryDark:'#1e4a4d',
   secondary: '#7B68EE',
 
   // Text colors
@@ -98,6 +100,7 @@ export default {
   todayIndicator: '#2B6568',
   slotCardBackground: '#F8F9FA',
   slotCardBorder: '#E1E8ED',
+  cardShadow:'rgba(43,101,104,0.08)',
   addTimeText: '#2B6568',
   todayTextBackground: 'rgba(50, 194, 202, 0.15)',
 

@@ -41,11 +41,11 @@ function App() {
               console.log(' NavigationContainer is ready');
             }}
           >
-            <SafeAreaContainer>
+            {/* <SafeAreaContainer> */}
               <RootNavigator />
               <ToastContainer />
               <PortalHost name="safe" />
-            </SafeAreaContainer>
+            {/* </SafeAreaContainer> */}
           </NavigationContainer>
           {/* </PersistGate> */}
           {/* </Provider> */}
