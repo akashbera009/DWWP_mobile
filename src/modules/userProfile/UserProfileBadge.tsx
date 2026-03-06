@@ -26,7 +26,10 @@ const UserProfileBadge = ({ isProfileBadgeOpen, onOpen, onClose }: UserProfileBa
     type MainStackNavigationProp =
         NativeStackNavigationProp<MainStackParamList>;
 
+        type RootStackNavigationProp =
+        NativeStackNavigationProp<RootStackParamList>;
     const navigation = useNavigation<MainStackNavigationProp>();
+    const navigationAuth = useNavigation<RootStackNavigationProp >();
     const [userDetails, setUserDetails] = useState<user | null>(null)
     const useProfileMenuItem = [
         {
@@ -42,12 +45,19 @@ const UserProfileBadge = ({ isProfileBadgeOpen, onOpen, onClose }: UserProfileBa
         {
             title: strings.logout,
             imageUrl: localImages.logout,
-            onClickEvent: async() => { 
-                await mmkvStorage.removeItem("USER_EMAIL");
-                navigationRef?.current?.getParent()?.dispatch(CommonActions.reset({
-                    index: 0,
-                    routes: [{ name: 'AuthStack' }],
-                }))
+            onClickEvent: async () => {
+                await mmkvStorage.setItem("USER_EMAIL", '');
+                console.log('userEmail cleared to space');
+
+                navigationAuth.getParent()?.getParent()?.dispatch(
+                    CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: screenNames.AuthStack }],
+                    })
+                )
+                // navigationAuth.navigate(screenNames.AuthStack, {
+                //     screen: screenNames.LoginScreen
+                // })
             }
         }
     ]

@@ -1,5 +1,5 @@
 import colors from "@dwwp/utils/colors";
-import { screenNames } from "@dwwp/utils/screenNames";
+import { ScreenNames, screenNames } from "@dwwp/utils/screenNames";
 import React, { useState } from "react";
 import {
   View,
@@ -15,9 +15,14 @@ import mmkvStorage from "@dwwp/utils/mmkvStorage";
 import { navigationRef } from "@dwwp/utils/navigationService";
 
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { AuthStackParamList, RootStackParamList } from "@dwwp/utils/types";
 
+type NavigationType = NativeStackNavigationProp<AuthStackParamList>;
+type RootNavigationType = NativeStackNavigationProp<RootStackParamList>;
 export default function LoginScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationType>();
+  const navigationRoot = useNavigation<RootNavigationType>();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState<boolean>(false)
@@ -46,16 +51,14 @@ export default function LoginScreen() {
           await mmkvStorage.setItem("USER_EMAIL", userEmail);
           await mmkvStorage.setItem("USER_UID", resUser.uid);
         }
-
-        // navigation.getParent()?.dispatch(
-        //   CommonActions.reset({
-        //     index: 0,
-        //     routes: [{ name: 'MainStack' }],
-        //   })
-        // );
-        // navigation.navigate(screenNames.MainStack,{
-        //   screen: screenNames.DashBoard,
+        // navigation.getParent()?.navigate(screenNames.MainStack, {
+        //   screen: 'BottomTabs',
+        //   params: {
+        //     screen: 'DashBoard',
+        //   },
         // });
+       navigationRoot.navigate(screenNames.MainStack as any)
+
         console.log("User logged in:", resUser.email);
       } else {
         console.log("Login failed: No user returned");
@@ -68,27 +71,18 @@ export default function LoginScreen() {
     }
   };
   const handleGotoSignUpScreen = () => {
-    // navigation.navigate(screenNames.SignUpScreen)
+    navigation.navigate(screenNames.SignUpScreen)
   }
   const handleSkip = () => {
-    navigationRef?.current?.reset({
+    navigationRef.current?.getParent()?.reset({
       index: 0,
-      routes: [
-        {
-          name: 'MainStack',
-          state: {
-            routes: [
-              {
-                name: 'BottomTabs',
-                state: {
-                  routes: [{ name: 'DashBoard' }],
-                },
-              },
-            ],
-          },
+      routes: [{ name: 'MainStack' , params: {
+        screen: 'BottomTabs',
+        params: {
+          screen: 'DashBoard',
         },
-      ],
-    });
+      }}],
+    })
   }
 
   return (

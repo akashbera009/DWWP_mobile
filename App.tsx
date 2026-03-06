@@ -37,7 +37,6 @@ function App() {
           {/* <PersistGate loading={null} persistor={persister}> */}
           <NavigationContainer
             ref={navigationRef}
-            // linking={deepLinkConfig}
             onReady={() => {
               console.log(' NavigationContainer is ready');
             }}
