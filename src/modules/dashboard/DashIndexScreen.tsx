@@ -7,8 +7,7 @@ import {
 import { Portal } from '@gorhom/portal'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 // utils 
-import { screenWidth, vh, vw } from '@dwwp/utils/dimensions'
-import { showSnackbar } from '@dwwp/utils/showSnackBar'
+import { screenWidth, vh, vw } from '@dwwp/utils/dimensions' 
 import colors from '@dwwp/utils/colors'
 import { getStoredUserEmail } from '@dwwp/utils/commonFunctions'
 
@@ -46,11 +45,9 @@ const DashIndexScreen = () => {
         (idx: number) => {
             setActiveTab(idx)
             scrolRef?.current?.scrollTo({
-                y: screenWidth * idx,
+                x: screenWidth * idx,
                 animated: true
             })
-            console.log('should  have to scroll to ', screenWidth * idx);
-
         }, []
     )
 
@@ -73,7 +70,6 @@ const DashIndexScreen = () => {
             if (!userEmail) {
                 return
             } else {
-                console.log('dashboard page ', userEmail);
                 setUserEmail(userEmail)
             }
         }
@@ -150,6 +146,7 @@ const DashIndexScreen = () => {
                         setIsSwitchOpen={() => setIsSwitchOpen(true)}
                     />
                 </View>
+
                 <View style={styles.page2}>
                     <UsageChart />
                 </View>

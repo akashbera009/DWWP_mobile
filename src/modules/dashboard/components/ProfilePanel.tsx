@@ -70,13 +70,6 @@ const ProfilePanel = ({ onClose }: { onClose: () => void }) => {
     }, []);
     return (
         <View style={[styles.dropdownPanel, { right: vw(12), width: vw(200) }]}>
-            {/* <View style={[styles.dropdownHeader, { gap: normalize(10) }]}>
-                <Avatar name="Akash Bera" size={40} />
-                <View>
-                    <Text style={styles.dropdownTitle}>Akash Bera</Text>
-                    <Text style={styles.cardSubtitle}>Admin</Text>
-                </View>
-            </View> */}
             <View style={styles.profileSection}>
                 <Image
                     source={userDetails?.imageUrl}
@@ -149,7 +142,8 @@ const styles = StyleSheet.create({
     individualContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: vh(6)
+        marginVertical: vh(6),
+        marginLeft: vw(8)
     },
     borderTop: {
         borderTopWidth: normalize(1),

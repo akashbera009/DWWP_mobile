@@ -110,7 +110,7 @@ const BottomTabNavigator = () => {
     <Tab.Navigator
       screenOptions={({ route }) => {
         // const routeName = getFocusedRouteNameFromRoute(route);
-// console.log('routename ' , routeName);
+        // console.log('routename ' , routeName);
 
         // const tabBarVisible =
         //   routeName === undefined || // root screen
@@ -134,7 +134,6 @@ const BottomTabNavigator = () => {
     >
       <Tab.Screen
         name={screenNames.DashBoard}
-        // component={DashBoardPage}
         component={DashIndexScreen}
         options={{
           tabBarIcon: HomeTabIcon,

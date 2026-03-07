@@ -41,7 +41,9 @@ export default {
   lightGreenBackground: 'rgba(43, 101, 104, 1)',
   transparentBackground07: 'rgba(0, 0, 0, 0.7)',
   lightGreen: 'rgba(50, 194, 202, 0.1)',
+  indicatorBackgroundColor: 'rgba(255,255,255,0.18)',
 
+  // 'rgba(43,101,104,0.10)'  
   // Border colors
   border: '#E1E8ED',
   disabledBorder: '#D5DBDB',

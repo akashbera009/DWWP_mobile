@@ -39,8 +39,8 @@ const DeviceSection = ({ lastSeen, servoState, setIsSwitchOpen }: DeviceSectionP
                 >
                     <LinearGradient
                         colors={servoState
-                            ? ['#2B6568', '#1e4a4d']
-                            : ['#F4F7F8', '#EFF2F5']}
+                            ? ['#58bec3', '#1e4a4d']
+                            : ['#cee9f1', '#EFF2F5']}
                         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                         style={styles.valveTop}
                     >
@@ -122,9 +122,8 @@ const styles = StyleSheet.create({
         borderTopColor: colors.border,
         borderTopWidth : normalize(5), 
         flex: 1,
-        backgroundColor : colors.primary,
         borderRadius: normalize(22),
-        overflow: 'hidden',
+        overflow: 'hid\den',
         shadowRadius: 12,
         elevation: 10,
     },

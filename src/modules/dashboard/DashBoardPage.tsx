@@ -1,14 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback} from 'react'
 import {
     View, StyleSheet, ScrollView,
     RefreshControl,
 } from 'react-native'
-
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+ 
 // utils 
 import { vh, vw } from '@dwwp/utils/dimensions'
-import { showSnackbar } from '@dwwp/utils/showSnackBar'
-import { getStoredUserEmail } from '@dwwp/utils/commonFunctions'
+import { showSnackbar } from '@dwwp/utils/showSnackBar' 
 
 // components
 import FixedCharges from './FixedCharges'
@@ -55,7 +53,7 @@ const DashBoardPage = ({ lastSeen, servoState, setIsSwitchOpen }: DashBoardPageP
                 <WelcomeBanner userName={'Akash Bera'} />
 
                 {/* Hero Summary Card */}
-                <HeroSummaryCard onlineCount={2} total={4} />
+                <HeroSummaryCard />
 
                 {/* 2×2 Stat Grid */}
                 <StatGrid />

@@ -4,28 +4,7 @@ import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
 import LinearGradient from 'react-native-linear-gradient'
 import Pill from './Pill'
-
-const colors = {
-    primary: '#2B6568',
-    primaryLight: 'rgba(43,101,104,0.12)',
-    primaryDark: '#1e4a4d',
-    activeDot: '#32C2CA',
-    activeDotLight: 'rgba(50,194,202,0.18)',
-    lightGreen: 'rgba(50,194,202,0.08)',
-    white: '#FFFFFF',
-    neutralBlack: '#041617',
-    neutralBodyText: '#6A7C92',
-    background: '#F4F7F8',
-    border: '#E1E8ED',
-    success: '#27AE60',
-    error: '#E74C3C',
-    warning: '#F39C12',
-    lightGray: '#F8F9FA',
-    inputBackground: '#EFF2F5',
-    shadow: 'rgba(43,101,104,0.10)',
-    cardShadow: 'rgba(43,101,104,0.08)',
-    primaryDisabled: '#4A8A8D',
-}
+import colors from '@dwwp/utils/colors'
 
 const USAGE_DATA = [
     { month: 'Aug', value: 340 },
@@ -83,7 +62,7 @@ const UsageChart = () => {
                                     style={[styles.bar, { height: barH }]}
                                 />
                             ) : (
-                                <View style={[styles.bar, { height: barH, backgroundColor: i < activeBar ? 'rgba(43,101,104,0.10)' : colors.inputBackground }]} />
+                                <View style={[styles.bar, { height: barH, backgroundColor: i < activeBar ? colors.disabledBorder : colors.inputBackground }]} />
                             )}
                             <Text style={[styles.barLabel, isActive && { color: colors.primary, fontFamily: fonts.Bold }]}>
                                 {d.month}

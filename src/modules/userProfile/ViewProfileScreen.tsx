@@ -10,12 +10,11 @@ import {
 import colors from '@dwwp/utils/colors'
 import fonts from '@dwwp/utils/fonts'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
-import { CustomHeader } from '@dwwp/components/CustomHeader';
 import { goBack, navigationRef } from '@dwwp/utils/navigationService';
 import { strings } from '@dwwp/utils/strings';
 import { localImages } from '@dwwp/utils/localimages';
-import { Screen } from 'react-native-screens';
 import { screenNames } from '@dwwp/utils/screenNames';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const ViewProfileScreen = () => {
   // Dummy user data (replace with real data later)
   const user = {
@@ -26,10 +25,9 @@ const ViewProfileScreen = () => {
     address: 'Jaipur, Rajasthan',
     status: 'Active',
   };
-
+  const { top } = useSafeAreaInsets()
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: vh(40) }}>
-      {/* Header */}
+    <View style={[styles.containerWrapper, { paddingTop: top }]}>
       <View style={styles.homeHeaderContainer}>
         <TouchableOpacity
           onPress={() => goBack()}>
@@ -40,45 +38,49 @@ const ViewProfileScreen = () => {
         </TouchableOpacity>
         <Text style={styles.homeHeaderText}>{strings.viewProfile}</Text>
       </View>
-      <View style={styles.content}>
+      <ScrollView style={[styles.container]} contentContainerStyle={{ paddingBottom: vh(40) }}>
+        {/* Header */}
 
-        <View style={styles.header}>
-          <Image
-            source={{ uri: 'https://i.pravatar.cc/150?img=12' }}
-            style={styles.avatar}
-          />
-          <Text style={styles.name}>{user.name}</Text>
-          <Text style={styles.email}>{user.email}</Text>
+        <View style={styles.content}>
+
+          <View style={styles.header}>
+            <Image
+              source={{ uri: 'https://i.pravatar.cc/150?img=12' }}
+              style={styles.avatar}
+            />
+            <Text style={styles.name}>{user.name}</Text>
+            <Text style={styles.email}>{user.email}</Text>
+          </View>
+
+          {/* Info Card */}
+          <View style={styles.card}>
+            <ProfileRow label="Phone" value={user.phone} />
+            <ProfileRow label="User ID" value={user.userId} />
+            <ProfileRow label="Address" value={user.address} />
+            <ProfileRow
+              label="Account Status"
+              value={user.status}
+              valueStyle={{ color: '#10B981' }}
+            />
+          </View>
+
+          {/* Buttons */}
+          <TouchableOpacity style={styles.editButton}>
+            <Text style={styles.editButtonText}>Edit Profile</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => navigationRef.current?.reset({
+              index: 0,
+              routes: [{ name: screenNames.AuthStack }],
+            })}
+            style={styles.logoutButton}>
+            <Text style={styles.logoutButtonText}>Logout</Text>
+          </TouchableOpacity>
+
         </View>
-
-        {/* Info Card */}
-        <View style={styles.card}>
-          <ProfileRow label="Phone" value={user.phone} />
-          <ProfileRow label="User ID" value={user.userId} />
-          <ProfileRow label="Address" value={user.address} />
-          <ProfileRow
-            label="Account Status"
-            value={user.status}
-            valueStyle={{ color: '#10B981' }}
-          />
-        </View>
-
-        {/* Buttons */}
-        <TouchableOpacity style={styles.editButton}>
-          <Text style={styles.editButtonText}>Edit Profile</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => navigationRef.current?.reset({
-            index: 0,
-            routes: [{ name: screenNames.AuthStack }],
-          })}
-          style={styles.logoutButton}>
-          <Text style={styles.logoutButtonText}>Logout</Text>
-        </TouchableOpacity>
-
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -98,10 +100,13 @@ const ProfileRow = ({ label, value, valueStyle }: ProfileRowProps) => (
 );
 
 const styles = StyleSheet.create({
-  container: {
+  containerWrapper: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
-    // paddingHorizontal: vw(16),
+    backgroundColor: colors.primary
+  },
+  container: {
+    flexGrow: 1,
+    backgroundColor: colors.overlayBackground,
   },
   homeHeaderContainer: {
     backgroundColor: colors.primary,
