@@ -18,7 +18,6 @@ const MAX_VAL = Math.max(...USAGE_DATA.map(d => d.value))
 
 const UsageChart = () => {
     const [activeBar, setActiveBar] = useState(USAGE_DATA.length - 1)
-    const activeData = USAGE_DATA[activeBar]
 
     return (
         <View style={styles.card}>

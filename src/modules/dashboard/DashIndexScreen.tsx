@@ -7,7 +7,7 @@ import {
 import { Portal } from '@gorhom/portal'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 // utils 
-import { screenWidth, vh, vw } from '@dwwp/utils/dimensions' 
+import { screenWidth, vh, vw } from '@dwwp/utils/dimensions'
 import colors from '@dwwp/utils/colors'
 import { getStoredUserEmail } from '@dwwp/utils/commonFunctions'
 
@@ -18,7 +18,7 @@ import NotificationPanel from './components/NotificationPanel'
 import ControlSwitchModal from './components/ControlSwitchModal'
 import DeviceSection from './DeviceSection'
 import DashBoardPage from './DashBoardPage'
-import UsageChart from './components/UsageChart'
+import MonthlyUsageDetail, { MOCK_ADDONS, MOCK_MONTH_DATA } from './Monthlyusagedetail'
 
 const SCREEN_WIDTH = screenWidth
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
@@ -148,7 +148,9 @@ const DashIndexScreen = () => {
                 </View>
 
                 <View style={styles.page2}>
-                    <UsageChart />
+                    <ScrollView showsVerticalScrollIndicator={false}>
+                        <MonthlyUsageDetail monthData={MOCK_MONTH_DATA} addons={MOCK_ADDONS} />
+                    </ScrollView>
                 </View>
 
             </ScrollView>
@@ -179,7 +181,7 @@ const styles = StyleSheet.create({
     },
     page2: {
         width: SCREEN_WIDTH,
-        marginTop: vh(16),
+        // paddingTop: vh(16),
         paddingHorizontal: vw(8),
     },
 })
