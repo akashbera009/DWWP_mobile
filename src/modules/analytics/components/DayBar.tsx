@@ -42,7 +42,7 @@ interface DayBarProps {
 
 const DayBar: React.FC<DayBarProps> = ({ day, value, max, isToday, avg }) => {
     const anim = useRef(new Animated.Value(0)).current
-    const BAR_MAX_H = normalize(60)
+    const BAR_MAX_H = normalize(90)
 
     useEffect(() => {
         Animated.timing(anim, {

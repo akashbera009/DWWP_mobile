@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Platform, Image } from 'react-native';
+import { StyleSheet, Text, View, Image } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 // custom imports
 import { BottomTabParamList } from '@dwwp/utils/types';
@@ -7,15 +7,12 @@ import { localImages } from '@dwwp/utils/localimages';
 import colors from '@dwwp/utils/colors';
 import { normalize, vh, vw } from '@dwwp/utils/dimensions';
 import fonts from '@dwwp/utils/fonts';
-
-import DashBoardPage from '@dwwp/modules/dashboard/DashBoardPage';
-
-import PasymentsDashboard from '@dwwp/modules/paymentsDashboard/PaymentsDashboard';
-
 import { screenNames } from '@dwwp/utils/screenNames';
 
+import PasymentsDashboard from '@dwwp/modules/paymentsDashboard/PaymentsDashboard';
 import AnalyticsPage from '@dwwp/modules/analytics/AnalyticsPage';
 import DashIndexScreen from '@dwwp/modules/dashboard/DashIndexScreen';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Tab Navigator
 const Tab = createBottomTabNavigator<BottomTabParamList>();
@@ -73,22 +70,15 @@ const TabIcon = ({ routeName, focused }: TabIconProps) => {
       >
         {routeName}
       </Text>
-      <View
+      {/* <View
         style={[
           styles.dot,
           { backgroundColor: focused ? colors.primary : colors.white },
         ]}
-      />
+      /> */}
     </View>
   );
 };
-
-// Extract TabBarBackground component
-const TabBarBackground = () => (
-  <View style={styles.tabBarWrapper}>
-    <View style={styles.tabBarBackground1} />
-  </View>
-);
 
 // Home tab icon component
 const HomeTabIcon = (props: TabIconProps) => (
@@ -105,31 +95,20 @@ const AccountTabIcon = (props: TabIconProps) => (
 );
 
 const BottomTabNavigator = () => {
-
+  const { bottom } = useSafeAreaInsets()
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => {
-        // const routeName = getFocusedRouteNameFromRoute(route);
-        // console.log('routename ' , routeName);
-
-        // const tabBarVisible =
-        //   routeName === undefined || // root screen
-        //   routeName === screenNames.DashBoard ||
-        //   routeName === screenNames.PaymentDashBoard ||
-        //   routeName === screenNames.AnalyticsPage;
-
-        return {
-          tabBarActiveTintColor: colors.primary,
-          tabBarInactiveTintColor: colors.primaryBlack,
-          // tabBarStyle: tabBarVisible
-          //   ? [styles.tabBar]
-          //   : { display: 'none' },
-          headerShown: false,
-          tabBarShowLabel: false,
-          animation: 'shift',
-          // tabBarHideOnKeyboard: true,
-          tabBarBackground: TabBarBackground,
-        };
+      screenOptions={{
+        headerShown: false,
+        tabBarShowLabel: false,
+        animation: 'shift',
+        tabBarStyle: {
+          height: vh(55) + bottom,
+          backgroundColor: colors.white,
+          shadowColor: colors.black,
+          shadowOpacity: 1,
+          elevation: 10 
+        }
       }}
     >
       <Tab.Screen
@@ -159,40 +138,10 @@ const BottomTabNavigator = () => {
 };
 
 const styles = StyleSheet.create({
-  tabBar: {
-    height: Platform.OS === 'ios' ? vh(84) : vh(69),
-    borderTopWidth: 0,
-    elevation: 10, // Android shadow
-    backgroundColor: colors.white,
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingTop: Platform.OS === 'ios' ? vh(19) : vh(14),
-    paddingBottom: vh(0),
-    shadowColor: colors.black, // iOS shadow
-    shadowOffset: { width: 2, height: -2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
-  },
-
-  tabBarWrapper: {
-    overflow: 'hidden',
-    height: Platform.OS === 'ios' ? vh(84) : vh(69),
-  },
-
-  tabBarBackground1: {
-    backgroundColor: colors.white,
-    flex: 1,
-    shadowColor: colors.black,
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-    height: '100%',
-  },
+ 
   tabBarLabel: {
     fontSize: normalize(11),
-    marginTop: vh(3),
+    marginTop: vh(1),
     textAlign: 'center',
     textTransform: 'capitalize',
     width: vw(120),
@@ -210,7 +159,7 @@ const styles = StyleSheet.create({
   iconWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: vh(25),
+    paddingTop: vh(20),
     width: vw(25),
   },
   iconContainer: {
@@ -223,7 +172,7 @@ const styles = StyleSheet.create({
   },
   dot: {
     paddingTop: vh(10),
-    width: normalize(6),
+    width: '100%',
     height: normalize(6),
     borderRadius: normalize(3),
   },

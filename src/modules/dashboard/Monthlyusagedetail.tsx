@@ -293,7 +293,7 @@ const MonthlyUsageDetail: React.FC<Props> = ({
     const basePct = Math.min(baseConsumed / Math.max(monthData.limit, 1), 1)
     const overallPct = Math.min(totalConsumed / Math.max(effectiveLimit, 1), 1)
 
-    const [baseQuotaCollapse, setBaseQuotaCollapse] = useState<boolean>(true)
+    const [baseQuotaCollapse, setBaseQuotaCollapse] = useState<boolean>(false)
     const [addonSectionCollapse, setAddonSectionCollapse] = useState<boolean>(true)
 
     // Per-addon consumed (waterfall: base limit consumed first, then addons in order)

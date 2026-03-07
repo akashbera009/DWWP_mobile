@@ -1,132 +1,224 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React, { useEffect } from 'react'
+import React from 'react'
 import LinearGradient from 'react-native-linear-gradient'
 import { normalize, vh } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
 import colors from '@dwwp/utils/colors'
 import Animated, {
     SensorType,
-    useAnimatedSensor, useAnimatedStyle,
-    useDerivedValue, useSharedValue
+    useAnimatedSensor,
+    useAnimatedStyle,
+    useDerivedValue,
+    useSharedValue,
+    withSpring,
+} from 'react-native-reanimated'
+
+// ─── Tuning constants ─────────────────────────────────────────────────────────
+//
+//  MAX_DEG    – hard ceiling on tilt angle. 8° feels premium without being dizzy.
+//  SCALE      – gyro units → degrees. Lower = calmer reaction.
+//  SMOOTHING  – EMA alpha. Higher = snappier, lower = more lag/buttery.
+//               0.04 gives a nice ~60ms lag that feels physical.
+//  DEADZONE   – ignore micro-vibrations below this rad/s threshold.
+//  DECAY      – how fast velocity bleeds to zero when device is still.
+//               0.88 = slow graceful return; 0.92 = even lazier.
+//  SPRING     – withSpring config for the snap-back to 0 when truly still.
+//
+const MAX_DEG = 8       // max tilt in degrees (was 15 — too aggressive)
+const SCALE = 2    // gravity is in m/s², 9.8 = full tilt, so scale down
+const DEADZONE = 0.08   // gravity has more ambient noise than gyro
+const SMOOTHING = 0.12   // slightly snappier since gravity is already stable
+const DECAY = 0.88    // velocity decay per frame when near-still
+
+const SPRING_CFG = {
+    damping: 10,   // high damping = no oscillation, settles smoothly
+    stiffness: 280,   // low stiffness = slow, lazy spring-back
+    mass: .8,  // slightly heavy = more inertia, premium feel
 }
-    from 'react-native-reanimated'
 
 const clamp = (v: number, lo: number, hi: number) => {
     'worklet'
     return Math.max(lo, Math.min(hi, v))
 }
 
-const maxDeg = 15
-const scale = 20
-const smoothing = 0.08   // 0.08 is a good starting point
-const deadzone = 0.01
-const interval = 16
+// ─── How it works ─────────────────────────────────────────────────────────────
+//
+//  1. Gyro readings are noisy. We apply an EMA (exponential moving average)
+//     with a low alpha (SMOOTHING=0.05) to smooth out jitter. This introduces
+//     intentional lag that makes motion feel weighty and physical.
+//
+//  2. We track "velocity" (the EMA-filtered gyro value) and apply DECAY each
+//     frame when the raw reading is near-zero. This means the card continues
+//     drifting slightly even after you stop moving, then settles — exactly
+//     like a physical card on a spring.
+//
+//  3. DEADZONE filters out the ambient vibration every phone has at rest.
+//     Without it, the card trembles even on a still desk.
+//
+//  4. When velocity drops below a tiny threshold, we trigger withSpring back
+//     to zero. This gives the "snap home" feel — the card gracefully returns
+//     to flat with a nice spring curve, not a hard cut.
+//
+//  5. MAX_DEG clamps the output so the card never over-rotates even if you
+//     spin the phone quickly. This is the "professional ceiling".
 
-const HeroSummaryCard = () => {
-    const ringRadius = 38
-    const circumference = 2 * Math.PI * ringRadius
-    const usagePct = 0.67  // 72% of monthly budget used
-    const strokeDash = circumference * usagePct
+// interface Props {
+//     onlineCount: number
+//     total: number
+//     usagePct?: number        // 0–1, defaults to 0.72
+//     billAmount?: string
+//     billDue?: string
+//     todayUsage?: string | number
+//     monthUsage?: string | number
+// }
+const onlineCount = 2;
+const total = 4;
+const usagePct = 0.72;
+const billAmount = '₹2,340';
+const billDue = 'Due in 8 days';
+const todayUsage = 590;
+const monthUsage = 2300
 
-    const sensor = useAnimatedSensor(SensorType.GYROSCOPE, { interval })
-    const fx = useSharedValue(0)
-    const fy = useSharedValue(0)
-    const fz = useSharedValue(0)
+const HeroSummaryCard: React.FC = () => {
+    // const sensor = useAnimatedSensor(SensorType.GYROSCOPE, { interval: 16 })
+    const sensor = useAnimatedSensor(SensorType.GRAVITY, { interval: 16 })
+
+    // Smoothed velocity values (EMA output)
+    const vx = useSharedValue(0)
+    const vy = useSharedValue(0)
+
+    // Final display angles (fed into transform)
+    const angleX = useSharedValue(0)
+    const angleY = useSharedValue(0)
+
+    // Track whether spring-back is already running so we don't retrigger it
+    const isReturning = useSharedValue(false)
 
     useDerivedValue(() => {
-        const a = smoothing   // <-- this is just a number; good to re-declare here
-        const dz = deadzone
+        'worklet'
+        // const rawX = sensor.sensor.value.x
+        // const rawY = sensor.sensor.value.y
+        const rawX = -sensor.sensor.value.x   // phone leans left → card tilts right
+        const rawY = sensor.sensor.value.y   // phone tilts toward you → card top comes forward
 
-        const rawX = sensor.sensor.value.x
-        const rawY = sensor.sensor.value.y
-        const rawZ = sensor.sensor.value.z
+        // Apply deadzone — treat micro-noise as zero
+        const rX = Math.abs(rawX) < DEADZONE ? 0 : rawX
+        const rY = Math.abs(rawY) < DEADZONE ? 0 : rawY
 
-        const rX = Math.abs(rawX) < dz ? 0 : rawX
-        const rY = Math.abs(rawY) < dz ? 0 : rawY
-        const rZ = Math.abs(rawZ) < dz ? 0 : rawZ
+        // EMA smoothing — blends new reading into running average slowly
+        vx.value = vx.value + SMOOTHING * (rX - vx.value)
+        vy.value = vy.value + SMOOTHING * (rY - vy.value)
 
-        fx.value = fx.value + a * (rX - fx.value)
-        fy.value = fy.value + a * (rY - fy.value)
-        fz.value = fz.value + a * (rZ - fz.value)
-    })
+        // Check if device is effectively still
+        const stillX = Math.abs(vx.value) < 0.04
+        const stillY = Math.abs(vy.value) < 0.04
 
-    const animatedStyle = useAnimatedStyle(() => {
-        const degX = clamp(fx.value * scale, -maxDeg, maxDeg)
-        const degY = clamp(fy.value * scale, -maxDeg, maxDeg)
-        const degZ = clamp(fz.value * scale, -maxDeg, maxDeg)
+        const isStill = stillX && stillY
 
-        return {
-            transform: [
-                { perspective: 600 },
-                // note: rotateX rotates the top towards/away from the screen
-                { rotateX: `${degX}deg` },
-                { rotateY: `${degY}deg` },
-                { rotateZ: `${degZ}deg` }
-            ]
+        if (isStill) {
+            // Gradually decay toward zero (gives the drifting-to-rest feel)
+            vx.value = vx.value * DECAY
+            vy.value = vy.value * DECAY
+
+            // Once velocity is tiny enough, spring back to neutral
+            const tinyX = Math.abs(vx.value) < 0.015
+            const tinyY = Math.abs(vy.value) < 0.015
+
+            if (tinyX && tinyY && !isReturning.value) {
+                isReturning.value = true
+                angleX.value = withSpring(0, SPRING_CFG)
+                angleY.value = withSpring(0, SPRING_CFG, () => {
+                    isReturning.value = false
+                })
+            }
+        } else {
+            // Device is moving — update angles directly from velocity
+            isReturning.value = false
+
+            // rotateX tilts top/bottom, driven by Y-axis gyro
+            // rotateY tilts left/right, driven by X-axis gyro
+            // Note the intentional axis swap — this maps physical motion correctly
+            angleX.value = clamp(vy.value * SCALE, -MAX_DEG, MAX_DEG)
+            angleY.value = clamp(vx.value * SCALE, -MAX_DEG, MAX_DEG)
         }
     })
 
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [
+            { perspective: 700 },
+            { rotateX: `${angleX.value}deg` },
+            { rotateY: `${angleY.value}deg` },
+        ],
+    }))
+
     return (
-        <Animated.View style={[animatedStyle]}>
+        <Animated.View style={animatedStyle}>
             <LinearGradient
                 colors={[colors.primary, colors.primaryDark, '#163a3c']}
                 start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
                 style={styles.heroCard}
             >
-                {/* Decorative circle blobs */}
+                {/* Decorative blobs */}
                 <View style={styles.heroBlobTop} />
                 <View style={styles.heroBlobBottom} />
 
-                {/* Left: text content */}
+                {/* ── Left: text ── */}
                 <View style={styles.heroLeft}>
                     <Text style={styles.heroLabel}>Current Bill</Text>
-                    <Text style={styles.heroAmount}>₹2,340</Text>
+                    <Text style={styles.heroAmount}>{billAmount}</Text>
+
                     <View style={styles.heroRow}>
-                        <View style={[styles.heroBadge, { backgroundColor: 'rgba(50,194,202,0.18)' }]}>
-                            <Text style={styles.heroBadgeText}>Due in 8 days</Text>
+                        <View style={styles.heroBadge}>
+                            <Text style={styles.heroBadgeText}>{billDue}</Text>
                         </View>
                     </View>
+
                     <View style={styles.heroStats}>
                         <View style={styles.heroStatItem}>
-                            <Text style={styles.heroStatValue}>590</Text>
+                            <Text style={styles.heroStatValue}>{todayUsage}L</Text>
                             <Text style={styles.heroStatUnit}>Today</Text>
                         </View>
                         <View style={styles.heroStatDivider} />
                         <View style={styles.heroStatItem}>
-                            <Text style={styles.heroStatValue}>2300</Text>
+                            <Text style={styles.heroStatValue}>{monthUsage}L</Text>
                             <Text style={styles.heroStatUnit}>This month</Text>
+                        </View>
+                        <View style={styles.heroStatDivider} />
+                        <View style={styles.heroStatItem}>
+                            <Text style={styles.heroStatValue}>{onlineCount}/{total}</Text>
+                            <Text style={styles.heroStatUnit}>Devices</Text>
                         </View>
                     </View>
                 </View>
 
-                {/* Right: circular ring progress */}
+                {/* ── Right: ring gauge ── */}
                 <View style={styles.heroRight}>
-                    <View style={styles.ringContainer}>
-                        {/* SVG-like ring using View rotation trick */}
-                        <View style={styles.ringOuter}>
-                            <View style={styles.ringTrack} />
-                            {/* Arc segments via rotated views */}
-                            {Array.from({ length: 20 }).map((_, i) => {
-                                const angle = (i / 20) * 360
-                                const active = i < Math.round(20 * usagePct)
-                                return (
-                                    <View
-                                        key={i}
-                                        style={[
-                                            styles.ringSegment,
-                                            {
-                                                transform: [{ rotate: `${angle}deg` }],
-                                                borderTopColor: active ? colors.activeDot : 'transparent',
-                                                opacity: active ? (0.5 + (i / 20) * 0.5) : 0.15,
-                                            }
-                                        ]}
-                                    />
-                                )
-                            })}
-                            <View style={styles.ringInner}>
-                                <Text style={styles.ringPct}>72%</Text>
-                                <Text style={styles.ringPctLabel}>used</Text>
-                            </View>
+                    <View style={styles.ringOuter}>
+                        {/* Track */}
+                        <View style={styles.ringTrack} />
+
+                        {/* Arc segments */}
+                        {Array.from({ length: 24 }).map((_, i) => {
+                            const angle = (i / 24) * 360
+                            const active = i < Math.round(24 * usagePct)
+                            return (
+                                <View
+                                    key={i}
+                                    style={[styles.ringSegment, {
+                                        transform: [{ rotate: `${angle}deg` }],
+                                        borderTopColor: active ? colors.activeDot : 'transparent',
+                                        opacity: active
+                                            ? 0.45 + (i / 24) * 0.55
+                                            : 0.12,
+                                    }]}
+                                />
+                            )
+                        })}
+
+                        {/* Center */}
+                        <View style={styles.ringInner}>
+                            <Text style={styles.ringPct}>{Math.round(usagePct * 100)}%</Text>
+                            <Text style={styles.ringPctLabel}>used</Text>
                         </View>
                     </View>
                     <Text style={styles.ringCaption}>Monthly budget</Text>
@@ -135,11 +227,13 @@ const HeroSummaryCard = () => {
         </Animated.View>
     )
 }
+
 export default HeroSummaryCard
 
-const styles = StyleSheet.create({
+// ─── Styles ───────────────────────────────────────────────────────────────────
+const RING = normalize(88)
 
-    // Hero Card
+const styles = StyleSheet.create({
     heroCard: {
         borderRadius: normalize(24),
         padding: normalize(22),
@@ -150,134 +244,95 @@ const styles = StyleSheet.create({
     },
     heroBlobTop: {
         position: 'absolute',
-        top: -normalize(40),
-        right: -normalize(20),
-        width: normalize(160),
-        height: normalize(160),
+        top: -normalize(40), right: -normalize(20),
+        width: normalize(160), height: normalize(160),
         borderRadius: normalize(80),
         backgroundColor: 'rgba(50,194,202,0.08)',
     },
     heroBlobBottom: {
         position: 'absolute',
-        bottom: -normalize(50),
-        left: normalize(100),
-        width: normalize(130),
-        height: normalize(130),
+        bottom: -normalize(50), left: normalize(100),
+        width: normalize(130), height: normalize(130),
         borderRadius: normalize(65),
         backgroundColor: 'rgba(255,255,255,0.04)',
     },
-    heroLeft: {
-        flex: 1,
-        gap: vh(6),
-    },
+
+    // Left
+    heroLeft: { flex: 1, gap: vh(6) },
     heroLabel: {
-        fontFamily: fonts.Medium,
-        fontSize: normalize(12),
+        fontFamily: fonts.Medium, fontSize: normalize(12),
         color: 'rgba(255,255,255,0.65)',
-        letterSpacing: 0.8,
-        textTransform: 'uppercase',
+        letterSpacing: 0.8, textTransform: 'uppercase',
     },
     heroAmount: {
-        fontFamily: fonts.Bold,
-        fontSize: normalize(32),
-        color: colors.white,
-        lineHeight: normalize(36),
+        fontFamily: fonts.Bold, fontSize: normalize(32),
+        color: colors.white, lineHeight: normalize(36),
     },
-    heroRow: {
-        flexDirection: 'row',
-    },
+    heroRow: { flexDirection: 'row' },
     heroBadge: {
-        paddingHorizontal: normalize(10),
-        paddingVertical: normalize(4),
+        paddingHorizontal: normalize(10), paddingVertical: normalize(4),
         borderRadius: normalize(20),
+        backgroundColor: 'rgba(50,194,202,0.18)',
     },
     heroBadgeText: {
-        fontFamily: fonts.SemiBold,
-        fontSize: normalize(11),
+        fontFamily: fonts.SemiBold, fontSize: normalize(11),
         color: colors.activeDot,
     },
     heroStats: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: normalize(14),
-        marginTop: vh(4),
+        flexDirection: 'row', alignItems: 'center',
+        gap: normalize(10), marginTop: vh(4),
     },
-    heroStatItem: {
-        gap: vh(1),
-    },
+    heroStatItem: { gap: vh(1) },
     heroStatValue: {
-        fontFamily: fonts.Bold,
-        fontSize: normalize(15),
-        color: colors.white,
+        fontFamily: fonts.Bold, fontSize: normalize(13), color: colors.white,
     },
     heroStatUnit: {
-        fontFamily: fonts.Regular,
-        fontSize: normalize(10),
+        fontFamily: fonts.Regular, fontSize: normalize(9),
         color: 'rgba(255,255,255,0.55)',
     },
     heroStatDivider: {
-        width: 1,
-        height: normalize(28),
-        backgroundColor: 'rgba(255,255,255,0.2)',
+        width: 1, height: normalize(26),
+        backgroundColor: 'rgba(255,255,255,0.18)',
     },
-    heroRight: {
-        alignItems: 'center',
-        gap: vh(6),
-    },
-    ringContainer: {
-        width: normalize(90),
-        height: normalize(90),
-    },
+
+    // Ring
+    heroRight: { alignItems: 'center', gap: vh(6) },
     ringOuter: {
-        width: normalize(90),
-        height: normalize(90),
-        borderRadius: normalize(45),
-        alignItems: 'center',
-        justifyContent: 'center',
+        width: RING, height: RING,
+        borderRadius: RING / 2,
+        alignItems: 'center', justifyContent: 'center',
         position: 'relative',
     },
     ringTrack: {
         position: 'absolute',
-        width: normalize(90),
-        height: normalize(90),
-        borderRadius: normalize(45),
-        borderWidth: normalize(8),
-        borderColor: 'rgba(255,255,255,0.1)',
+        width: RING, height: RING, borderRadius: RING / 2,
+        borderWidth: normalize(7),
+        borderColor: 'rgba(255,255,255,0.10)',
     },
     ringSegment: {
         position: 'absolute',
-        width: normalize(90),
-        height: normalize(90),
-        borderRadius: normalize(45),
-        borderTopWidth: normalize(8),
+        width: RING, height: RING, borderRadius: RING / 2,
+        borderTopWidth: normalize(7),
         borderRightColor: 'transparent',
         borderBottomColor: 'transparent',
         borderLeftColor: 'transparent',
     },
     ringInner: {
-        width: normalize(66),
-        height: normalize(66),
-        borderRadius: normalize(33),
+        width: normalize(64), height: normalize(64),
+        borderRadius: normalize(32),
         backgroundColor: 'rgba(255,255,255,0.08)',
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: 'center', justifyContent: 'center',
         zIndex: 10,
     },
     ringPct: {
-        fontFamily: fonts.Bold,
-        fontSize: normalize(17),
-        color: colors.white,
+        fontFamily: fonts.Bold, fontSize: normalize(16), color: colors.white,
     },
     ringPctLabel: {
-        fontFamily: fonts.Regular,
-        fontSize: normalize(9),
-        color: 'rgba(255,255,255,0.6)',
+        fontFamily: fonts.Regular, fontSize: normalize(9),
+        color: 'rgba(255,255,255,0.60)',
     },
     ringCaption: {
-        fontFamily: fonts.Regular,
-        fontSize: normalize(10),
-        color: 'rgba(255,255,255,0.55)',
-        textAlign: 'center',
+        fontFamily: fonts.Regular, fontSize: normalize(10),
+        color: 'rgba(255,255,255,0.55)', textAlign: 'center',
     },
-
 })

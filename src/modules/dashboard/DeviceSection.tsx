@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
         fontFamily: fonts.Bold,
         fontSize: normalize(16),
         color: colors.neutralBlack,
+        marginBottom : vh(14)
     },
 
 

@@ -61,7 +61,6 @@ const MonthlyBreakDown = () => {
 
       {/* Bars */}
       <View style={[styles.card, { paddingBottom: normalize(10) }]}>
-
         <View style={styles.chartHeader}>
           <View style={styles.chartLegendRow}>
             <View style={[styles.legendDot, { backgroundColor: C.error, marginLeft: normalize(10) }]} />
@@ -109,18 +108,6 @@ const MonthlyBreakDown = () => {
             )
           })}
         </View>
-
-        {/* Summary row */}
-        {/* <View style={styles.chartSummaryRow}>
-          <View style={styles.chartSummaryItem}>
-            <View style={[styles.chartSummaryDot, { backgroundColor: colors.activeDot }]} />
-            <Text style={styles.chartSummaryLabel}>Peak: <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>Nov · 510 kWh</Text></Text>
-          </View>
-          <View style={styles.chartSummaryItem}>
-            <View style={[styles.chartSummaryDot, { backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border }]} />
-            <Text style={styles.chartSummaryLabel}>Avg: <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>450 kWh</Text></Text>
-          </View>
-        </View> */}
       </View>
     </>
   )

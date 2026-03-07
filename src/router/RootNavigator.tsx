@@ -12,22 +12,6 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const RootNavigator = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  // user = 'ab@gmail.com' , 123456
-  // useEffect(() => {
-  //   const checkUser = async () => {
-  //     const userEmail = await mmkvStorage.getItem("USER_EMAIL");
-
-  //     console.log("root navigator user email:", userEmail);
-
-  //     if (userEmail !== null) {
-  //       setIsAuthenticated(true);
-  //     } else {
-  //       setIsAuthenticated(false);
-  //     }
-  //   };
-
-  //   checkUser();
-  // }, []);
   
   useEffect(() => {
     const checkAuth = async () => {

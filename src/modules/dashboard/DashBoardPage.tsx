@@ -1,12 +1,12 @@
-import React, { useCallback} from 'react'
+import React, { useCallback } from 'react'
 import {
     View, StyleSheet, ScrollView,
     RefreshControl,
 } from 'react-native'
- 
+
 // utils 
 import { vh, vw } from '@dwwp/utils/dimensions'
-import { showSnackbar } from '@dwwp/utils/showSnackBar' 
+import { showSnackbar } from '@dwwp/utils/showSnackBar'
 
 // components
 import FixedCharges from './FixedCharges'
@@ -15,6 +15,7 @@ import HeroSummaryCard from './HeroSummaryCard'
 import UsageChart from './components/UsageChart'
 import StatGrid from './StatGrid'
 import DeviceSection from './DeviceSection'
+import { Text } from 'react-native-gesture-handler'
 
 type DashBoardPagePropsType = {
     lastSeen: number | undefined;
@@ -58,18 +59,24 @@ const DashBoardPage = ({ lastSeen, servoState, setIsSwitchOpen }: DashBoardPageP
                 {/* 2×2 Stat Grid */}
                 <StatGrid />
 
-                {/* Usage Chart */}
-                <UsageChart />
-
-                {/* Fixed Charges */}
-                <FixedCharges />
-
                 {/* Device Control */}
                 <DeviceSection
                     lastSeen={lastSeen}
                     servoState={servoState}
                     setIsSwitchOpen={() => setIsSwitchOpen()}
                 />
+
+                {/* Usage Chart */}
+                <UsageChart />
+
+                {/* Fixed Charges */}
+                <FixedCharges />
+
+                <Text>  Quick Links</Text>
+                <Text>  Reiase Complaint</Text>
+                <Text>  Give Feedback</Text>
+                <Text>  Do a Quick Recharge </Text>
+                <Text>  Pay Dues </Text>
 
             </ScrollView >
         </View >
@@ -94,7 +101,7 @@ const styles = StyleSheet.create({
     scrollContent: {
         paddingHorizontal: vw(16),
         paddingTop: vh(16),
-        paddingBottom: vh(90),
+        paddingBottom: vh(40),
         gap: vh(14),
     },
 
