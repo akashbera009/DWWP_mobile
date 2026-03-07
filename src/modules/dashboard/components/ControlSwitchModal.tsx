@@ -26,33 +26,34 @@ import {
 import LinearGradient from 'react-native-linear-gradient'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
+import ToggleSwitch from '@dwwp/modules/dashboard/components/ToggleSwitch'
 
 // ─── theme ────────────────────────────────────────────────────────────────────
 const C = {
-    primary:       '#2B6568',
-    primaryDark:   '#1e4a4d',
-    primaryLight:  'rgba(43,101,104,0.10)',
+    primary: '#2B6568',
+    primaryDark: '#1e4a4d',
+    primaryLight: 'rgba(43,101,104,0.10)',
     primaryBorder: 'rgba(43,101,104,0.20)',
-    cyan:          '#32C2CA',
-    cyanBg:        'rgba(50,194,202,0.10)',
-    white:         '#FFFFFF',
-    black:         '#041617',
-    bodyText:      '#6A7C92',
-    border:        '#E1E8ED',
-    bg:            '#F4F7F8',
-    error:         '#E74C3C',
-    errorBg:       'rgba(231,76,60,0.08)',
-    errorBorder:   'rgba(231,76,60,0.20)',
-    warning:       '#F39C12',
-    warningBg:     'rgba(243,156,18,0.08)',
+    cyan: '#32C2CA',
+    cyanBg: 'rgba(50,194,202,0.10)',
+    white: '#FFFFFF',
+    black: '#041617',
+    bodyText: '#6A7C92',
+    border: '#E1E8ED',
+    bg: '#F4F7F8',
+    error: '#E74C3C',
+    errorBg: 'rgba(231,76,60,0.08)',
+    errorBorder: 'rgba(231,76,60,0.20)',
+    warning: '#F39C12',
+    warningBg: 'rgba(243,156,18,0.08)',
     warningBorder: 'rgba(243,156,18,0.22)',
-    success:       '#27AE60',
-    successBg:     'rgba(39,174,96,0.10)',
-    overlay:       'rgba(4,22,23,0.52)',
-    disabled:      '#B0BEC5',
-    disabledBg:    '#ECEFF1',
-    inputBg:       '#EFF2F5',
-    shadow:        'rgba(43,101,104,0.12)',
+    success: '#27AE60',
+    successBg: 'rgba(39,174,96,0.10)',
+    overlay: 'rgba(4,22,23,0.52)',
+    disabled: '#B0BEC5',
+    disabledBg: '#ECEFF1',
+    inputBg: '#EFF2F5',
+    shadow: 'rgba(43,101,104,0.12)',
 }
 
 // ─── Big animated valve toggle ────────────────────────────────────────────────
@@ -63,9 +64,9 @@ interface ValveToggleProps {
 }
 
 const ValveToggle: React.FC<ValveToggleProps> = ({ value, disabled, onToggle }) => {
-    const anim      = useRef(new Animated.Value(value ? 1 : 0)).current
-    const glowAnim  = useRef(new Animated.Value(value ? 1 : 0)).current
-    const ripple    = useRef(new Animated.Value(0)).current
+    const anim = useRef(new Animated.Value(value ? 1 : 0)).current
+    const glowAnim = useRef(new Animated.Value(value ? 1 : 0)).current
+    const ripple = useRef(new Animated.Value(0)).current
 
     useEffect(() => {
         Animated.spring(anim, { toValue: value ? 1 : 0, friction: 6, tension: 120, useNativeDriver: false }).start()
@@ -86,7 +87,7 @@ const ValveToggle: React.FC<ValveToggleProps> = ({ value, disabled, onToggle }) 
 
     const thumbX = anim.interpolate({ inputRange: [0, 1], outputRange: [normalize(5), TRACK_W - THUMB_D - normalize(5)] })
     const trackBg = anim.interpolate({ inputRange: [0, 1], outputRange: [C.inputBg, C.cyan] })
-    const glowOp  = glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0.4] })
+    const glowOp = glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0.4] })
     const rippleS = ripple.interpolate({ inputRange: [0, 1], outputRange: [0.8, 2.2] })
     const rippleO = ripple.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0.4, 0.2, 0] })
 
@@ -103,15 +104,19 @@ const ValveToggle: React.FC<ValveToggleProps> = ({ value, disabled, onToggle }) 
                     {/* Ripple */}
                     <Animated.View style={[
                         styles.toggleRipple,
-                        { width: THUMB_D, height: THUMB_D, borderRadius: THUMB_D / 2, transform: [{ scale: rippleS }], opacity: rippleO,
-                          left: thumbX, backgroundColor: value ? C.white : C.cyan }
+                        {
+                            width: THUMB_D, height: THUMB_D, borderRadius: THUMB_D / 2, transform: [{ scale: rippleS }], opacity: rippleO,
+                            left: thumbX, backgroundColor: value ? C.white : C.cyan
+                        }
                     ]} />
 
                     {/* Thumb */}
                     <Animated.View style={[
                         styles.toggleThumb,
-                        { width: THUMB_D, height: THUMB_D, borderRadius: THUMB_D / 2, left: thumbX,
-                          backgroundColor: disabled ? C.disabled : C.white }
+                        {
+                            width: THUMB_D, height: THUMB_D, borderRadius: THUMB_D / 2, left: thumbX,
+                            backgroundColor: disabled ? C.disabled : C.white
+                        }
                     ]}>
                         {/* Icon inside thumb */}
                         <Text style={[styles.thumbIcon, { opacity: disabled ? 0.4 : 1 }]}>
@@ -138,10 +143,10 @@ function useShake() {
     const shake = () => {
         Animated.sequence([
             Animated.timing(anim, { toValue: -10, duration: 60, useNativeDriver: true }),
-            Animated.timing(anim, { toValue:  10, duration: 60, useNativeDriver: true }),
-            Animated.timing(anim, { toValue:  -7, duration: 60, useNativeDriver: true }),
-            Animated.timing(anim, { toValue:   7, duration: 60, useNativeDriver: true }),
-            Animated.timing(anim, { toValue:   0, duration: 60, useNativeDriver: true }),
+            Animated.timing(anim, { toValue: 10, duration: 60, useNativeDriver: true }),
+            Animated.timing(anim, { toValue: -7, duration: 60, useNativeDriver: true }),
+            Animated.timing(anim, { toValue: 7, duration: 60, useNativeDriver: true }),
+            Animated.timing(anim, { toValue: 0, duration: 60, useNativeDriver: true }),
         ]).start()
     }
     const style = { transform: [{ translateX: anim }] }
@@ -150,14 +155,16 @@ function useShake() {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 interface Props {
-    servoState:     boolean          // current valve state from Firebase
-    onToggle:       (next: boolean) => void  // save to Firebase
-    onClose:        () => void
+    userId : string
+    servoState: boolean          // current valve state from Firebase
+    onToggle: (next: boolean) => void  // save to Firebase
+    onClose: () => void
     quotaExceeded?: boolean          // Firebase: limitExceeded
     deviceOffline?: boolean          // derived from lastSeen
 }
 
-const SwitchModal: React.FC<Props> = ({
+const ControlSwitchModal: React.FC<Props> = ({
+    userId , 
     servoState,
     onToggle,
     onClose,
@@ -165,8 +172,8 @@ const SwitchModal: React.FC<Props> = ({
     deviceOffline = false,
 }) => {
     const [localState, setLocalState] = useState(servoState)
-    const isDirty   = localState !== servoState
-    const isLocked  = quotaExceeded
+    const isDirty = localState !== servoState
+    const isLocked = quotaExceeded
 
     const sheetAnim = useRef(new Animated.Value(600)).current
     const { shake, style: shakeStyle } = useShake()
@@ -285,13 +292,17 @@ const SwitchModal: React.FC<Props> = ({
                                 {isLocked ? 'Recharge your plan to control the valve'
                                     : 'Tap to toggle water supply'}
                             </Text>
-                            <Animated.View style={shakeStyle}>
+                            {/* <Animated.View style={shakeStyle}>
                                 <ValveToggle
                                     value={localState}
                                     disabled={isLocked}
                                     onToggle={handleToggle}
                                 />
-                            </Animated.View>
+                            </Animated.View> */}
+                            <ToggleSwitch
+                                userId={userId}
+                                disabled={isLocked}
+                            />
                         </View>
 
                         {/* ── Info note ── */}
@@ -336,7 +347,7 @@ const SwitchModal: React.FC<Props> = ({
     )
 }
 
-export default SwitchModal
+export default ControlSwitchModal
 
 // ─── styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
@@ -347,7 +358,7 @@ const styles = StyleSheet.create({
     },
     sheet: {
         backgroundColor: C.white,
-        borderTopLeftRadius:  normalize(28),
+        borderTopLeftRadius: normalize(28),
         borderTopRightRadius: normalize(28),
         paddingHorizontal: normalize(20),
         paddingBottom: Platform.OS === 'ios' ? normalize(38) : normalize(22),
@@ -405,9 +416,9 @@ const styles = StyleSheet.create({
     },
     bannerIcon: { fontSize: normalize(18), marginTop: normalize(1) },
     errorBannerTitle: { fontFamily: fonts.Bold, fontSize: normalize(13), color: C.error },
-    errorBannerSub:   { fontFamily: fonts.Regular, fontSize: normalize(11), color: C.error, marginTop: vh(2), opacity: 0.8 },
-    warnBannerTitle:  { fontFamily: fonts.Bold, fontSize: normalize(13), color: C.warning },
-    warnBannerSub:    { fontFamily: fonts.Regular, fontSize: normalize(11), color: C.warning, marginTop: vh(2), opacity: 0.8 },
+    errorBannerSub: { fontFamily: fonts.Regular, fontSize: normalize(11), color: C.error, marginTop: vh(2), opacity: 0.8 },
+    warnBannerTitle: { fontFamily: fonts.Bold, fontSize: normalize(13), color: C.warning },
+    warnBannerSub: { fontFamily: fonts.Regular, fontSize: normalize(11), color: C.warning, marginTop: vh(2), opacity: 0.8 },
 
     // State card
     stateCard: {
@@ -428,7 +439,7 @@ const styles = StyleSheet.create({
         alignItems: 'center', justifyContent: 'center',
     },
     stateLabel: { fontFamily: fonts.Bold, fontSize: normalize(15) },
-    stateDesc:  { fontFamily: fonts.Regular, fontSize: normalize(11), marginTop: vh(2) },
+    stateDesc: { fontFamily: fonts.Regular, fontSize: normalize(11), marginTop: vh(2) },
     liveBadge: {
         flexDirection: 'row', alignItems: 'center', gap: normalize(4),
         paddingHorizontal: normalize(10), paddingVertical: normalize(5),

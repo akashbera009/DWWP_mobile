@@ -1,6 +1,7 @@
 import mmkvStorage from "./mmkvStorage";
 
 const USER_KEY = "APP_USER";
+const USER_EMAIL ='USER_EMAIL'
 
 export type StoredUser = {
   uid: string;
@@ -21,6 +22,13 @@ export const getStoredUser = async (): Promise<StoredUser | null> => {
   if (!user) return null;
 
   return JSON.parse(user);
+};
+export const getStoredUserEmail = async (): Promise<string | null> => {
+  const userEmail = await mmkvStorage.getItem(USER_EMAIL);
+
+  if (!userEmail) return null;
+
+  return userEmail;
 };
 export const removeStoredUser = async () => {
   await mmkvStorage.removeItem(USER_KEY);

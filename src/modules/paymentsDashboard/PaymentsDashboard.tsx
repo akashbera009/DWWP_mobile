@@ -9,11 +9,15 @@ import fonts from '@dwwp/utils/fonts'
 import PlanSelector from './Planselector'
 import TransactionHistory from './TransactionHistory'
 import CurrentBillComponent from './CurrentBillComponent'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const PaymentsDashboard = () => {
+  const { top } = useSafeAreaInsets()
   return (
-    <View style={styles.container}>
-      <ScrollView>
+    <View style={[styles.container, { paddingTop: top }]}>
+      <ScrollView style={
+        styles.scrollview
+      }>
         <View style={styles.homeHeaderContainer}>
           <Text style={styles.homeHeaderText}>{strings.rechargesAndPayments}</Text>
         </View>
@@ -41,6 +45,10 @@ export default PaymentsDashboard
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.primary
+  },
+  scrollview: {
+    backgroundColor: colors.overlayBackground
   },
   homeHeaderContainer: {
     backgroundColor: colors.primary

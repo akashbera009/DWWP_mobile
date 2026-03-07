@@ -289,7 +289,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ userId, disabled }) => {
                 </View>
             </GestureDetector>
 
-            {!limitReached && ( // need change 
+            {limitReached && ( // need change 
                 <View style={styles.limitBanner}>
                     <Text style={styles.limitText}>
                         Water usage limit reached. Control disabled.

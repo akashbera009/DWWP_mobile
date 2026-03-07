@@ -8,7 +8,7 @@ import {
 import { Portal } from '@gorhom/portal'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 // utils 
-import { vh, vw } from '@dwwp/utils/dimensions'
+import { screenWidth, vh, vw } from '@dwwp/utils/dimensions'
 import { showSnackbar } from '@dwwp/utils/showSnackBar'
 import colors from '@dwwp/utils/colors'
 import { getStoredUserEmail } from '@dwwp/utils/commonFunctions'
@@ -24,9 +24,11 @@ import ProfilePanel from './components/ProfilePanel'
 import NotificationPanel from './components/NotificationPanel'
 import ControlSwitchModal from './components/ControlSwitchModal'
 import DeviceSection from './DeviceSection'
+import DashBoardPage from './DashBoardPage'
 
+const SCREEN_WIDTH = screenWidth
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
-const DashBoardPage = () => {
+const DashIndexScreen = () => {
     const [userEmail, setUserEmail] = useState<string>('')
     const [notifOpen, setNotifOpen] = useState(false)
     const [profileOpen, setProfileOpen] = useState(false)
@@ -110,44 +112,29 @@ const DashBoardPage = () => {
                 />
             )}
 
-            {/* ── Scrollable Content ── */}
             <ScrollView
-                style={styles.scroll}
-                contentContainerStyle={styles.scrollContent}
-                showsVerticalScrollIndicator={false}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
-                    />
-                }
+                horizontal
+                pagingEnabled
+                
+
             >
-                {/* Welcome Row */}
-                <WelcomeBanner userName={'Akash Bera'} />
+                <View style={styles.page}>
+                    <DashBoardPage />
+                </View>
 
-                {/* Hero Summary Card */}
-                <HeroSummaryCard onlineCount={2} total={4} />
+                <View style={styles.page}>
+                    <DashBoardPage />
+                </View>
 
-                {/* 2×2 Stat Grid */}
-                <StatGrid />
 
-                {/* Usage Chart */}
-                <UsageChart />
-
-                {/* Fixed Charges */}
-                <FixedCharges />
-
-                {/* Device Control */}
-                <DeviceSection lastSeen={lastSeen} servoState={servoState} setIsSwitchOpen={() => setIsSwitchOpen(true)} />
-
-            </ScrollView >
+            </ScrollView>
 
 
         </View >
     )
 }
 
-export default DashBoardPage
+export default DashIndexScreen
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
@@ -160,16 +147,7 @@ const styles = StyleSheet.create({
         top: 0, left: 0, right: 0, bottom: 0,
         zIndex: 300,
     },
-    // Scroll
-    scroll: {
-        flex: 1,
-        backgroundColor: colors.overlayBackground,
-    },
-    scrollContent: {
-        paddingHorizontal: vw(16),
-        paddingTop: vh(16),
-        paddingBottom: vh(90),
-        gap: vh(14),
-    },
-
+    page: {
+        width: SCREEN_WIDTH
+    }
 })

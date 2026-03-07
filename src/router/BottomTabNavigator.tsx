@@ -9,12 +9,13 @@ import { normalize, vh, vw } from '@dwwp/utils/dimensions';
 import fonts from '@dwwp/utils/fonts';
 
 import DashBoardPage from '@dwwp/modules/dashboard/DashBoardPage';
-import ServoControlPage from '@dwwp/modules/servoControl/ServoControlPage';
+
 import PasymentsDashboard from '@dwwp/modules/paymentsDashboard/PaymentsDashboard';
-import Analytics from '@dwwp/modules/analytics/AnalyticsPage';
+
 import { screenNames } from '@dwwp/utils/screenNames';
-import { getFocusedRouteNameFromRoute, Route } from '@react-navigation/native';
+
 import AnalyticsPage from '@dwwp/modules/analytics/AnalyticsPage';
+import DashIndexScreen from '@dwwp/modules/dashboard/DashIndexScreen';
 
 // Tab Navigator
 const Tab = createBottomTabNavigator<BottomTabParamList>();

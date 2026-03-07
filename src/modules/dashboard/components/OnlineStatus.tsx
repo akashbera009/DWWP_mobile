@@ -20,14 +20,14 @@ import fonts from '@dwwp/utils/fonts'
 
 // ─── theme ────────────────────────────────────────────────────────────────────
 const C = {
-    primary:     '#2B6568',
+    primary: '#2B6568',
     primaryDark: '#1e4a4d',
-    cyan:        '#32C2CA',
-    cyanLight:   'rgba(50,194,202,0.15)',
-    white:       '#FFFFFF',
-    error:       '#E74C3C',
-    warning:     '#F39C12',
-    bodyText:    'rgba(255,255,255,0.60)',
+    cyan: '#32C2CA',
+    cyanLight: 'rgba(50,194,202,0.15)',
+    white: '#FFFFFF',
+    error: '#E74C3C',
+    warning: '#F39C12',
+    bodyText: 'rgba(255,255,255,0.60)',
     borderGlass: 'rgba(255,255,255,0.12)',
 }
 
@@ -37,26 +37,26 @@ type Level = 'online' | 'recent' | 'away' | 'offline' | 'loading'
 function calcLevel(lastSeen?: number): Level {
     if (lastSeen === undefined) return 'loading'
     const secs = Math.floor((Date.now() - lastSeen) / 1000)
-    if (secs < 15)    return 'online'
-    if (secs < 60)    return 'recent'
-    if (secs < 3600)  return 'away'
+    if (secs < 15) return 'online'
+    if (secs < 60) return 'recent'
+    if (secs < 3600) return 'away'
     return 'offline'
 }
 
 function calcLabel(lastSeen?: number): { top: string; sub: string } {
     if (lastSeen === undefined) return { top: 'Connecting…', sub: 'Waiting for device' }
     const secs = Math.floor((Date.now() - lastSeen) / 1000)
-    if (secs < 15)   return { top: 'Online',                       sub: 'Device Synced'       }
-    if (secs < 60)   return { top: `${secs}s ago`,                 sub: 'Just disconnected'   }
-    if (secs < 3600) return { top: `${Math.floor(secs/60)}m ago`,  sub: 'Connection lost'     }
-    if (secs < 86400)return { top: `${Math.floor(secs/3600)}h ago`,sub: 'Device inactive'     }
-    return                  { top: `${Math.floor(secs/86400)}d ago`,sub: 'Device unreachable' }
+    if (secs < 15) return { top: 'Online', sub: 'Device Synced' }
+    if (secs < 60) return { top: `${secs}s ago`, sub: 'Just disconnected' }
+    if (secs < 3600) return { top: `${Math.floor(secs / 60)}m ago`, sub: 'Connection lost' }
+    if (secs < 86400) return { top: `${Math.floor(secs / 3600)}h ago`, sub: 'Device inactive' }
+    return { top: `${Math.floor(secs / 86400)}d ago`, sub: 'Device unreachable' }
 }
 
 const levelColor: Record<Level, string> = {
-    online:  C.cyan,
-    recent:  C.warning,
-    away:    C.warning,
+    online: C.cyan,
+    recent: C.warning,
+    away: C.warning,
     offline: C.error,
     loading: 'rgba(255,255,255,0.3)',
 }
@@ -107,7 +107,7 @@ function usePulse(active: boolean) {
             loop.current = Animated.loop(
                 Animated.sequence([
                     Animated.timing(anim, { toValue: 1.8, duration: 900, easing: Easing.out(Easing.ease), useNativeDriver: true }),
-                    Animated.timing(anim, { toValue: 1,   duration: 900, useNativeDriver: true }),
+                    Animated.timing(anim, { toValue: 1, duration: 900, useNativeDriver: true }),
                 ])
             )
             loop.current.start()
@@ -130,16 +130,17 @@ export const OnlineStatus: React.FC<Props> = ({ lastSeen, onPress }) => {
     // Refresh label every 5 s
     const [tick, setTick] = React.useState(0)
     useEffect(() => {
-        const id = setInterval(() => setTick(t => t + 1), 5000)
+        const id = setInterval(() =>
+            setTick(t => t + 1), 5000)
         return () => clearInterval(id)
     }, [])
 
-    const level   = calcLevel(lastSeen)
-    const label   = calcLabel(lastSeen)
-    const isOnline = level === 'online'
-    const dot      = levelColor[level]
+    const level = calcLevel(lastSeen)
+    const label = calcLabel(lastSeen)
+    const isOnline = level == 'online'
+    const dot = levelColor[level]
 
-    const arcAnims  = useWifiAnims(isOnline)
+    const arcAnims = useWifiAnims(isOnline)
     const pulseAnim = usePulse(isOnline)
 
     // Card entry scale
@@ -150,8 +151,8 @@ export const OnlineStatus: React.FC<Props> = ({ lastSeen, onPress }) => {
 
     // Press feedback
     const pressScale = useRef(new Animated.Value(1)).current
-    const onPressIn  = () => Animated.spring(pressScale, { toValue: 0.96, useNativeDriver: true, speed: 30 }).start()
-    const onPressOut = () => Animated.spring(pressScale, { toValue: 1,    useNativeDriver: true, speed: 20 }).start()
+    const onPressIn = () => Animated.spring(pressScale, { toValue: 0.96, useNativeDriver: true, speed: 30 }).start()
+    const onPressOut = () => Animated.spring(pressScale, { toValue: 1, useNativeDriver: true, speed: 20 }).start()
 
     const bgColors: [string, string, string] = isOnline
         ? [C.primary, '#235558', C.primaryDark]
@@ -180,7 +181,7 @@ export const OnlineStatus: React.FC<Props> = ({ lastSeen, onPress }) => {
                         {/* Arcs – rendered bottom-up: arc[0]=inner, arc[2]=outer */}
                         <View style={styles.arcStack}>
                             {arcAnims.map((anim, i) => {
-                                const SIZE  = normalize(22 + i * 20)   // 22 / 42 / 62
+                                const SIZE = normalize(22 + i * 20)   // 22 / 42 / 62
                                 const THICK = normalize(3.5 - i * 0.5) // 3.5 / 3 / 2.5
                                 return (
                                     <Animated.View
@@ -188,16 +189,16 @@ export const OnlineStatus: React.FC<Props> = ({ lastSeen, onPress }) => {
                                         style={[
                                             styles.arc,
                                             {
-                                                width:  SIZE,
+                                                width: SIZE,
                                                 height: SIZE / 2,
-                                                borderTopLeftRadius:  SIZE / 2,
+                                                borderTopLeftRadius: SIZE / 2,
                                                 borderTopRightRadius: SIZE / 2,
-                                                borderTopWidth:    THICK,
-                                                borderLeftWidth:   THICK,
-                                                borderRightWidth:  THICK,
-                                                borderTopColor:  isOnline ? C.cyan : '#555',
+                                                borderTopWidth: THICK,
+                                                borderLeftWidth: THICK,
+                                                borderRightWidth: THICK,
+                                                borderTopColor: isOnline ? C.cyan : '#555',
                                                 borderLeftColor: isOnline ? C.cyan : '#555',
-                                                borderRightColor:isOnline ? C.cyan : '#555',
+                                                borderRightColor: isOnline ? C.cyan : '#555',
                                                 opacity: anim,
                                                 bottom: normalize(10),  // align all arcs at base
                                             },
