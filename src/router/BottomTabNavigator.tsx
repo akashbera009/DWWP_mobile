@@ -134,7 +134,8 @@ const BottomTabNavigator = () => {
     >
       <Tab.Screen
         name={screenNames.DashBoard}
-        component={DashBoardPage}
+        // component={DashBoardPage}
+        component={DashIndexScreen}
         options={{
           tabBarIcon: HomeTabIcon,
         }}

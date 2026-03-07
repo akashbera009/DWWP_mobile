@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
     View, StyleSheet, ScrollView,
     Pressable,
-    RefreshControl,
 } from 'react-native'
 
 import { Portal } from '@gorhom/portal'
@@ -14,17 +13,13 @@ import colors from '@dwwp/utils/colors'
 import { getStoredUserEmail } from '@dwwp/utils/commonFunctions'
 
 // components
-import FixedCharges from './FixedCharges'
-import WelcomeBanner from './WelcomeBanner'
-import HeroSummaryCard from './HeroSummaryCard'
-import UsageChart from './components/UsageChart'
-import StatGrid from './StatGrid'
 import Header from './components/Header'
 import ProfilePanel from './components/ProfilePanel'
 import NotificationPanel from './components/NotificationPanel'
 import ControlSwitchModal from './components/ControlSwitchModal'
 import DeviceSection from './DeviceSection'
 import DashBoardPage from './DashBoardPage'
+import UsageChart from './components/UsageChart'
 
 const SCREEN_WIDTH = screenWidth
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
@@ -32,25 +27,34 @@ const DashIndexScreen = () => {
     const [userEmail, setUserEmail] = useState<string>('')
     const [notifOpen, setNotifOpen] = useState(false)
     const [profileOpen, setProfileOpen] = useState(false)
-    const [activeTab, setActiveTab] = useState<'overview' | 'device' | 'usages'>('overview')
-    const [refreshing, setRefreshing] = React.useState(false);
+    const [activeTab, setActiveTab] = useState<number>(0)
 
     const [servoState, setServoState] = useState<boolean>(false)
     const [lastSeen, setLastSeen] = useState<number | undefined>(undefined)
     const [limitExceeded, setLimitExceeded] = useState<boolean>(false)
     const [isSwitchOpen, setIsSwitchOpen] = useState<boolean>(false)
 
+    const scrolRef = useRef<ScrollView | null>(null)
     const { top } = useSafeAreaInsets()
 
     const closeDropdowns = useCallback(() => { setNotifOpen(false); setProfileOpen(false) }, [])
+    const handleNotifOpen = useCallback(() => { setNotifOpen(true) }, [])
+    const handleNotifClose = useCallback(() => { setNotifOpen(false) }, [])
+    const handleProfileOpen = useCallback(() => { setProfileOpen(true) }, [])
+    const handleProfileClose = useCallback(() => { setProfileOpen(false) }, [])
+    const handleSetActivetab = useCallback(
+        (idx: number) => {
+            setActiveTab(idx)
+            scrolRef?.current?.scrollTo({
+                y: screenWidth * idx,
+                animated: true
+            })
+            console.log('should  have to scroll to ', screenWidth * idx);
 
-    const onRefresh = useCallback(() => {
-        setRefreshing(true);
-        setTimeout(() => {
-            showSnackbar({ message: 'Data refreshed!', type: 'success' })
-            setRefreshing(false);
-        }, 1000);
-    }, []);
+        }, []
+    )
+
+    // demo online status checking
     useEffect(() => {
         const unsubscriber = setInterval(() => {
             const timer = Date.now()
@@ -58,7 +62,7 @@ const DashIndexScreen = () => {
         }, 10000)
         return () => clearInterval(unsubscriber)
     }, [])
-    // Derive device online level from lastSeen
+    // Derive device online level from lastSeen 
     const deviceOffline = lastSeen !== undefined
         ? Math.floor((Date.now() - lastSeen) / 1000) > 60
         : false
@@ -79,7 +83,14 @@ const DashIndexScreen = () => {
         <View style={[styles.safeArea, { paddingTop: top, }]} >
 
             {/* ── Header ── */}
-            <Header activeTab={activeTab} setActiveTab={setActiveTab} setProfileOpen={setProfileOpen} setNotifOpen={setNotifOpen} />
+            <Header
+                activeTab={activeTab}
+                handleSetActivetab={handleSetActivetab}
+                handleProfileOpen={handleProfileOpen}
+                handleProfileClose={handleProfileClose}
+                handleNotifOpen={handleNotifOpen}
+                handleNotifClose={handleNotifClose}
+            />
 
             {/* ── Dropdowns ── */}
             {notifOpen && (
@@ -113,22 +124,37 @@ const DashIndexScreen = () => {
             )}
 
             <ScrollView
+                ref={scrolRef}
                 horizontal
                 pagingEnabled
-                
-
+                scrollEventThrottle={16}
+                showsHorizontalScrollIndicator={false}
+                style={styles.scrollView}
+                onMomentumScrollEnd={(e) => {
+                    const nextIdx = Math.round(e.nativeEvent.contentOffset.x / screenWidth)
+                    setActiveTab(nextIdx)
+                }}
             >
                 <View style={styles.page}>
-                    <DashBoardPage />
+                    <DashBoardPage
+                        lastSeen={lastSeen}
+                        servoState={servoState}
+                        setIsSwitchOpen={() => setIsSwitchOpen(true)}
+                    />
                 </View>
 
-                <View style={styles.page}>
-                    <DashBoardPage />
+                <View style={styles.page2}>
+                    <DeviceSection
+                        lastSeen={lastSeen}
+                        servoState={servoState}
+                        setIsSwitchOpen={() => setIsSwitchOpen(true)}
+                    />
                 </View>
-
+                <View style={styles.page2}>
+                    <UsageChart />
+                </View>
 
             </ScrollView>
-
 
         </View >
     )
@@ -147,7 +173,16 @@ const styles = StyleSheet.create({
         top: 0, left: 0, right: 0, bottom: 0,
         zIndex: 300,
     },
+    scrollView: {
+        flex: 1,
+        backgroundColor: colors.overlayBackground
+    },
     page: {
-        width: SCREEN_WIDTH
-    }
+        width: SCREEN_WIDTH,
+    },
+    page2: {
+        width: SCREEN_WIDTH,
+        marginTop: vh(16),
+        paddingHorizontal: vw(8),
+    },
 })

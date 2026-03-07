@@ -119,6 +119,8 @@ const styles = StyleSheet.create({
 
     // Valve card (right side, same height as OnlineStatus)
     valveCard: {
+        borderTopColor: colors.border,
+        borderTopWidth : normalize(5), 
         flex: 1,
         backgroundColor : colors.primary,
         borderRadius: normalize(22),

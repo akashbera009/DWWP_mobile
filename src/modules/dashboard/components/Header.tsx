@@ -8,16 +8,33 @@ import { strings } from '@dwwp/utils/strings';
 import { localImages } from '@dwwp/utils/localimages';
 import colors from '@dwwp/utils/colors'
 type HeaderProps = {
-    activeTab: 'overview' | 'device' | 'usages',
-    setActiveTab: (tab: 'overview' | 'device' | 'usages') => void,
-    setProfileOpen: (open: any) => void,
-    setNotifOpen: (open: any) => void,
+    activeTab: number,
+    handleSetActivetab: (tab: number) => void,
+    handleProfileOpen: () => void
+    handleProfileClose: () => void
+    handleNotifOpen: () => void
+    handleNotifClose: () => void
 }
-const Header = ({ activeTab, setActiveTab, setProfileOpen, setNotifOpen }: HeaderProps) => {
+const Header = ({
+    activeTab,
+    handleSetActivetab,
+    handleProfileOpen,
+    handleProfileClose,
+    handleNotifOpen,
+    handleNotifClose
+}: HeaderProps) => {
+    const handleProfileTap = () => {
+        handleProfileOpen()
+        handleNotifClose()
+    }
+    const handleNotificationTap = () => {
+        handleNotifOpen()
+        handleProfileClose()
+    }
     return (
         <LinearGradient
-            colors={[colors.primaryDark , colors.primary ]}
-            start={{ x: 1, y: 1}} end={{ x: 1, y: 0 }}
+            colors={[colors.primaryDark, colors.primary]}
+            start={{ x: 1, y: 1 }} end={{ x: 1, y: 0 }}
             style={styles.header}
         >
             {/* Logo + Actions */}
@@ -32,7 +49,7 @@ const Header = ({ activeTab, setActiveTab, setProfileOpen, setNotifOpen }: Heade
                     {/* Notification Bell */}
                     <TouchableOpacity
                         style={styles.headerIconBtn}
-                        onPress={() => { setNotifOpen((p: any) => !p); setProfileOpen(false) }}
+                        onPress={handleNotificationTap}
                     >
                         <Image source={localImages.bell_full}
                             style={styles.notificationIcon}
@@ -43,7 +60,7 @@ const Header = ({ activeTab, setActiveTab, setProfileOpen, setNotifOpen }: Heade
                     {/* Avatar */}
                     <TouchableOpacity
                         style={styles.userPressButton}
-                        onPress={() => { setProfileOpen((p: any) => !p); setNotifOpen(false) }}
+                        onPress={handleProfileTap}
                     >
                         <Avatar name="Akash Bera" size={36} />
                         <Image source={localImages.downarrow}
@@ -55,13 +72,13 @@ const Header = ({ activeTab, setActiveTab, setProfileOpen, setNotifOpen }: Heade
 
             {/* Tab Bar */}
             <View style={styles.tabBar}>
-                {(['overview', 'device', 'usages'] as const).map(tab => (
+                {(['overview', 'device', 'usages'] as const).map((tab, idx) => (
                     <TouchableOpacity
                         key={tab}
-                        style={[styles.tab, activeTab === tab && styles.tabActive]}
-                        onPress={() => setActiveTab(tab)}
+                        style={[styles.tab, activeTab === idx && styles.tabActive]}
+                        onPress={() => handleSetActivetab(idx)}
                     >
-                        <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
+                        <Text style={[styles.tabText, activeTab === idx && styles.tabTextActive]}>
                             {tab.charAt(0).toUpperCase() + tab.slice(1)}
                         </Text>
                     </TouchableOpacity>
