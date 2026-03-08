@@ -30,5 +30,8 @@ export const localImages = {
     bell_full: require('../assets/images/bell_full.png'),
     close: require('../assets/images/close.png'),
     angle: require('../assets/images/angle.png'),
+
+    hide: require('../assets/images/hide.png'),
+    view: require('../assets/images/view.png'),
     
 }

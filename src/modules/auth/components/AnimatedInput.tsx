@@ -8,10 +8,10 @@ interface AnimatedInputProps {
     value: string;
     onChangeText: (t: string) => void;
     secureTextEntry?: boolean;
-    keyboardType?: "default" | "email-address" | "number-pad" |"phone-pad";
+    keyboardType?: "default" | "email-address" | "number-pad" | "phone-pad";
     delay?: number;
     rightElement?: React.ReactNode;
-    multiline?:boolean
+    multiline?: boolean
 }
 
 const AnimatedInput: React.FC<AnimatedInputProps> = ({
@@ -89,7 +89,7 @@ const AnimatedInput: React.FC<AnimatedInputProps> = ({
                     autoCapitalize="none"
                     onFocus={() => setFocused(true)}
                     onBlur={() => setFocused(false)}
-                    multiline
+                    multiline={multiline}
                 />
                 {rightElement}
             </Animated.View>
@@ -100,22 +100,22 @@ const AnimatedInput: React.FC<AnimatedInputProps> = ({
 export default AnimatedInput
 
 const styles = StyleSheet.create({
-      // Input
-      inputWrapper: {
+    // Input
+    inputWrapper: {
         marginBottom: 14,
-      },
-      inputContainer: {
+    },
+    inputContainer: {
         flexDirection: "row",
         alignItems: "center",
         borderWidth: 1.5,
         borderRadius: 14,
         paddingHorizontal: 16,
         height: 52,
-      },
-      textInput: {
+    },
+    textInput: {
         flex: 1,
         fontSize: 15,
         color: colors.neutralBlack,
         paddingVertical: 0,
-      },
+    },
 })

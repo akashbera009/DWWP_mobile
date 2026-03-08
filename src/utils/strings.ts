@@ -20,6 +20,10 @@ export const strings = {
     total: 'Total:',
     add: '+ Add',
 
+    signIn : 'Sign In',
+    signUp: 'Sign Up',
+    dontHaveAccount : "Don't have an account?",
+
     analytics: 'Analytics',
 
     viewProfile: 'View Profile',

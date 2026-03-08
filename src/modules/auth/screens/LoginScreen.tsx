@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   StatusBar,
+  Image,
 } from "react-native";
 
 import { useNavigation } from "@react-navigation/native";
@@ -26,6 +27,9 @@ import BlobBackground from "../components/BlobBackground";
 import AnimatedInput from "../components/AnimatedInput";
 import { LoadingPopup } from "../components/LoadingPopup";
 import fonts from "@dwwp/utils/fonts";
+import { strings } from "@dwwp/utils/strings";
+import { localImages } from "@dwwp/utils/localimages";
+import { vh } from "@dwwp/utils/dimensions";
 
 
 // ─── Loading Popup ────────────────────────────────────────────────────────────
@@ -143,7 +147,7 @@ export default function LoginScreen() {
         <View style={styles.logoMark}>
           <View style={styles.logoInner} />
         </View>
-        <Text style={styles.brandName}>DWWP</Text>
+        <Text style={styles.brandName}>{strings.dwwp}</Text>
         <Text style={styles.tagline}>Your wellness, simplified.</Text>
       </Animated.View>
 
@@ -180,7 +184,9 @@ export default function LoginScreen() {
               style={styles.eyeButton}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Text style={styles.eyeIcon}>{showPassword ? "🙈" : "👁️"}</Text>
+              <Image
+                source={showPassword ? localImages.view : localImages.hide}
+                style={styles.showImage} />
             </TouchableOpacity>
           }
         />
@@ -208,7 +214,7 @@ export default function LoginScreen() {
             activeOpacity={0.85}
             disabled={isLoading || !email || !password}
           >
-            <Text style={styles.buttonText}>Sign In</Text>
+            <Text style={styles.buttonText}>{strings.signIn}</Text>
           </TouchableOpacity>
         </Animated.View>
 
@@ -224,10 +230,11 @@ export default function LoginScreen() {
           onPress={() => navigation.navigate(screenNames.SignUpScreen)}
           style={styles.linkRow}
         >
-          <Text style={styles.linkGray}>Don't have an account? </Text>
-          <Text style={styles.linkPrimary}>Sign Up</Text>
+          <Text style={styles.linkGray}>{strings.dontHaveAccount} </Text>
+          <Text style={styles.linkPrimary}>{strings.signUp}</Text>
         </TouchableOpacity>
 
+        {/* unnecessary  */}
         <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
           <Text style={styles.skipText}>Skip for now</Text>
         </TouchableOpacity>
@@ -249,7 +256,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     justifyContent: "center",
   },
- 
   // Header
   header: {
     alignItems: "center",
@@ -307,7 +313,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "700",
     color: colors.neutralBlack,
-    fontFamily : fonts.Bold,
+    fontFamily: fonts.Bold,
     marginBottom: 4,
   },
   cardSubtitle: {
@@ -319,8 +325,10 @@ const styles = StyleSheet.create({
   eyeButton: {
     paddingLeft: 8,
   },
-  eyeIcon: {
-    fontSize: 16,
+  showImage: {
+    height: vh(14),
+    width: vh(14),
+    tintColor: colors.black
   },
 
   // Error
