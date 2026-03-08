@@ -1,2 +1,2 @@
-export *  from './LoginScreen'
-export *  from './SignUpScreen'
+export *  from './screens/LoginScreen'
+export *  from './screens/SignUpScreen'

@@ -1,5 +1,5 @@
 import { Image, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { cache, useEffect, useState } from 'react'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import colors from '@dwwp/utils/colors'
 import fonts from '@dwwp/utils/fonts'
@@ -10,7 +10,8 @@ import { CommonActions, useNavigation } from '@react-navigation/native'
 import { strings } from '@dwwp/utils/strings'
 import { localImages } from '@dwwp/utils/localimages'
 import { screenNames } from '@dwwp/utils/screenNames'
-import mmkvStorage from '@dwwp/utils/mmkvStorage'
+import { useAppDispatch } from '@dwwp/store/hooks'
+import { logout } from '@dwwp/modules/auth/authAction'
 
 type user = {
     imageUrl: ImageSourcePropType,
@@ -18,6 +19,8 @@ type user = {
     email: string
 }
 const ProfilePanel = ({ onClose }: { onClose: () => void }) => {
+    const dispatch = useAppDispatch()
+
     type MainStackNavigationProp =
         NativeStackNavigationProp<MainStackParamList>;
 
@@ -42,18 +45,19 @@ const ProfilePanel = ({ onClose }: { onClose: () => void }) => {
             title: strings.logout,
             imageUrl: localImages.logout,
             onClickEvent: async () => {
-                await mmkvStorage.setItem("USER_EMAIL", '');
-                console.log('userEmail cleared to space');
+                try {
+                    await dispatch(logout())
+                    console.log('logged out succesfully');
+                    navigationAuth.getParent()?.getParent()?.dispatch(
+                        CommonActions.reset({
+                            index: 0,
+                            routes: [{ name: screenNames.AuthStack }],
+                        })
+                    )
+                } catch (e) {
+                    console.log('error is ', e);
 
-                navigationAuth.getParent()?.getParent()?.dispatch(
-                    CommonActions.reset({
-                        index: 0,
-                        routes: [{ name: screenNames.AuthStack }],
-                    })
-                )
-                // navigationAuth.navigate(screenNames.AuthStack, {
-                //     screen: screenNames.LoginScreen
-                // })
+                }
             }
         }
     ]
@@ -103,7 +107,7 @@ const styles = StyleSheet.create({
     dropdownPanel: {
         position: 'absolute',
         top: normalize(90),
-        right: vw(30), 
+        right: vw(30),
         backgroundColor: colors.white,
         padding: vh(12),
         minWidth: vw(210),

@@ -5,7 +5,7 @@ import {
     TouchableOpacity
 } from 'react-native'
 import React from 'react'
-import { OnlineStatus } from './components/OnlineStatus'
+import { OnlineStatus } from './OnlineStatus'
 import LinearGradient from 'react-native-linear-gradient'
 import colors from '@dwwp/utils/colors'
 import fonts from '@dwwp/utils/fonts'

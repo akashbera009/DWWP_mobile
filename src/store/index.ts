@@ -1,34 +1,46 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit';
-import { persistStore, persistReducer } from 'redux-persist';
-import logger from 'redux-logger';
-//Reducers
-// import authReducer from '../modules/auth/authSlice';
-// import cartReducer from '../modules/cart/cartSlice';
-// //Storage
-import mmkvStorage from '../utils/mmkvStorage';
+/**
+ * store/index.ts
+ *
+ * RTK store with MMKV-backed redux-persist.
+ *
+ * Deps:
+ *   npm install @reduxjs/toolkit react-redux redux-persist react-native-mmkv
+ */
 
+import { configureStore } from '@reduxjs/toolkit'
+import { persistReducer, persistStore } from 'redux-persist'
+import logger from 'redux-logger'
+import { combineReducers } from '@reduxjs/toolkit'
+
+import mmkvStorage from "../utils/mmkvStorage";
+
+import authReducer from '@dwwp/modules/auth/authSlice'
+// import dashboardReducer from '../slices/dashboardSlice'
+// import paymentReducer from '../slices/payment/paymentSlice'
+
+// persist 
 const persistConfig = {
-  key: 'root',
-  storage: mmkvStorage,
-  whitelist: ['auth', 'cart'], // add 'settings' for tutorial persistence
-};
+    key: 'root',
+    storage: mmkvStorage,
+    whitelist: ['auth'],
+}
 
 const rootReducer = combineReducers({
-//   auth: authReducer,
-//   cart: cartReducer,
-});
-
+    auth: authReducer,
+})
+// dashboard: dashboardReducer,
+// payment: paymentReducer,
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const store = configureStore({
-  reducer: persistedReducer,
-  middleware: getDefaultMiddleware =>
-    getDefaultMiddleware({ serializableCheck: false }).concat(logger),
-});
+// store
+export const store = configureStore({
+    reducer: persistedReducer,
+    middleware: getDefaultMiddleware =>
+        getDefaultMiddleware({ serializableCheck: false, }).concat(logger)
+})
 
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
+export const persistor = persistStore(store)
 
-export const persister = persistStore(store);
-
-export default store;
+// ─── Types ────────────────────────────────────────────────────────────────────
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch

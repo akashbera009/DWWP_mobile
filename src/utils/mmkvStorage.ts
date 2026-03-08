@@ -1,6 +1,8 @@
 import { createMMKV } from "react-native-mmkv";
 
-export const mmkv = createMMKV();
+export const mmkv = createMMKV({
+  id: "dwwp-storage"
+});
 // Storage adapter for redux-persist
 export const mmkvStorage = {
   setItem: (key: string, value: string): Promise<void> => {
@@ -23,6 +25,9 @@ export const mmkvStorage = {
       resolve();
     });
   },
-};
 
+};
+export const clearAll = async (): Promise<void> => {
+  mmkv.clearAll();
+};
 export default mmkvStorage;

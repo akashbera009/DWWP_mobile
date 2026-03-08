@@ -3,7 +3,7 @@ import React from 'react'
 import colors from '@dwwp/utils/colors'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
-import Pill from './components/Pill'
+import Pill from './Pill'
 
 const WelcomeBanner = ({userName} :{userName:string}) => {
     const onlineCount = 5 ; 

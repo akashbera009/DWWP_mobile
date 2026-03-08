@@ -1,17 +1,17 @@
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import UsageChart from '../dashboard/components/UsageChart'
 import colors from '@dwwp/utils/colors'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import fonts from '@dwwp/utils/fonts'
 import { normalize, screenWidth, vh, vw } from '@dwwp/utils/dimensions'
 import { strings } from '@dwwp/utils/strings'
-import { MOCK_ADDONS, MOCK_MONTH_DATA } from '../dashboard/Monthlyusagedetail'
+
 import { getDaysInMonth, getTrend } from '@dwwp/utils/commonFunctions'
-import EffectiveTotal from './components/EffectiveTotal'
-import DailyBreakDown from './components/DailyBreakDown'
-import MonthlyBreakDown from './components/MonthlyBreakDown'
+import EffectiveTotal from '../components/EffectiveTotal'
+import DailyBreakDown from '../components/DailyBreakDown'
+import MonthlyBreakDown from '../components/MonthlyBreakDown'
 import { localImages } from '@dwwp/utils/localimages'
+import { MOCK_ADDONS, MOCK_MONTH_DATA } from '@dwwp/modules/dashboard/components/Monthlyusagedetail'
 
 const SCREEN_WIDTH = screenWidth;
 const MARGIN_BOTH_SIDE = vw(16)

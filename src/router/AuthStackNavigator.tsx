@@ -2,8 +2,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { screenNames } from '../utils/screenNames';
 import { AuthStackParamList } from '../utils/types';
 
-import SignUpPage from '@dwwp/modules/auth/SignUpScreen';
-import LoginPage from '@dwwp/modules/auth/LoginScreen';
+import SignUpPage from '@dwwp/modules/auth/screens/SignUpScreen';
+import LoginPage from '@dwwp/modules/auth/screens/LoginScreen';
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 
 const AuthStackNavigator = () => {

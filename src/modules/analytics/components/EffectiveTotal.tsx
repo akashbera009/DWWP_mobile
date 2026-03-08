@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import fonts from '@dwwp/utils/fonts'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
-import { MOCK_ADDONS, MOCK_MONTH_DATA } from '@dwwp/modules/dashboard/Monthlyusagedetail'
+import { MOCK_ADDONS, MOCK_MONTH_DATA } from '@dwwp/modules/dashboard/components/Monthlyusagedetail'
 
 const fmt = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(2)}kL` : `${Math.round(n)}L`
 

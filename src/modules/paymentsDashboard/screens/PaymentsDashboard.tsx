@@ -1,14 +1,12 @@
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import {  ScrollView, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { CustomHeader } from '@dwwp/components/CustomHeader'
 import { strings } from '@dwwp/utils/strings'
-import { localImages } from '@dwwp/utils/localimages'
 import colors from '@dwwp/utils/colors'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
-import PlanSelector from './Planselector'
-import TransactionHistory from './TransactionHistory'
-import CurrentBillComponent from './CurrentBillComponent'
+import PlanSelector from '../Planselector'
+import TransactionHistory from '../TransactionHistory'
+import CurrentBillComponent from '../CurrentBillComponent'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const PaymentsDashboard = () => {

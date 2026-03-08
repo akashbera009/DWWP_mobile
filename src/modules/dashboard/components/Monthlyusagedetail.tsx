@@ -35,7 +35,7 @@ import {
 import LinearGradient from 'react-native-linear-gradient'
 import { normalize, screenWidth, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
-import UsageChart from './components/UsageChart'
+import UsageChart from './UsageChart'
 import { localImages } from '@dwwp/utils/localimages'
 import { rotate } from '@shopify/react-native-skia'
 import { fmt } from '@dwwp/utils/commonFunctions'

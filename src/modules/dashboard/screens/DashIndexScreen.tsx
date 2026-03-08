@@ -12,13 +12,13 @@ import colors from '@dwwp/utils/colors'
 import { getStoredUserEmail } from '@dwwp/utils/commonFunctions'
 
 // components
-import Header from './components/Header'
-import ProfilePanel from './components/ProfilePanel'
-import NotificationPanel from './components/NotificationPanel'
-import ControlSwitchModal from './components/ControlSwitchModal'
-import DeviceSection from './DeviceSection'
-import DashBoardPage from './DashBoardPage'
-import MonthlyUsageDetail, { MOCK_ADDONS, MOCK_MONTH_DATA } from './Monthlyusagedetail'
+import Header from '../components/Header'
+import ProfilePanel from '../components/ProfilePanel'
+import NotificationPanel from '../components/NotificationPanel'
+import ControlSwitchModal from '../components/ControlSwitchModal'
+import DeviceSection from '../components/DeviceSection'
+import DashBoardPage from '../components/DashBoardPage'
+import MonthlyUsageDetail, { MOCK_ADDONS, MOCK_MONTH_DATA } from '../components/Monthlyusagedetail'
 
 const SCREEN_WIDTH = screenWidth
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
