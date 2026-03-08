@@ -7,8 +7,8 @@ import {
     fetchBroadcasts,
     updateServoState,
     fetchAdminConfig,
+    fetchServoState,
 } from "./dashboardActions"
-import { RootState } from "@dwwp/store"
 
 const initialState: DashboardState = {
     servoState: false,
@@ -59,17 +59,16 @@ const dashboardSlice = createSlice({
         builder.addCase(fetchUserDocument.pending, (state) => {
             state.isLoading = true
         })
+            .addCase(fetchUserDocument.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.userDetails = action.payload.userDetails
+                state.notification = action.payload.notification
+            })
 
-        builder.addCase(fetchUserDocument.fulfilled, (state, action) => {
-            state.isLoading = false
-            state.userDetails = action.payload.userDetails
-            state.notification = action.payload.notification
-        })
-
-        builder.addCase(fetchUserDocument.rejected, (state, action) => {
-            state.isLoading = false
-            state.error = action.payload ?? "Failed to load user"
-        })
+            .addCase(fetchUserDocument.rejected, (state, action) => {
+                state.isLoading = false
+                state.error = action.payload ?? "Failed to load user"
+            })
 
         //  fetchCurrentMonth
         builder
@@ -94,6 +93,19 @@ const dashboardSlice = createSlice({
             .addCase(updateServoState.rejected, (state, action) => {
                 state.error = action.payload ?? "Servo update failed."
             })
+        builder
+            .addCase(fetchServoState.pending, (state, action) => {
+                state.isLoading = true
+                state.error = action.payload ?? "Servo fetch failed."
+                state.error = null
+            })
+            .addCase(fetchServoState.fulfilled, (state, action) => {
+                state.servoState = action.payload ?? "Servo fetch success."
+            })
+            .addCase(fetchServoState.rejected, (state) => {
+                state.isLoading = false
+                state.error = "Servo fetch failed."
+            })
         // broadcast 
         builder
             .addCase(fetchBroadcasts.pending, (state) => {
@@ -111,7 +123,8 @@ const dashboardSlice = createSlice({
             })
 
 
-            // admin configs like limits and price 
+        // admin configs like limits and price 
+        builder
             .addCase(fetchAdminConfig.pending, (state) => {
                 state.isLoading = true
                 state.error = null

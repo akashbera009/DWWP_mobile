@@ -86,6 +86,32 @@ export const fetchCurrentMonth = createAsyncThunk<
 
 })
 
+// fetch servo state 
+export const fetchServoState = createAsyncThunk<
+    boolean,
+    { email: string },
+    { rejectValue: string; state: RootState }
+>(
+    "dashboard/fetchServoState",
+    async ({ email }, { rejectWithValue }) => {
+        try {
+            const snap = await firestore()
+                .collection("users")
+                .doc(email)
+                .get()
+
+            const data = snap.data()
+
+            if (!data) {
+                throw new Error("User document not found")
+            }
+
+            return data.servoState as boolean
+
+        } catch (e: any) {
+            return rejectWithValue(e.message ?? "Servo Fetch failed.")
+        }
+    })
 
 // Servo Update
 export const updateServoState = createAsyncThunk<

@@ -22,7 +22,7 @@ import MonthlyUsageDetail, { MOCK_ADDONS, MOCK_MONTH_DATA } from '../components/
 
 // redux
 import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks'
-import { fetchAdminConfig, fetchBroadcasts, fetchCurrentMonth, fetchUserDocument } from '../dashboardActions'
+import { fetchAdminConfig, fetchBroadcasts, fetchCurrentMonth, fetchServoState, fetchUserDocument } from '../dashboardActions'
 
 const SCREEN_WIDTH = screenWidth
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
@@ -32,10 +32,10 @@ const DashIndexScreen = () => {
     const email = useAppSelector((state) => state.auth.user?.email)
     useEffect(() => {
         if (!email) return
-
         dispatch(fetchUserDocument({ email }))
         dispatch(fetchCurrentMonth({ email }))
         dispatch(fetchBroadcasts())
+        dispatch(fetchServoState({email}))
         dispatch(fetchAdminConfig())
     }, [email])
 
