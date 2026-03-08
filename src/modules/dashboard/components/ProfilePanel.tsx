@@ -10,26 +10,27 @@ import { CommonActions, useNavigation } from '@react-navigation/native'
 import { strings } from '@dwwp/utils/strings'
 import { localImages } from '@dwwp/utils/localimages'
 import { screenNames } from '@dwwp/utils/screenNames'
-import { useAppDispatch } from '@dwwp/store/hooks'
+import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks'
 import { logout } from '@dwwp/modules/auth/authAction'
+import Avatar from './Avatar'
+import { LoadingPopup } from '@dwwp/modules/auth/components/LoadingPopup'
 
 type user = {
-    imageUrl: ImageSourcePropType,
-    name: string
-    email: string
+    fullName: string,
+    emailId: string,
 }
 const ProfilePanel = ({ onClose }: { onClose: () => void }) => {
     const dispatch = useAppDispatch()
+    const userSelector = useAppSelector(state => state?.dashboard?.userDetails)
 
-    type MainStackNavigationProp =
-        NativeStackNavigationProp<MainStackParamList>;
+    type MainStackNavigationProp = NativeStackNavigationProp<MainStackParamList>;
+    type RootStackNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-    type RootStackNavigationProp =
-        NativeStackNavigationProp<RootStackParamList>;
     const navigation = useNavigation<MainStackNavigationProp>();
     const navigationAuth = useNavigation<RootStackNavigationProp>();
 
     const [userDetails, setUserDetails] = useState<user | null>(null)
+    const [logouLoading, setLogOutLoading] = useState<boolean>(false)
     const useProfileMenuItem = [
         {
             title: strings.viewProfile,
@@ -46,6 +47,7 @@ const ProfilePanel = ({ onClose }: { onClose: () => void }) => {
             imageUrl: localImages.logout,
             onClickEvent: async () => {
                 try {
+                    setLogOutLoading(true)
                     await dispatch(logout())
                     console.log('logged out succesfully');
                     navigationAuth.getParent()?.getParent()?.dispatch(
@@ -56,38 +58,40 @@ const ProfilePanel = ({ onClose }: { onClose: () => void }) => {
                     )
                 } catch (e) {
                     console.log('error is ', e);
-
+                } finally {
+                    setLogOutLoading(false)
                 }
             }
         }
     ]
 
     useEffect(() => {
+        if (userSelector === null) return
         setUserDetails(
             {
-                name: 'Akash Bera',
-                email: 'ab@gmail.com',
-                imageUrl: {
-                    uri: 'https://imgs.search.brave.com/jVFBSCsWLVIm0V_8EDl9hAXC4cnGgQ34Djm_UIm_EZU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzA2LzI0LzY5LzM3/LzM2MF9GXzYyNDY5/Mzc3Ml9OYUczUEU3/U1JBcUhBU3VJVGg3/QWVFNWU1MnE0Z0VQ/eS5qcGc'
-                }
-            });
+                fullName: userSelector?.fullName,
+                emailId: userSelector?.emailId,
+            }
+        )
     }, []);
     return (
         <View style={[styles.dropdownPanel, { right: vw(12), width: vw(200) }]}>
             <View style={styles.profileSection}>
-                <Image
-                    source={userDetails?.imageUrl}
-                    style={styles.profileSectionImage}
-                />
+                <View style={styles.profileSectionImage}>
+                    {userDetails?.fullName &&
+                        <Avatar name={userDetails?.fullName} size={45} />
+                    }
+                </View>
                 <View >
                     <Text style={styles.profileSectionName}>
-                        {userDetails?.name}
+                        {userDetails?.fullName}
                     </Text>
                     <Text style={styles.profileSectionEmail}>
-                        {userDetails?.email}
+                        {userDetails?.emailId}
                     </Text>
-                </View>
+                </View> 
             </View>
+            <LoadingPopup visible={logouLoading} message="Logging Out.." />
             {useProfileMenuItem.map((item, idx) => (
                 <TouchableOpacity
                     style={[styles.individualContainer, idx === useProfileMenuItem?.length - 1 && styles.borderTop]}
@@ -178,6 +182,8 @@ const styles = StyleSheet.create({
         borderRadius: normalize(30),
         borderColor: colors.primary,
         marginRight: normalize(10),
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     profileSectionName: {
         fontFamily: fonts.Medium,

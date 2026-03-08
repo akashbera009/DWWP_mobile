@@ -30,7 +30,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import firestore from '@react-native-firebase/firestore'
 import type { RootState } from '../index'
-import { fetchCurrentMonth } from './dashboardSlice'
+import { fetchCurrentMonth } from '../../modules/dashboard/dashboardSlice'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface PaymentRecord {

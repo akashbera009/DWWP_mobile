@@ -20,15 +20,34 @@ import DeviceSection from '../components/DeviceSection'
 import DashBoardPage from '../components/DashBoardPage'
 import MonthlyUsageDetail, { MOCK_ADDONS, MOCK_MONTH_DATA } from '../components/Monthlyusagedetail'
 
+// redux
+import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks'
+import { fetchAdminConfig, fetchBroadcasts, fetchCurrentMonth, fetchUserDocument } from '../dashboardActions'
+
 const SCREEN_WIDTH = screenWidth
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 const DashIndexScreen = () => {
+
+    const dispatch = useAppDispatch()
+    const email = useAppSelector((state) => state.auth.user?.email)
+    useEffect(() => {
+        if (!email) return
+
+        dispatch(fetchUserDocument({ email }))
+        dispatch(fetchCurrentMonth({ email }))
+        dispatch(fetchBroadcasts())
+        dispatch(fetchAdminConfig())
+    }, [email])
+
+    const servoState = useAppSelector((state) => state.dashboard?.servoState)
+
     const [userEmail, setUserEmail] = useState<string>('')
     const [notifOpen, setNotifOpen] = useState(false)
     const [profileOpen, setProfileOpen] = useState(false)
     const [activeTab, setActiveTab] = useState<number>(0)
 
-    const [servoState, setServoState] = useState<boolean>(false)
+
+    // const [servoState, setServoState] = useState<boolean>(false)
     const [lastSeen, setLastSeen] = useState<number | undefined>(undefined)
     const [limitExceeded, setLimitExceeded] = useState<boolean>(false)
     const [isSwitchOpen, setIsSwitchOpen] = useState<boolean>(false)
@@ -109,7 +128,7 @@ const DashIndexScreen = () => {
                     userId={userEmail}
                     servoState={servoState}
                     onToggle={(next) => {
-                        setServoState(next)
+                        // setServoState(next)
                         // TODO: write to Firebase:
                         // firestore().doc(`users/${email}`).update({ servoState: next })
                     }}

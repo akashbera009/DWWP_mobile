@@ -15,7 +15,7 @@ import { combineReducers } from '@reduxjs/toolkit'
 import mmkvStorage from "../utils/mmkvStorage";
 
 import authReducer from '@dwwp/modules/auth/authSlice'
-// import dashboardReducer from '../slices/dashboardSlice'
+import dashboardReducer from '@dwwp/modules/dashboard/dashboardSlice'
 // import paymentReducer from '../slices/payment/paymentSlice'
 
 // persist 
@@ -27,8 +27,8 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
     auth: authReducer,
+    dashboard: dashboardReducer,
 })
-// dashboard: dashboardReducer,
 // payment: paymentReducer,
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 

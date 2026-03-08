@@ -1,45 +1,47 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
 import colors from '@dwwp/utils/colors'
+import { useAppSelector } from '@dwwp/store/hooks'
+import { BroadcastMsg } from '@dwwp/modals'
 
-
-const NOTIFICATIONS = [
-    { id: 1, title: 'Power Usage Alert', desc: 'High consumption detected in Zone A', time: '2m ago', type: 'warning', icon: '⚡' },
-    { id: 2, title: 'Device Online', desc: 'Pump Station #3 is back online', time: '15m ago', type: 'success', icon: '✅' },
-    { id: 3, title: 'Bill Generated', desc: 'Your monthly bill is ready', time: '1h ago', type: 'info', icon: 'ℹ️' },
-]
-
-const NotificationPanel = ({ onClose }: { onClose: () => void }) => (
-    <View style={styles.dropdownPanel}>
-        <View style={styles.dropdownHeader}>
-            <Text style={styles.dropdownTitle}>Notifications</Text>
-            <View style={styles.notifBadge}>
-                <Text style={styles.notifBadgeText}>{NOTIFICATIONS.length}</Text>
+const NotificationPanel = ({ onClose }: { onClose: () => void }) => {
+    const [notifications, setNoticications] = useState<BroadcastMsg[] | null>([])
+    const notificationSelector = useAppSelector(state => state.dashboard.broadcasts)
+    useEffect(() => {
+        if (notificationSelector?.length !== 0) {
+            setNoticications(notificationSelector)
+        } else return
+    }, [notificationSelector])
+    return (
+        <View style={styles.dropdownPanel}>
+            <View style={styles.dropdownHeader}>
+                <Text style={styles.dropdownTitle}>Notifications</Text>
+                <View style={styles.notifBadge}>
+                    <Text style={styles.notifBadgeText}>{notifications?.length}</Text>
+                </View>
             </View>
+            {notifications?.map((n: BroadcastMsg, id: number) => (
+                <View key={id} style={styles.notifRow}>
+                    <View style={[styles.notifIconBox, {
+                        backgroundColor:`${colors.activeDot}18`
+                    }]}>
+                        <Text style={{ fontSize: 15 }}>{n.icon}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.notifTitle}>{n.message}</Text>
+                        <Text style={styles.notifTime}>{n.timestamp}</Text>
+                    </View>
+                </View>
+            ))}
+            <TouchableOpacity onPress={onClose} style={styles.dropdownFooter}>
+                <Text style={styles.dropdownFooterText}>View All</Text>
+            </TouchableOpacity>
         </View>
-        {NOTIFICATIONS.map(n => (
-            <View key={n.id} style={styles.notifRow}>
-                <View style={[styles.notifIconBox, {
-                    backgroundColor: n.type === 'warning' ? `${colors.warning}18`
-                        : n.type === 'success' ? `${colors.success}18` : `${colors.activeDot}18`
-                }]}>
-                    <Text style={{ fontSize: 15 }}>{n.icon}</Text>
-                </View>
-                <View style={{ flex: 1 }}>
-                    <Text style={styles.notifTitle}>{n.title}</Text>
-                    <Text style={styles.notifDesc}>{n.desc}</Text>
-                    <Text style={styles.notifTime}>{n.time}</Text>
-                </View>
-            </View>
-        ))}
-        <TouchableOpacity onPress={onClose} style={styles.dropdownFooter}>
-            <Text style={styles.dropdownFooterText}>View All</Text>
-        </TouchableOpacity>
-    </View>
-)
+    )
+}
 
 export default NotificationPanel
 
@@ -128,5 +130,5 @@ const styles = StyleSheet.create({
         color: colors.neutralBodyText,
         marginTop: vh(2),
     },
-   
+
 })

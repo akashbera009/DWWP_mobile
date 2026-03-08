@@ -6,7 +6,7 @@ import { useAppSelector } from '@dwwp/store/hooks';
 //Custom Imports
 import MainStackNavigator from './MainStack';
 import AuthStackNavigator from './AuthStackNavigator';
-import DWWPSplash from '@dwwp/modules/splashScreen/DWWPSplash';
+import DWWPSplash from '@dwwp/assets/DWWPSplash';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -17,13 +17,13 @@ export const RootNavigator = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setSplashFinished(true);
-    }, 2000);
+    }, 100);
 
     return () => clearTimeout(timer);
   }, []);
 
   if (!splashFinished) {
-    return <DWWPSplash duration={2500} />;
+    return <DWWPSplash duration={100} />;
   }
   if (error) {
     console.error(error);

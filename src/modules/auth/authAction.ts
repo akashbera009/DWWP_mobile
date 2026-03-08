@@ -8,6 +8,7 @@ import { persistor } from "@dwwp/store"
 
 import { AuthUser, RegisterPayload } from '@dwwp/modals'
 import { clearAll } from "@dwwp/utils/mmkvStorage"
+import { showInfoSnackbar } from "@dwwp/utils/showSnackBar";
 
 const ADMIN_DOC = "adminConfig"
 
@@ -66,45 +67,45 @@ export const loginWithEmail = createAsyncThunk<
 // ─── Register ─────────────────────────────────────────────────────────────────
 
 export const registerWithEmail = createAsyncThunk<
-  AuthUser,
-  RegisterPayload,
-  { rejectValue: string }
+    AuthUser,
+    RegisterPayload,
+    { rejectValue: string }
 >(
-  "auth/registerWithEmail",
-  async ({ name, email, address, aadhaar, mobile, password }, { rejectWithValue }) => {
-    try {
-      // 1. Create Firebase Auth user
-      const cred = await createUserWithEmailAndPassword(getAuth(), email, password);
-      const uid = cred.user.uid;
+    "auth/registerWithEmail",
+    async ({ name, email, address, aadhaar, mobile, password }, { rejectWithValue }) => {
+        try {
+            // 1. Create Firebase Auth user
+            const cred = await createUserWithEmailAndPassword(getAuth(), email, password);
+            const uid = cred.user.uid;
 
-      // 2. Save profile to Firestore under /users/{uid}
-      await firestore().collection("users").doc(uid).set({
-        uid,
-        name,
-        email,
-        address,
-        aadhaar,        // store hashed / encrypted in production
-        mobile,
-        createdAt: firestore.FieldValue.serverTimestamp(),
-      });
+            // 2. Save profile to Firestore under /users/{uid}
+            await firestore().collection("users").doc(uid).set({
+                uid,
+                name,
+                email,
+                address,
+                aadhaar,        // store hashed / encrypted in production
+                mobile,
+                createdAt: firestore.FieldValue.serverTimestamp(),
+            });
 
-      return {
-        uid,
-        email,
-        name,
-      };
-    } catch (e: any) {
-      const msg =
-        e.code === "auth/email-already-in-use"
-          ? "An account with this email already exists."
-          : e.code === "auth/invalid-email"
-          ? "Invalid email address."
-          : e.code === "auth/weak-password"
-          ? "Password is too weak. Use at least 8 characters."
-          : e.message ?? "Registration failed.";
-      return rejectWithValue(msg);
+            return {
+                uid,
+                email,
+                name,
+            };
+        } catch (e: any) {
+            const msg =
+                e.code === "auth/email-already-in-use"
+                    ? "An account with this email already exists."
+                    : e.code === "auth/invalid-email"
+                        ? "Invalid email address."
+                        : e.code === "auth/weak-password"
+                            ? "Password is too weak. Use at least 8 characters."
+                            : e.message ?? "Registration failed.";
+            return rejectWithValue(msg);
+        }
     }
-  }
 );
 
 export const logout = createAsyncThunk(
@@ -113,5 +114,6 @@ export const logout = createAsyncThunk(
         await getAuth().signOut()
         await persistor.purge()
         await clearAll()
+        showInfoSnackbar('Logged Out successfully')
     }
 )

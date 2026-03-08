@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+// utils 
 import colors from '@dwwp/utils/colors'
 import fonts from '@dwwp/utils/fonts'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
@@ -14,18 +16,49 @@ import { goBack, navigationRef } from '@dwwp/utils/navigationService';
 import { strings } from '@dwwp/utils/strings';
 import { localImages } from '@dwwp/utils/localimages';
 import { screenNames } from '@dwwp/utils/screenNames';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { UserDetails } from '@dwwp/modals';
+import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks';
+// components 
+import Avatar from '../dashboard/components/Avatar';
+import { logout } from '../auth/authAction';
+import { LoadingPopup } from '../auth/components/LoadingPopup';
+
 const ViewProfileScreen = () => {
-  // Dummy user data (replace with real data later)
-  const user = {
-    name: 'Akash Bera',
-    email: 'akash@example.com',
-    phone: '+91 98765 43210',
-    userId: 'DW-10023',
-    address: 'Jaipur, Rajasthan',
-    status: 'Active',
-  };
   const { top } = useSafeAreaInsets()
+  const dispatch = useAppDispatch()
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null)
+  const userSelector = useAppSelector(state => state?.dashboard?.userDetails)
+  useEffect(() => {
+    if (userSelector === null) return
+    setUserDetails({
+      fullName: userSelector?.fullName,
+      emailId: userSelector?.emailId,
+      mobileNo: userSelector?.mobileNo,
+      address: userSelector?.address,
+      accountNumber: userSelector?.accountNumber,
+      consumerNumber: userSelector?.consumerNumber,
+      meterNumber: userSelector?.meterNumber,
+      supplyZone: userSelector?.supplyZone,
+    })
+  }, []);
+
+  const [logouLoading, setLogOutLoading] = useState<boolean>(false)
+  const handleLogOut = async () => {
+    try {
+      setLogOutLoading(true)
+      await dispatch(logout())
+      navigationRef.current?.getParent()?.getParent()?.reset({
+        index: 0,
+        routes: [{ name: screenNames.AuthStack }],
+      })
+    } catch (error) {
+      console.error('logout error')
+    } finally {
+      setLogOutLoading(true)
+    }
+  }
+
   return (
     <View style={[styles.containerWrapper, { paddingTop: top }]}>
       <View style={styles.homeHeaderContainer}>
@@ -44,22 +77,29 @@ const ViewProfileScreen = () => {
         <View style={styles.content}>
 
           <View style={styles.header}>
-            <Image
-              source={{ uri: 'https://i.pravatar.cc/150?img=12' }}
+            <View
               style={styles.avatar}
-            />
-            <Text style={styles.name}>{user.name}</Text>
-            <Text style={styles.email}>{user.email}</Text>
+            >
+              {userDetails && (
+                <Avatar name={userDetails?.fullName} size={80} />
+              )}
+            </View>
+            <Text style={styles.name}>{userDetails?.fullName}</Text>
+            <Text style={styles.email}>{userDetails?.emailId}</Text>
           </View>
 
           {/* Info Card */}
           <View style={styles.card}>
-            <ProfileRow label="Phone" value={user.phone} />
-            <ProfileRow label="User ID" value={user.userId} />
-            <ProfileRow label="Address" value={user.address} />
+            {userDetails && (<>
+              <ProfileRow label="Phone" value={userDetails?.mobileNo} />
+              <ProfileRow label="User ID" value={userDetails?.consumerNumber} />
+              <ProfileRow label="Meter No" value={userDetails?.meterNumber} />
+              <ProfileRow label="Address" value={userDetails?.address} />
+            </>
+            )}
             <ProfileRow
               label="Account Status"
-              value={user.status}
+              value={userDetails?.emailId ? 'Active' : 'In Active'}
               valueStyle={{ color: '#10B981' }}
             />
           </View>
@@ -70,16 +110,14 @@ const ViewProfileScreen = () => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => navigationRef.current?.reset({
-              index: 0,
-              routes: [{ name: screenNames.AuthStack }],
-            })}
+            onPress={handleLogOut}
             style={styles.logoutButton}>
             <Text style={styles.logoutButtonText}>Logout</Text>
           </TouchableOpacity>
 
         </View>
       </ScrollView>
+      <LoadingPopup visible={logouLoading} message="Logging Out.." />
     </View>
   );
 };
@@ -130,19 +168,19 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginTop: vh(40),
+    marginTop: vh(20),
     marginBottom: vh(24),
   },
 
   avatar: {
-    width: normalize(110),
-    height: normalize(110),
+    width: normalize(80),
+    height: normalize(80),
     borderRadius: normalize(55),
-    marginBottom: vh(12),
+    marginBottom: vh(2),
   },
 
   name: {
-    fontSize: normalize(20),
+    fontSize: normalize(22),
     fontFamily: fonts.Bold,
     color: colors.primaryBlack,
   },
@@ -150,8 +188,7 @@ const styles = StyleSheet.create({
   email: {
     fontSize: normalize(14),
     fontFamily: fonts.Regular,
-    color: '#6B7280',
-    marginTop: vh(4),
+    color: colors.secondary,
   },
 
   card: {
