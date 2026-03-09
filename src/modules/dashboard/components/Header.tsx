@@ -2,7 +2,8 @@ import { Image, LayoutChangeEvent, StyleSheet, Text, TouchableOpacity, View } fr
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
-    withSpring
+    withSpring,
+    withTiming
 } from 'react-native-reanimated'
 import React, { useEffect, useState } from 'react'
 import LinearGradient from 'react-native-linear-gradient';
@@ -25,9 +26,9 @@ type HeaderProps = {
 }
 const tabs = ['overview', 'device', 'usages']
 const springConfig = {
-    damping: 10,      // lower = more oscillation
+    damping: 5,      // lower = more oscillation
     stiffness: 90,
-    mass: 1,
+    mass: .5,
 }
 const Header = ({
     activeTab,
@@ -46,7 +47,9 @@ const Header = ({
         const indicatorWidth = tabBarWidth / tabs.length
         const to = indicatorWidth * activeTab
         // animate with spring for bounce
-        indicatorTranslateX.value = withSpring(to, springConfig)
+        indicatorTranslateX.value =  
+        withSpring(to, springConfig)
+        // withTiming(indicatorWidth * activeTab , {duration: 100})
     }, [activeTab, tabBarWidth, indicatorTranslateX])
 
     const onTabBarLayout = (e: LayoutChangeEvent) => {
@@ -55,7 +58,9 @@ const Header = ({
         setTabBarWidth(w)
         // ensure indicator snaps to current tab if width was previously 0
         const indicatorWidth = w / tabs.length
-        indicatorTranslateX.value = withSpring(indicatorWidth * activeTab, springConfig)
+        indicatorTranslateX.value =
+        withSpring(indicatorWidth * activeTab, springConfig)
+        //  withTiming(indicatorWidth * activeTab , {duration: 100})
     }
 
     const indicatorWidth = tabBarWidth ? tabBarWidth / tabs.length : 0

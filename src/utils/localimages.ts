@@ -6,6 +6,7 @@ export const localImages = {
     eyeSlash: require('../assets/images/eye-slash.png'),
     eye: require('../assets/images/eye.png'),
     backArrow: require('../assets/images/backArrow.png'),
+    back: require('../assets/images/back.png'),
     downarrow: require('../assets/images/downarrow.png'),
     tick: require('../assets/images/tick.png'),
     verified: require('../assets/images/verified.png'),
@@ -33,5 +34,8 @@ export const localImages = {
 
     hide: require('../assets/images/hide.png'),
     view: require('../assets/images/view.png'),
+    usages: require('../assets/images/usages.png'),
+    calendar: require('../assets/images/calendar.png'),
+    bill: require('../assets/images/bill.png'),
     
 }

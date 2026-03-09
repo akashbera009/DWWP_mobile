@@ -1,2 +1,2 @@
 
-sigin keyboard avoinding view test on real device 
+sigin/siginup keyboard avoinding view test on real device 

@@ -1,0 +1,358 @@
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    TouchableOpacity,
+    Animated,
+    Image,
+} from 'react-native';
+import colors from '@dwwp/utils/colors';
+import { normalize, vh, vw } from '@dwwp/utils/dimensions';
+import fonts from '@dwwp/utils/fonts';
+import { displayNOtification } from '@dwwp/utils/displayNotification';
+import { localImages } from '@dwwp/utils/localimages';
+import ConfirmationPayModal from './ConfirmationPayMpdal';
+
+export interface BillingCardProps {
+    amount: number;
+    usage: number;
+    dueDate: string;
+    isPaid: boolean;
+    onPayPress: () => void;
+}
+
+const isLastDayOfMonth = () => {
+    // const today = new Date();
+    // const tomorrow = new Date(today);
+    // tomorrow.setDate(today.getDate() + 1);
+    // return tomorrow.getDate() === 1;
+    return true;
+};
+
+const CurrentBillComponent = () => {
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+    const dummyBillObject = {
+        amount: 250.75,
+        usage: 120,
+        dueDate: '2026-03-04',
+        isPaid: false,
+    };
+
+    const scaleAnim = useRef(new Animated.Value(1)).current;
+    const pulseAnim = useRef(new Animated.Value(1)).current;
+
+    const isMonthEnd = isLastDayOfMonth();
+    const isDisabled = dummyBillObject.isPaid || !isMonthEnd;
+    const isPaid = dummyBillObject.isPaid;
+
+    // Pulse the status dot when pending
+    useEffect(() => {
+        if (!isPaid) {
+            Animated.loop(
+                Animated.sequence([
+                    Animated.timing(pulseAnim, { toValue: 1.4, duration: 900, useNativeDriver: true }),
+                    Animated.timing(pulseAnim, { toValue: 1, duration: 900, useNativeDriver: true }),
+                ])
+            ).start();
+        }
+    }, []);
+
+    const handlePressIn = () =>
+        Animated.spring(scaleAnim, { toValue: 0.97, useNativeDriver: true, damping: 10 }).start();
+
+    const handlePressOut = () =>
+        Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, damping: 10 }).start();
+
+
+    const onSuccess = useCallback(() => {
+        setIsModalOpen(false)
+    }, [])
+    const payCurrentBill = () => {
+        console.log('initiating payment ');
+        try {
+            setIsModalOpen(true)
+            const success = false
+            if (success) {
+                displayNOtification({
+                    title: 'Payment Successful',
+                    body: 'Your payment has been processed successfully.',
+                });
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const monthLabel = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
+
+    return (
+        <View style={styles.wrapper}>
+            <Text style={styles.sectionLabel}>Current Bill</Text>
+
+            <View style={styles.card}>
+                {/* Top accent bar */}
+                <View style={[styles.accentBar, { backgroundColor: isPaid ? colors.success : colors.warning }]} />
+
+                {/* Decorative circle */}
+                <View style={styles.decorCircle} />
+                <View style={styles.decorCircle2} />
+
+                {/* Header row */}
+                <View style={styles.header}>
+                    <View>
+                        <Text style={styles.monthText}>{monthLabel}</Text>
+                    </View>
+                    <View style={styles.statusPill}>
+                        <Animated.View
+                            style={[
+                                styles.statusDot,
+                                {
+                                    backgroundColor: isPaid ? colors.success : colors.warning,
+                                    transform: [{ scale: isPaid ? 1 : pulseAnim }],
+                                },
+                            ]}
+                        />
+                        <Text style={[styles.statusText, { color: isPaid ? colors.success : colors.warning }]}>
+                            {isPaid ? 'Paid' : 'Pending'}
+                        </Text>
+                    </View>
+                </View>
+
+                {/* Amount display */}
+                <View style={styles.amountRow}>
+                    <Text style={styles.currencySymbol}>₹</Text>
+                    <Text style={styles.amountText}>{dummyBillObject.amount.toFixed(2)}</Text>
+                </View>
+
+                {/* Stats row */}
+                <View style={styles.statsRow}>
+                    <View style={styles.statItem}>
+                        <Image source={localImages.usages}
+                            style={styles.Stateicon} />
+                        <View>
+                            <Text style={styles.statValue}>{dummyBillObject.usage} L</Text>
+                            <Text style={styles.statLabel}>Usage</Text>
+                        </View>
+                    </View>
+                    <View style={styles.statDivider} />
+                    <View style={styles.statItem}>
+                        <Image source={localImages.calendar}
+                            style={styles.Stateicon} />
+                        <View>
+                            <Text style={styles.statValue}>{dummyBillObject.dueDate}</Text>
+                            <Text style={styles.statLabel}>Due Date</Text>
+                        </View>
+                    </View>
+                </View>
+
+                {/* Pay button */}
+                <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+                    <TouchableOpacity
+                        style={[styles.button, isDisabled && styles.disabledButton]}
+                        disabled={isDisabled}
+                        onPress={payCurrentBill}
+                        onPressIn={handlePressIn}
+                        onPressOut={handlePressOut}
+                        activeOpacity={1}
+                    >
+                        {!isDisabled && <Text style={styles.buttonIcon}>⚡</Text>}
+                        <Text style={styles.buttonText}>
+                            {isPaid ? 'Already Paid' : !isMonthEnd ? 'Available on Month End' : 'Pay Now'}
+                        </Text>
+                    </TouchableOpacity>
+                </Animated.View>
+            </View>
+
+            <ConfirmationPayModal
+                visible={isModalOpen}
+                onSuccess={() => {
+                    setIsModalOpen(false)
+                    displayNOtification({
+                        title: 'Payment Successful',
+                        body: 'Your payment has been processed successfully.',
+                    })
+                }}
+                onCancel={() => setIsModalOpen(false)}
+            />
+        </View>
+    );
+};
+
+export default CurrentBillComponent;
+
+const styles = StyleSheet.create({
+    wrapper: {
+        marginHorizontal: vw(16),
+        marginTop: vh(16),
+    },
+    sectionLabel: {
+        fontFamily: fonts.Bold,
+        fontSize: normalize(16),
+        color: colors.primary,
+        marginBottom: vh(10),
+        letterSpacing: -0.2,
+    },
+    decorCircle: {
+        position: 'absolute',
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        backgroundColor: colors.primaryLight,
+        top: -30,
+        right: -20,
+    },
+    decorCircle2: {
+        position: 'absolute',
+        width: 160,
+        height: 160,
+        borderRadius: 160,
+        backgroundColor: 'rgba(50,194,202,0.08)',
+        bottom: 60,
+        left: 10,
+    },
+    card: {
+        backgroundColor: colors.white,
+        borderRadius: 20,
+        overflow: 'hidden',
+        elevation: 8,
+        shadowColor: colors.primaryDark,
+        shadowOpacity: 0.12,
+        shadowRadius: 12,
+        shadowOffset: { width: 0, height: 4 },
+    },
+    accentBar: {
+        height: 4,
+        width: '100%',
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        padding: vw(20),
+        paddingBottom: vh(4),
+    },
+    monthText: {
+        fontFamily: fonts.Bold,
+        fontSize: normalize(16),
+        color: colors.neutralBlack,
+        letterSpacing: -0.3,
+    },
+    subText: {
+        fontFamily: fonts.Regular,
+        fontSize: normalize(12),
+        color: colors.neutralBodyText,
+        marginTop: 2,
+    },
+    statusPill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: colors.lightGray,
+        paddingHorizontal: vw(10),
+        paddingVertical: vh(5),
+        borderRadius: 20,
+        gap: 6,
+    },
+    statusDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+    },
+    statusText: {
+        fontFamily: fonts.Bold,
+        fontSize: normalize(12),
+    },
+    amountRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        paddingHorizontal: vw(20),
+        paddingVertical: vh(0),
+    },
+    currencySymbol: {
+        fontFamily: fonts.Bold,
+        fontSize: normalize(18),
+        color: colors.primary,
+        marginTop: vh(6),
+        marginRight: vw(2),
+    },
+    amountText: {
+        fontFamily: fonts.Bold,
+        fontSize: normalize(42),
+        color: colors.neutralBlack,
+        letterSpacing: -1.5,
+        lineHeight: normalize(48),
+    },
+    statsRow: {
+        flexDirection: 'row',
+        marginHorizontal: vw(20),
+        marginBottom: vh(12),
+        marginTop: vh(8),
+        backgroundColor: colors.white,
+        elevation: 2,
+        borderRadius: normalize(14),
+        padding: vw(8),
+        gap: vw(8),
+        borderWidth: normalize(1),
+        borderColor: colors.border
+    },
+    statItem: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: vw(8),
+    },
+    Stateicon: {
+        height: vh(22),
+        width: vh(22),
+        marginRight: vw(6),
+        tintColor: colors.black
+    },
+    statIcon: {
+        fontSize: 20,
+    },
+    statValue: {
+        fontFamily: fonts.Bold,
+        fontSize: normalize(13),
+        color: colors.neutralBlack,
+    },
+    statLabel: {
+        fontFamily: fonts.Regular,
+        fontSize: normalize(11),
+        color: colors.neutralBodyText,
+    },
+    statDivider: {
+        width: 1,
+        alignSelf: 'stretch',
+        backgroundColor: colors.border,
+    },
+    button: {
+        flexDirection: 'row',
+        backgroundColor: colors.primary,
+        marginHorizontal: vw(20),
+        marginBottom: vh(20),
+        paddingVertical: vh(15),
+        borderRadius: 14,
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        elevation: 4,
+        shadowColor: colors.primaryDark,
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 3 },
+    },
+    disabledButton: {
+        backgroundColor: colors.inputBackground,
+        elevation: 0,
+        shadowOpacity: 0,
+    },
+    buttonIcon: {
+        fontSize: 16,
+    },
+    buttonText: {
+        fontFamily: fonts.Bold,
+        fontSize: normalize(15),
+        color: colors.white,
+        letterSpacing: 0.2,
+    },
+});

@@ -15,7 +15,9 @@ export const screenNames = {
     AnalyticsPage: 'AnalyticsPage',
 
     ViewProfileScreen:'ViewProfileScreen',
-    SelectAddress : 'SelectAddress' 
+    SelectAddress : 'SelectAddress',
+
+    FullPaymantHistory : 'FullPaymantHistory'
 } as const;
 
 export type ScreenNames = keyof typeof screenNames;

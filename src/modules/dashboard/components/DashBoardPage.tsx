@@ -21,13 +21,15 @@ type DashBoardPagePropsType = {
     lastSeen: number | undefined;
     servoState: boolean;
     setIsSwitchOpen: () => void
+    refreshDashboard: () => void
 }
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
-const DashBoardPage = ({ lastSeen, servoState, setIsSwitchOpen }: DashBoardPagePropsType) => {
+const DashBoardPage = ({ lastSeen, servoState, setIsSwitchOpen ,refreshDashboard }: DashBoardPagePropsType) => {
     const [refreshing, setRefreshing] = React.useState(false);
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
+        refreshDashboard()
         setTimeout(() => {
             showSnackbar({ message: 'Data refreshed!', type: 'success' })
             setRefreshing(false);

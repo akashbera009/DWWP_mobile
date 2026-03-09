@@ -1,30 +1,44 @@
-import {  ScrollView, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import React, { useCallback } from 'react'
 import { strings } from '@dwwp/utils/strings'
 import colors from '@dwwp/utils/colors'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
-import PlanSelector from '../Planselector'
-import TransactionHistory from '../TransactionHistory'
-import CurrentBillComponent from '../CurrentBillComponent'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-const PaymentsDashboard = () => {
+import TransactionHistory from './components/MiniTransactionHistory'
+import CurrentBillComponent from './components/CurrentBillComponent'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import PlanSelector from './components/MiniPlanselector'
+import { showSnackbar } from '@dwwp/utils/showSnackBar'
+import { RefreshControl } from 'react-native-gesture-handler'
+
+const PaymentsIndexDashboard = () => {
   const { top } = useSafeAreaInsets()
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      showSnackbar({ message: 'Data refreshed!', type: 'success' })
+      setRefreshing(false);
+    }, 1000);
+  }, []);
   return (
     <View style={[styles.container, { paddingTop: top }]}>
-      <ScrollView style={
-        styles.scrollview
-      }>
-        <View style={styles.homeHeaderContainer}>
-          <Text style={styles.homeHeaderText}>{strings.rechargesAndPayments}</Text>
-        </View>
-        {/* <Text style={styles.heading}>Payment Dashboard</Text> */}
-        <View style={styles.summaryCard}>
-          <Text>Total Spent</Text>
-          <Text style={styles.totalAmount}>₹ 300</Text>
-        </View>
-
+      <View style={styles.homeHeaderContainer}>
+        <Text style={styles.homeHeaderText}>{strings.rechargesAndPayments}</Text>
+      </View>
+      <ScrollView
+        style={
+          styles.scrollview
+        }
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
+      >
         <CurrentBillComponent />
 
         <TransactionHistory />
@@ -33,12 +47,13 @@ const PaymentsDashboard = () => {
           defaultSelected="premium"
           onSelect={(plan) => console.log(plan)}
         />
+
       </ScrollView>
-    </View>
+    </View >
   )
 }
 
-export default PaymentsDashboard
+export default PaymentsIndexDashboard
 
 const styles = StyleSheet.create({
   container: {

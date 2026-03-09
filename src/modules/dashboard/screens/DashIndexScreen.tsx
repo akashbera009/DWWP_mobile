@@ -30,14 +30,19 @@ const DashIndexScreen = () => {
 
     const dispatch = useAppDispatch()
     const email = useAppSelector((state) => state.auth.user?.email)
-    useEffect(() => {
+    const fetchDashboardData = useCallback(() => {
         if (!email) return
         dispatch(fetchUserDocument({ email }))
         dispatch(fetchCurrentMonth({ email }))
         dispatch(fetchBroadcasts())
-        dispatch(fetchServoState({email}))
+        dispatch(fetchServoState({ email }))
         dispatch(fetchAdminConfig())
     }, [email])
+    useEffect(() => {
+
+        if (!email) return
+        fetchDashboardData()
+    }, [email, fetchDashboardData])
 
     const servoState = useAppSelector((state) => state.dashboard?.servoState)
 
@@ -155,6 +160,7 @@ const DashIndexScreen = () => {
                         lastSeen={lastSeen}
                         servoState={servoState}
                         setIsSwitchOpen={() => setIsSwitchOpen(true)}
+                        refreshDashboard={fetchDashboardData}
                     />
                 </View>
 

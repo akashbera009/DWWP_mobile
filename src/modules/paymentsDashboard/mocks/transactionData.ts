@@ -32,4 +32,20 @@ export const TRANSACTIONS: Transaction[] = [
     qty: 1,
     status: 'pending',
   },
+  {
+    id: 'TXN-1003',
+    date: '2026-03-03',
+    type: 'regular',
+    amount: 100,
+    qty: 1,
+    status: 'pending',
+  },
+  {
+    id: 'TXN-1003',
+    date: '2026-03-03',
+    type: 'regular',
+    amount: 100,
+    qty: 1,
+    status: 'pending',
+  },
 ];

@@ -11,7 +11,7 @@ import {
 //Custom Imports
 import colors from '../utils/colors';
 import fonts from '../utils/fonts';
-import { normalize, isTablet } from '@dwwp/utils/dimensions';
+import { normalize, isTablet, vh } from '@dwwp/utils/dimensions';
 import {
   Ionicons,
   IoniconsIconName,
@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
+    marginVertical : vh(8)
   },
   text: {
     fontFamily: fonts.Medium,

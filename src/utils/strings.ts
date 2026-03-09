@@ -20,6 +20,12 @@ export const strings = {
     total: 'Total:',
     add: '+ Add',
 
+    cancel : 'Cancel',
+    confirm : 'Confirm',
+    proceed : 'Proceed',
+
+    paymentSureHeader:'Are you sure you want to pay this bill?',
+    
     signIn : 'Sign In',
     signUp: 'Sign Up',
     dontHaveAccount : "Don't have an account?",
@@ -44,4 +50,6 @@ export const strings = {
     planSelectorHeading: 'Choose Your Plan',
     maxLimitReached: 'Maximum Selectable quantity is 10',
     minLimitReached: 'Minimum Selectable quantity is 1',
+
+    viewFullHistory : 'View Full History'
 }

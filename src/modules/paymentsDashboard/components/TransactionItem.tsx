@@ -1,23 +1,63 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   Modal,
+  Animated,
 } from 'react-native';
-import { Transaction } from './transactionData';
+import { Transaction } from '../mocks/transactionData';
+import { vh, vw } from '@dwwp/utils/dimensions';
+import colors from '@dwwp/utils/colors';
 
 interface Props {
   item: Transaction;
+  key?: string;
+  index: number
 }
 
-const TransactionItem: React.FC<Props> = ({ item }) => {
+const TransactionItem: React.FC<Props> = ({ item, index }) => {
   const [showActions, setShowActions] = useState(false);
 
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const opacityAnim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(opacityAnim, {
+        toValue: 1,
+        duration: 300,
+        delay: index * 60,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 1,
+        delay: index * 60,
+        useNativeDriver: true,
+        damping: 18,
+        stiffness: 120,
+      }),
+    ]).start();
+  }, []);
   return (
     <>
-      <View style={styles.container}>
+      {/* <View style={styles.container}> */}
+      <Animated.View
+        style={[
+          styles.row,
+          {
+            opacity: opacityAnim,
+            transform: [
+              {
+                translateX: slideAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [24, 0],
+                }),
+              },
+            ],
+          },
+        ]}
+      >
         {/* Left Section */}
         <View style={styles.left}>
           <Text style={styles.txnId}>{item.id}</Text>
@@ -50,11 +90,12 @@ const TransactionItem: React.FC<Props> = ({ item }) => {
         {/* 3-dot button */}
         <TouchableOpacity
           style={styles.moreBtn}
+          hitSlop={{ right: 10, top: 10, left: 10, bottom: 10 }}
           onPress={() => setShowActions(true)}
         >
           <Text style={{ fontSize: 18 }}>⋮</Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
       {/* Action Modal */}
       <Modal
@@ -85,13 +126,14 @@ const TransactionItem: React.FC<Props> = ({ item }) => {
 export default TransactionItem;
 
 const styles = StyleSheet.create({
-  container: {
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
+    paddingHorizontal: vw(16),
+    paddingVertical: vh(12),
+    gap: vw(12),
     borderBottomWidth: 1,
-    borderColor: '#E5E7EB',
-    backgroundColor: '#fff',
+    borderBottomColor: colors.border,
   },
   left: { flex: 1 },
   middle: { flex: 1 },
@@ -105,11 +147,11 @@ const styles = StyleSheet.create({
 
   amount: { fontWeight: '700' },
   status: { fontSize: 12, marginTop: 2 },
-  completed: { color: '#10B981' },
-  pending: { color: '#F59E0B' },
+  completed: { color: colors.success },
+  pending: { color: colors.warning },
 
   moreBtn: {
-    paddingHorizontal: 10,
+    paddingHorizontal: vw(10),
   },
 
   overlay: {
