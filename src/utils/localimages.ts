@@ -37,5 +37,6 @@ export const localImages = {
     usages: require('../assets/images/usages.png'),
     calendar: require('../assets/images/calendar.png'),
     bill: require('../assets/images/bill.png'),
+    share: require('../assets/images/share.png'),
     
 }

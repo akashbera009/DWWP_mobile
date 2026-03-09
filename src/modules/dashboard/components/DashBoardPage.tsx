@@ -2,10 +2,12 @@ import React, { useCallback } from 'react'
 import {
     View, StyleSheet, ScrollView,
     RefreshControl,
+    TouchableOpacity,
+    Text, Image
 } from 'react-native'
 
 // utils 
-import { vh, vw } from '@dwwp/utils/dimensions'
+import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import { showSnackbar } from '@dwwp/utils/showSnackBar'
 
 // components
@@ -15,7 +17,15 @@ import HeroSummaryCard from './HeroSummaryCard'
 import UsageChart from './UsageChart'
 import StatGrid from './StatGrid'
 import DeviceSection from './DeviceSection'
-import { Text } from 'react-native-gesture-handler'
+import colors from '@dwwp/utils/colors'
+import fonts from '@dwwp/utils/fonts'
+import { localImages } from '@dwwp/utils/localimages'
+import { strings } from '@dwwp/utils/strings'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { BottomTabParamList, MainStackParamList } from '@dwwp/utils/types'
+import { useNavigation } from '@react-navigation/native'
+import { screenNames } from '@dwwp/utils/screenNames'
+import QuickLinks from './Quicklinks'
 
 type DashBoardPagePropsType = {
     lastSeen: number | undefined;
@@ -23,9 +33,12 @@ type DashBoardPagePropsType = {
     setIsSwitchOpen: () => void
     refreshDashboard: () => void
 }
-// ─── Main Dashboard ───────────────────────────────────────────────────────────
-const DashBoardPage = ({ lastSeen, servoState, setIsSwitchOpen ,refreshDashboard }: DashBoardPagePropsType) => {
+
+type BottomStackNavigation = NativeStackNavigationProp<BottomTabParamList>;
+
+const DashBoardPage = ({ lastSeen, servoState, setIsSwitchOpen, refreshDashboard }: DashBoardPagePropsType) => {
     const [refreshing, setRefreshing] = React.useState(false);
+    const bottomStackNavigation = useNavigation<BottomStackNavigation>()
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
@@ -35,6 +48,17 @@ const DashBoardPage = ({ lastSeen, servoState, setIsSwitchOpen ,refreshDashboard
             setRefreshing(false);
         }, 1000);
     }, []);
+
+    const handleViewMonthlyUsagesPress = () => {
+        bottomStackNavigation.navigate(screenNames.AnalyticsPage)
+    }
+
+    const links = [
+        "Raise Complaint",
+        "Give Feedback",
+        "Do a Quick Recharge",
+        "Pay Dues"
+    ]
 
     return (
         <View
@@ -69,16 +93,20 @@ const DashBoardPage = ({ lastSeen, servoState, setIsSwitchOpen ,refreshDashboard
                 />
 
                 {/* Usage Chart */}
-                <UsageChart />
+                <View style={styles.card}>
+                    <UsageChart />
+                    <TouchableOpacity
+                        onPress={handleViewMonthlyUsagesPress}
+                        style={styles.viewAllContainer}>
+                        <Text style={styles.viewAll}>{strings.viewUsagesAnalytics}</Text>
+                        <Image source={localImages.back} style={styles.backArrow} />
+                    </TouchableOpacity>
+                </View>
 
                 {/* Fixed Charges */}
                 <FixedCharges />
 
-                <Text>  Quick Links</Text>
-                <Text>  Reiase Complaint</Text>
-                <Text>  Give Feedback</Text>
-                <Text>  Do a Quick Recharge </Text>
-                <Text>  Pay Dues </Text>
+             <QuickLinks/>
 
             </ScrollView >
         </View >
@@ -106,5 +134,32 @@ const styles = StyleSheet.create({
         paddingBottom: vh(40),
         gap: vh(14),
     },
-
+    card: {
+        backgroundColor: colors.white,
+        borderRadius: normalize(20),
+        shadowColor: colors.cardShadow,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 3,
+    },
+    viewAllContainer: {
+        marginHorizontal: vw(10),
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderTopWidth: normalize(2),
+        borderTopColor: colors.border,
+        paddingVertical: vh(6)
+    },
+    viewAll: {
+        color: colors.primary,
+        fontSize: normalize(14),
+        fontFamily: fonts.Medium
+    },
+    backArrow: {
+        height: vh(10),
+        width: vh(16),
+        marginHorizontal: vw(8),
+        tintColor: colors.primary,
+        transform: [{ rotate: '180deg' }]
+    },
 })

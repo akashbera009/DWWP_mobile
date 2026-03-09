@@ -18,7 +18,6 @@ import colors from '@dwwp/utils/colors';
 import fonts from '@dwwp/utils/fonts';
 import { strings } from '@dwwp/utils/strings';
 import { localImages } from '@dwwp/utils/localimages';
-import { navigationRef } from '@dwwp/utils/navigationService';
 import { screenNames } from '@dwwp/utils/screenNames';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -29,14 +28,19 @@ if (Platform.OS === 'android') {
     UIManager.setLayoutAnimationEnabledExperimental(true);
   }
 }
-
+type TransactionHistoryScreenProps = {
+  scrollToBottom: () => void
+}
 type MainStackNavigation = NativeStackNavigationProp<MainStackParamList>;
-const TransactionHistory = () => {
+const TransactionHistory = ({ scrollToBottom }: TransactionHistoryScreenProps) => {
   const [expanded, setExpanded] = useState(false);
   const rotateAnim = useRef(new Animated.Value(0)).current;
-
+ 
   const mainStackNavigation = useNavigation<MainStackNavigation>()
   const toggle = () => {
+    if(!expanded){
+      scrollToBottom()
+    }
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpanded((prev) => !prev);
     Animated.spring(rotateAnim, {
@@ -56,7 +60,7 @@ const TransactionHistory = () => {
     mainStackNavigation.navigate(screenNames.FullPaymantHistory)
   }
 
-  const isTransactionLoading = false 
+  const isTransactionLoading = false
   return (
     <View style={styles.wrapper}>
       <Text style={styles.sectionLabel}>{strings.TransactionHistory}</Text>
@@ -115,6 +119,7 @@ const styles = StyleSheet.create({
   wrapper: {
     marginHorizontal: vw(16),
     marginTop: vh(16),
+    marginBottom: vh(16)
   },
   sectionLabel: {
     fontFamily: fonts.Bold,
@@ -210,7 +215,7 @@ const styles = StyleSheet.create({
   },
   viewAll: {
     color: colors.primary,
-    fontSize: normalize(16),
+    fontSize: normalize(14),
     fontFamily: fonts.Medium
   },
   backArrow: {

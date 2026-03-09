@@ -169,16 +169,17 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
 
   return (
     <View style={styles.root}>
-      <Text style={styles.heading}>{strings.planSelectorHeading}</Text>
-      <Text style={styles.subHeading}>Purchase additional water packs</Text>
+      <ScrollView
+      horizontal>
       {PLANS.map((plan) => (
         <PlanCard
-          key={plan.id}
-          plan={plan}
-          selected={selectedId === plan.id}
-          onPress={() => handleSelect(plan)}
+        key={plan.id}
+        plan={plan}
+        selected={selectedId === plan.id}
+        onPress={() => handleSelect(plan)}
         />
       ))}
+      </ScrollView>
     </View>
   );
 };
@@ -187,23 +188,11 @@ export default PlanSelector;
 
 const styles = StyleSheet.create({
   root: {
-    marginHorizontal: vw(16),
-    marginTop: vh(16),
+    // marginHorizontal: vw(16),
+   
     gap: 12,
   },
-  heading: {
-    fontSize: normalize(16),
-    fontFamily: fonts.Bold,
-    color: colors.primary,
-    letterSpacing: -0.2,
-  },
-  subHeading: {
-    fontSize: normalize(12),
-    fontFamily: fonts.Regular,
-    color: colors.neutralBodyText,
-    marginTop: -4,
-    marginBottom: vh(4),
-  },
+
   card: {
     borderRadius: 16,
     borderWidth: 1,

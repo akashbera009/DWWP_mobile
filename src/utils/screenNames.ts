@@ -17,7 +17,8 @@ export const screenNames = {
     ViewProfileScreen:'ViewProfileScreen',
     SelectAddress : 'SelectAddress',
 
-    FullPaymantHistory : 'FullPaymantHistory'
+    FullPaymantHistory : 'FullPaymantHistory',
+    AddonRechargesScreen : 'AddonRechargesScreen'
 } as const;
 
 export type ScreenNames = keyof typeof screenNames;

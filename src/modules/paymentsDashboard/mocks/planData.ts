@@ -1,5 +1,6 @@
 // planData.ts
-import { Plan } from "./Planselector";
+
+import { Plan } from "../components/MiniPlanselector";
 
 export const PLANS: Plan[] = [
   {
