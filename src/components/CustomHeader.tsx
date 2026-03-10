@@ -12,11 +12,13 @@ type CustomHeaderScreenProps = {
     screenName: string
 }
 export const CustomHeader = ({ screenName }: CustomHeaderScreenProps) => {
-    const {top } = useSafeAreaInsets()
+    const { top } = useSafeAreaInsets()
     return (
-        <View style={[styles.homeHeaderContainer, {paddingTop : top }]}>
+        <View style={[styles.homeHeaderContainer, { paddingTop: top }]}>
             <TouchableOpacity
-                onPress={() => goBack()}>
+                onPress={() => goBack()}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
                 <Image
                     source={localImages.backArrow}
                     style={styles.backArrow}

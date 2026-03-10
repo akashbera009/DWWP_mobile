@@ -31,7 +31,7 @@ export default function MainStackNavigator() {
 
       <Stack.Screen name="ViewProfileScreen" component={ViewProfileScreen} options={{ headerShown: false }} />
       <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
-      <Stack.Screen name="RaiseComplaintScreen" component={RaiseComplaintScreen} />
+      <Stack.Screen name="RaiseComplaintScreen" component={RaiseComplaintScreen}   options={{ headerShown: false }}/>
 
 
     </Stack.Navigator>

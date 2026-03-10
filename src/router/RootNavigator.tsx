@@ -17,13 +17,13 @@ export const RootNavigator = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setSplashFinished(true);
-    }, 100);
+    }, 1300);
 
     return () => clearTimeout(timer);
   }, []);
 
   if (!splashFinished) {
-    return <DWWPSplash duration={100} />;
+    return <DWWPSplash duration={1300} />;
   }
   if (error) {
     console.error(error);

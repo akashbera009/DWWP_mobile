@@ -107,22 +107,23 @@ const BottomTabNavigator = () => {
           backgroundColor: colors.white,
           shadowColor: colors.black,
           shadowOpacity: 1,
-          elevation: 10 
+          elevation: 10
         }
       }}
+      // initialRouteName={screenNames.PaymentDashBoard}
     >
-      <Tab.Screen
-        name={screenNames.PaymentDashBoard}
-        component={PaymentsDashboard}
-        options={{
-          tabBarIcon: PaymentTabIcon,
-        }}
-      />
       <Tab.Screen
         name={screenNames.DashBoard}
         component={DashIndexScreen}
         options={{
           tabBarIcon: HomeTabIcon,
+        }}
+      />
+      <Tab.Screen
+        name={screenNames.PaymentDashBoard}
+        component={PaymentsDashboard}
+        options={{
+          tabBarIcon: PaymentTabIcon,
         }}
       />
       <Tab.Screen
@@ -138,7 +139,7 @@ const BottomTabNavigator = () => {
 };
 
 const styles = StyleSheet.create({
- 
+
   tabBarLabel: {
     fontSize: normalize(11),
     marginTop: vh(1),
