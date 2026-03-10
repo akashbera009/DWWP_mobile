@@ -31,6 +31,7 @@ export const localImages = {
     bell_full: require('../assets/images/bell_full.png'),
     close: require('../assets/images/close.png'),
     angle: require('../assets/images/angle.png'),
+    filter: require('../assets/images/filter.png'),
 
     hide: require('../assets/images/hide.png'),
     view: require('../assets/images/view.png'),
@@ -38,5 +39,7 @@ export const localImages = {
     calendar: require('../assets/images/calendar.png'),
     bill: require('../assets/images/bill.png'),
     share: require('../assets/images/share.png'),
+    thunder: require('../assets/images/thunder.png'),
+    salary: require('../assets/images/salary.png'),
     
 }

@@ -1,5 +1,5 @@
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import { strings } from '@dwwp/utils/strings'
 import colors from '@dwwp/utils/colors'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
@@ -16,6 +16,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import { MainStackParamList } from '@dwwp/utils/types'
 import { screenNames } from '@dwwp/utils/screenNames'
+import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks'
+import { fetchAllPaymentsAndAddons } from './paymentAction'
 
 type MainStackNavigation = NativeStackNavigationProp<MainStackParamList>;
 const PaymentsIndexDashboard = () => {
@@ -24,6 +26,13 @@ const PaymentsIndexDashboard = () => {
   const mainStackNavigation = useNavigation<MainStackNavigation>()
 
   const scrollViewRef = useRef<ScrollView | null>(null)
+
+  const dispatch = useAppDispatch();
+  const email = useAppSelector((state) => state.auth.user?.email)
+  useEffect(() => {
+    if (!email) return;
+    dispatch(fetchAllPaymentsAndAddons({ email }))
+  }, [])
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -38,7 +47,7 @@ const PaymentsIndexDashboard = () => {
   }
   const scrollToBottom = useCallback(() => {
     scrollViewRef.current?.scrollToEnd({
-      animated : true,
+      animated: true,
     })
   }, [])
   return (

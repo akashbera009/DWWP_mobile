@@ -77,3 +77,60 @@ export interface PriceConfig {
     penaltyPrice: number
     regularPrice: number
 }
+
+
+//  payment
+export interface PaymentRecord {
+  amount: number
+  date: string | null
+  forMonth: string
+  razorPayId: string
+  status: 'pending' | 'Completed' | string
+  timeStamp: string | null
+}
+
+export interface AddonRecord {
+  id: string
+  quantityDone: number
+  amount: number
+  addon_date: string | null
+  razor_pay_id: string
+  refill: number
+  status: string | null
+}
+
+type PaymentStatus = 'idle' | 'pending' | 'success' | 'failed'
+interface PaymentState {
+  payments: PaymentRecord[]
+  addons: AddonRecord[]
+  transactionHistory: {
+    paymentsHistory: PaymentRecord[]
+    addonsHistory: AddonRecord[]
+  }
+  pendingPaymentId: string | null
+  lastPaymentStatus: PaymentStatus
+  isProcessing: boolean
+  isLoading: boolean
+  error: string | null
+}
+
+export const PaymentInitialState: PaymentState = {
+  payments: [],
+  addons: [],
+  transactionHistory: { paymentsHistory: [], addonsHistory: [] },
+  pendingPaymentId: null,
+  lastPaymentStatus: 'idle',
+  isProcessing: false,
+  isLoading: false,
+  error: null,
+}
+
+/* ---- payload returned by thunk ---- */
+export type FetchAllMonthsPayload = {
+  payments: PaymentRecord[]     // flattened across all months
+  addons: AddonRecord[]         // flattened across all months
+  transactionHistory: {
+    paymentsHistory: PaymentRecord[]
+    addonsHistory: AddonRecord[]
+  }
+}

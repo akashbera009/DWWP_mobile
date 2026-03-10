@@ -9,13 +9,13 @@ import { PortalProvider, PortalHost } from '@gorhom/portal';
 // External Dependencies
 // import store, { persister } from './src/store/oldindex';
 import { navigationRef } from '@dwwp/utils/navigationService';
-import { RootNavigator } from "@dwwp/router";
 import { ToastContainer } from "@dwwp/components/ToastContainer";
 import SafeAreaContainer from "@dwwp/components/SafeAreaContainer";
 
 import notifee, { EventType } from '@notifee/react-native';
 import { store } from "@dwwp/store";
 import { persistor } from "@dwwp/store/index";
+import { RootNavigator } from "@dwwp/router";
 function App() {
   useEffect(() => {
     const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {

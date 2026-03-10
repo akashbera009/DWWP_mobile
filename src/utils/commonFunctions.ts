@@ -61,3 +61,32 @@ export function getTrend(consumed: number, limit: number, dayOfMonth: number, da
 export const fmt = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(2)}kL` : `${Math.round(n)}L`
 export const fmtD = (n: number) => `${n.toFixed(1)}L`
 
+
+
+export function getCurrentMonthKey(): string {
+    const d = new Date()
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+}
+
+// for paymnetss 
+export const normalizeTimestamp = (t: any): string | null => {
+  if (!t) return null
+  if (typeof t?.toDate === 'function') return t.toDate().toISOString()
+  if (typeof t === 'object' && typeof t.seconds === 'number')
+    return new Date(t.seconds * 1000).toISOString()
+  if (typeof t === 'string') return t
+  try {
+    return new Date(t).toISOString()
+  } catch {
+    return String(t)
+  }
+}
+
+export const toNumber = (v: any, fallback = 0): number => {
+  if (typeof v === 'number') return v
+  if (typeof v === 'string') {
+    const n = parseFloat(v.replace(/[^0-9.-]+/g, '')) // strip currency characters if any
+    return Number.isFinite(n) ? n : fallback
+  }
+  return fallback
+}

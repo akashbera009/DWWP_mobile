@@ -10,7 +10,6 @@ RootStack
 └── MainStack
     │
     ├── BottomTabs
-    │   │
     │   ├── DashBoard
     │   ├── PaymentDashBoard
     │   └── AnalyticsPage

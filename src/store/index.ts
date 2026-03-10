@@ -16,18 +16,19 @@ import mmkvStorage from "../utils/mmkvStorage";
 
 import authReducer from '@dwwp/modules/auth/authSlice'
 import dashboardReducer from '@dwwp/modules/dashboard/dashboardSlice'
-// import paymentReducer from '../slices/payment/paymentSlice'
+import paymentReducer from '@dwwp/modules/paymentsDashboard/paymentSlice'
 
 // persist 
 const persistConfig = {
     key: 'root',
     storage: mmkvStorage,
-    whitelist: ['auth'],
+    whitelist: ['auth','payment'],
 }
 
 const rootReducer = combineReducers({
     auth: authReducer,
     dashboard: dashboardReducer,
+    payments: paymentReducer
 })
 // payment: paymentReducer,
 const persistedReducer = persistReducer(persistConfig, rootReducer);
