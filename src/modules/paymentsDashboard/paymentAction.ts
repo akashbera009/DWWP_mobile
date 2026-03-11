@@ -128,32 +128,6 @@ export const fetchAllPaymentsAndAddons = createAsyncThunk<
 })
 
 /**
- * fetchCurrentMonthAddons
- * Pulls all addon documents for the current month.
- */
-export const fetchCurrentMonthAddons = createAsyncThunk<
-    AddonRecord[],
-    { email: string; monthKey?: string },
-    { rejectValue: string }
->('payment/fetchAddons', async ({ email, monthKey }, { rejectWithValue }) => {
-    try {
-        const monthKeyString = monthKey ?? getCurrentMonthKey()
-        const snap = await firestore()
-            .collection('users').doc(email)
-            .collection('monthlyUsages').doc(monthKeyString)
-            .collection('addon')
-            .get()
-
-        return snap.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-        } as AddonRecord))
-    } catch (e: any) {
-        return rejectWithValue(e.message ?? 'Failed to fetch addons.')
-    }
-})
-
-/**
  * confirmAddonPayment
  * Called after Razorpay payment succeeds on the client.
  * Writes the addon record to Firestore, then refreshes the dashboard month data.

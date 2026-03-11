@@ -28,7 +28,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
     auth: authReducer,
     dashboard: dashboardReducer,
-    payments: paymentReducer
+    payment: paymentReducer
 })
 // payment: paymentReducer,
 const persistedReducer = persistReducer(persistConfig, rootReducer);

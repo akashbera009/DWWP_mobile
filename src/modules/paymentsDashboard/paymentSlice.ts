@@ -28,7 +28,7 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { confirmAddonPayment, fetchAllPaymentsAndAddons, fetchCurrentMonthAddons } from './paymentAction'
+import { confirmAddonPayment, fetchAllPaymentsAndAddons } from './paymentAction'
 import { FetchAllMonthsPayload, PaymentInitialState } from '@dwwp/modals'
 
 
@@ -90,17 +90,6 @@ const paymentSlice = createSlice({
             .addCase(fetchAllPaymentsAndAddons.rejected, (state, action) => {
                 state.isLoading = false
                 state.error = action.payload ?? action.error?.message ?? 'Unknown error'
-            })
-        // fetchCurrentMonthAddons
-        builder
-            .addCase(fetchCurrentMonthAddons.pending, (state) => { state.isLoading = true })
-            .addCase(fetchCurrentMonthAddons.fulfilled, (state, { payload }) => {
-                state.isLoading = false
-                state.addons = payload
-            })
-            .addCase(fetchCurrentMonthAddons.rejected, (state, { payload }) => {
-                state.isLoading = false
-                state.error = payload ?? 'Failed to load addons.'
             })
 
         // confirmAddonPayment

@@ -1,11 +1,10 @@
 import React, { useRef, useState, useCallback, useMemo } from 'react'
 import {
   View, Text, StyleSheet, FlatList, Pressable,
-  Animated, Dimensions, StatusBar, ScrollView,
+  Animated, Dimensions,  ScrollView,
   Image,
   TouchableOpacity,
-} from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+} from 'react-native' 
 import LinearGradient from 'react-native-linear-gradient'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
@@ -437,7 +436,7 @@ const SummaryStrip: React.FC<{
 // ─── Main screen ──────────────────────────────────────────────────────────────
 const FullPaymentHistory: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   const { paymentsHistory, addonsHistory } = useAppSelector(
-    s => s.payments.transactionHistory
+    s => s.payment.transactionHistory
   ) as { paymentsHistory: PaymentRecord[]; addonsHistory: AddonRecord[] }
 
   const [activeTab, setActiveTab] = useState(0)
@@ -528,38 +527,6 @@ const FullPaymentHistory: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     <View style={styles.screen} >
      <CustomHeader
      screenName='Payment History'/>
-      {/* ── Header ── */}
-      {/* <LinearGradient
-        colors={[C.primary, C.primaryDark]}
-        start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-        style={styles.header}
-      >
-        {onBack && (
-          <Pressable onPress={onBack} style={styles.backBtn}>
-            <Text style={styles.backBtnText}>←</Text>
-          </Pressable>
-        )}
-        <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>Payment History</Text>
-          <Text style={styles.headerSub}>
-            {(paymentsHistory?.length ?? 0) + (addonsHistory?.length ?? 0)} total transactions
-          </Text>
-        </View> */}
-
-        {/* Filter toggle button */}
-        {/* <Pressable
-          onPress={() => setFilterOpen(p => !p)}
-          style={[styles.filterToggleBtn, filterOpen && styles.filterToggleBtnActive]}
-        >
-          <Text style={styles.filterToggleIcon}>⚙️</Text>
-          {activeBadge > 0 && (
-            <View style={styles.filterBadge}>
-              <Text style={styles.filterBadgeText}>{activeBadge}</Text>
-            </View>
-          )}
-        </Pressable> */}
-      {/* </LinearGradient> */}
-
 
       {/* ── Tab bar ── */}
       <View style={styles.tabBarWrap}>
@@ -698,7 +665,7 @@ const styles = StyleSheet.create({
   clearBtnText: { fontFamily: fonts.SemiBold, fontSize: normalize(11), color: C.body },
 
   // Summary strip
-  summaryStrip: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.card, paddingVertical: normalize(14), paddingHorizontal: normalize(24), borderBottomWidth: 1, borderBottomColor: C.border, shadowColor: C.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 4, elevation: 3 },
+  summaryStrip: { flexDirection: 'row', alignItems: 'center', backgroundColor: C.card, paddingVertical: normalize(14), paddingHorizontal: normalize(24), borderBottomWidth: 1, borderBottomColor: C.border, shadowColor: C.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 4, elevation: 10 },
   summaryItem: { flex: 1, alignItems: 'center', gap: vh(3) },
   summaryValue: { fontFamily: fonts.Bold, fontSize: normalize(17) },
   summaryLabel: { fontFamily: fonts.Regular, fontSize: normalize(10), color: C.body },
