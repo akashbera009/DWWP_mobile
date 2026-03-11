@@ -1,81 +1,138 @@
 // authTypes
 export interface AuthUser {
-    uid: string
-    email: string
+  uid: string
+  email: string
 }
 
 export interface AuthState {
-    user: AuthUser | null
-    isAuthenticated: boolean
-    isLoading: boolean
-    error: string | null
+  user: AuthUser | null
+  isAuthenticated: boolean
+  isLoading: boolean
+  error: string | null
 }
 
 export interface RegisterPayload {
-    name: string;
-    email: string;
-    address: string;
-    aadhaar: string;
-    mobile: string;
-    password: string;
+  name: string;
+  email: string;
+  address: string;
+  aadhaar: string;
+  mobile: string;
+  password: string;
 }
 
 // dashboardTypes
 export interface UserDetails {
-    fullName: string
-    mobileNo: string
-    emailId: string
-    address: string
-    accountNumber: string
-    consumerNumber: string
-    meterNumber: string
-    supplyZone: string
+  fullName: string
+  mobileNo: string
+  emailId: string
+  address: string
+  accountNumber: string
+  consumerNumber: string
+  meterNumber: string
+  supplyZone: string
 }
 
 export interface CurrentMonth {
-    monthKey: string
-    limit: number
-    limitExceeded: boolean
-    isMonthFinish: boolean
-    dailyUsages: Record<string, number>
-    totalConsumed: number
+  monthKey: string
+  limit: number
+  limitExceeded: boolean
+  isMonthFinish: boolean
+  dailyUsages: Record<string, number>
+  totalConsumed: number
 }
 
 export interface BroadcastMsg {
-    icon: string
-    message: string
-    timestamp: string
+  icon: string
+  message: string
+  timestamp: string
 }
 
 export interface DashboardState {
-    servoState: boolean
-    lastSeen: number | null
-    deviceOnline: boolean
+  userDetails: UserDetails | null
+  currentMonth: CurrentMonth | null
 
-    userDetails: UserDetails | null
-    currentMonth: CurrentMonth | null
+  notification: string
+  broadcasts: BroadcastMsg[]
 
-    notification: string
-    broadcasts: BroadcastMsg[]
+  limitConfig: LimitConfig | null
+  priceConfig: PriceConfig | null
 
-    limitConfig: LimitConfig | null
-    priceConfig: PriceConfig | null
-
-    lastSyncedAt: number | null
-    isLoading: boolean
-    error: string | null
+  isLoading: boolean
+  error: string | null
 }
+export const DashboardInitialState: DashboardState = {
+  userDetails: null,
+  currentMonth: null,
+  notification: "",
+  broadcasts: [],
 
+  limitConfig: null,
+  priceConfig: null,
+
+  isLoading: true,
+  error: null,
+}
+// servo state 
+export type servoStateType = {
+  servoState: boolean
+  lastSeen: number | null
+
+  isLoading: boolean
+  error: string | null
+}
+export const servoInitialState: servoStateType = {
+  servoState: false,
+  lastSeen: null,
+
+  isLoading: false,
+  error: null,
+}
 // admin limits and prices 
 export interface LimitConfig {
-    max: number
-    penalty: number
-    regular: number
+  max: number
+  penalty: number
+  regular: number
 }
 
 export interface PriceConfig {
-    penaltyPrice: number
-    regularPrice: number
+  penaltyPrice: number
+  regularPrice: number
+}
+
+// consumption 
+type DayUsageMap = {
+  [date: string]: number
+}
+
+export type MonthUsage = {
+  monthId: string          // "YYYY-MM"
+  days: DayUsageMap
+  total: number
+  limit?: number
+  limitExceeded?: boolean
+  isMonthFinish?: boolean
+  lastUpdated?: number     // unix ms — when this was last fetched/updated
+}
+export type usageType = {
+  months: Record<string, MonthUsage>
+  currentMonthId: string | null
+  todayUsage: number
+  allTimeMonths: Record<string, number>
+  allTimeDaysTotal: number
+  historyLoaded: boolean
+
+  loading: boolean
+  error: string | null
+}
+export const usageInitialState: usageType = {
+  months: {},
+  currentMonthId: null,
+  todayUsage: 0,
+  allTimeMonths: {},
+  allTimeDaysTotal: 0,
+  historyLoaded: false,
+  loading: false,
+  error: null,
 }
 
 

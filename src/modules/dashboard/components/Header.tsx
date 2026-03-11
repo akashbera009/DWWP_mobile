@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     },
     tabText: {
         fontFamily: fonts.Medium,
-        fontSize: normalize(12),
+        fontSize: normalize(14),
         color: colors.placeholderText,
     },
     tabTextActive: {

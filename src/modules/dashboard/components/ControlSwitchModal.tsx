@@ -22,11 +22,13 @@ import React, { useEffect, useRef, useState } from 'react'
 import {
     View, Text, StyleSheet, Modal, Pressable,
     TouchableOpacity, Platform, Animated, Easing,
+    Image,
 } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
 import ToggleSwitch from '@dwwp/modules/dashboard/components/ToggleSwitch'
+import { localImages } from '@dwwp/utils/localimages'
 
 // ─── theme ────────────────────────────────────────────────────────────────────
 const C = {
@@ -157,7 +159,6 @@ function useShake() {
 interface Props {
     userId : string
     servoState: boolean          // current valve state from Firebase
-    onToggle: (next: boolean) => void  // save to Firebase
     onClose: () => void
     quotaExceeded?: boolean          // Firebase: limitExceeded
     deviceOffline?: boolean          // derived from lastSeen
@@ -166,7 +167,6 @@ interface Props {
 const ControlSwitchModal: React.FC<Props> = ({
     userId , 
     servoState,
-    onToggle,
     onClose,
     quotaExceeded = false,
     deviceOffline = false,
@@ -180,7 +180,7 @@ const ControlSwitchModal: React.FC<Props> = ({
 
     // Slide in
     useEffect(() => {
-        Animated.spring(sheetAnim, { toValue: 0, friction: 9, tension: 140, useNativeDriver: true }).start()
+        Animated.spring(sheetAnim, { toValue: 0, friction: 9, tension: 40, useNativeDriver: true }).start()
     }, [])
 
     const close = () => {
@@ -193,7 +193,7 @@ const ControlSwitchModal: React.FC<Props> = ({
     }
 
     const handleConfirm = () => {
-        onToggle(localState)
+        // onToggle(localState)
         close()
     }
 
@@ -210,7 +210,7 @@ const ControlSwitchModal: React.FC<Props> = ({
                         <View style={styles.header}>
                             <View style={styles.headerLeft}>
                                 <View style={styles.headerIconBox}>
-                                    <Text style={styles.headerIconEmoji}>💧</Text>
+                    <Image source={localImages.dwwp_logo} style={styles.logo}/>
                                 </View>
                                 <View>
                                     <Text style={styles.title}>Water Supply Control</Text>
@@ -388,6 +388,10 @@ const styles = StyleSheet.create({
         borderRadius: normalize(14), backgroundColor: C.cyanBg,
         alignItems: 'center', justifyContent: 'center',
     },
+    logo:{
+        height : vh(22),
+        width: vh(22),
+    },  
     headerIconEmoji: { fontSize: normalize(20) },
     title: {
         fontFamily: fonts.Bold, fontSize: normalize(17), color: C.black,

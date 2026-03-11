@@ -3,24 +3,15 @@ import { createAsyncThunk } from "@reduxjs/toolkit"
 import firestore from "@react-native-firebase/firestore"
 import { RootState } from "@dwwp/store"
 import { CurrentMonth, BroadcastMsg, UserDetails, LimitConfig, PriceConfig } from "@dwwp/modals"
-
-const STALE_MS = 15 * 60 * 1000
-
-function getCurrentMonthKey(): string {
-    const d = new Date()
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
-}
-
-function sumDailyUsages(usages: Record<string, number>): number {
-    return Object.values(usages).reduce((s, v) => s + v, 0)
-}
+import { showErrorSnackbar } from "@dwwp/utils/showSnackBar"
+import { getCurrentMonthKey, sumDailyUsages } from "@dwwp/utils/commonFunctions"
 
 // Fetch User Document
-export const fetchUserDocument = createAsyncThunk<
+export const fetchUserDetails = createAsyncThunk<
     { userDetails: UserDetails; notification: string },
     { email: string },
     { rejectValue: string }
->("dashboard/fetchUserDocument", async ({ email }, { rejectWithValue }) => {
+>("dashboard/fetchUserDetails", async ({ email }, { rejectWithValue }) => {
     try {
         const snap = await firestore().collection("users").doc(email).get()
         const data = snap.data()
@@ -32,6 +23,7 @@ export const fetchUserDocument = createAsyncThunk<
             notification: data.notification ?? "",
         }
     } catch (e: any) {
+        showErrorSnackbar(e.message ?? "Failed to fetch user document.")
         return rejectWithValue(e.message ?? "Failed to fetch user document.")
     }
 })
@@ -45,12 +37,13 @@ export const fetchCurrentMonth = createAsyncThunk<
 
     try {
 
-        const { lastSyncedAt, currentMonth } = getState().dashboard
+        const { currentMonth } = getState().dashboard
 
-        const isStale =
-            !lastSyncedAt || Date.now() - lastSyncedAt > STALE_MS
+        // const isStale =
+        //     !lastSyncedAt || Date.now() - lastSyncedAt > STALE_MS
 
-        if (!force && !isStale && currentMonth) return currentMonth
+        // if (!force && !isStale && currentMonth) return currentMonth
+        if (!force && currentMonth) return currentMonth
 
         const monthKey = getCurrentMonthKey()
 
@@ -81,88 +74,37 @@ export const fetchCurrentMonth = createAsyncThunk<
         }
 
     } catch (e: any) {
+        showErrorSnackbar(e.message ?? "Failed to fetch month data.")
         return rejectWithValue(e.message ?? "Failed to fetch month data.")
     }
 
 })
 
-// fetch servo state 
-export const fetchServoState = createAsyncThunk<
-    boolean,
-    { email: string },
-    { rejectValue: string; state: RootState }
->(
-    "dashboard/fetchServoState",
-    async ({ email }, { rejectWithValue }) => {
-        try {
-            const snap = await firestore()
-                .collection("users")
-                .doc(email)
-                .get()
 
-            const data = snap.data()
+// // broadcast 
+// export const fetchBroadcasts = createAsyncThunk<
+//     BroadcastMsg[],
+//     void,
+//     { rejectValue: string }
+// >(
+//     "dashboard/fetchBroadcasts",
+//     async (_, { rejectWithValue }) => {
+//         try {
+//             const snap = await firestore()
+//                 .collection("admin")
+//                 .doc("broadcast")
+//                 .get()
 
-            if (!data) {
-                throw new Error("User document not found")
-            }
+//             const broadcasts = snap.data() ?? []
 
-            return data.servoState as boolean
-
-        } catch (e: any) {
-            return rejectWithValue(e.message ?? "Servo Fetch failed.")
-        }
-    })
-
-// Servo Update
-export const updateServoState = createAsyncThunk<
-    boolean,
-    { email: string; newState: boolean },
-    { rejectValue: string; state: RootState }
->("dashboard/updateServoState", async ({ email, newState }, { getState, dispatch, rejectWithValue }) => {
-
-    const prevState = getState().dashboard.servoState
-
-    dispatch({ type: "dashboard/setServoState", payload: newState })
-
-    try {
-        await firestore().collection("users").doc(email).update({
-            servoState: newState,
-        })
-
-        return newState
-    } catch (e: any) {
-
-        dispatch({ type: "dashboard/setServoState", payload: prevState })
-
-        return rejectWithValue(e.message ?? "Servo update failed.")
-    }
-
-})
-
-// broadcast 
-export const fetchBroadcasts = createAsyncThunk<
-    BroadcastMsg[],
-    void,
-    { rejectValue: string }
->(
-    "dashboard/fetchBroadcasts",
-    async (_, { rejectWithValue }) => {
-        try {
-            const snap = await firestore()
-                .collection("admin")
-                .doc("broadcast")
-                .get()
-
-            const broadcasts = snap.data() ?? []
-
-            return broadcasts as BroadcastMsg[]
-        } catch (e: any) {
-            return rejectWithValue(
-                e.message ?? "Failed to fetch broadcasts."
-            )
-        }
-    }
-)
+//             return broadcasts as BroadcastMsg[]
+//         } catch (e: any) {
+//             return rejectWithValue(
+//                 e.message ?? "Failed to fetch broadcasts."
+//             )
+//         }
+//     }
+// )
 
 // admin configs like limits and price 
 export const fetchAdminConfig = createAsyncThunk<
@@ -200,6 +142,7 @@ export const fetchAdminConfig = createAsyncThunk<
             }
 
         } catch (e: any) {
+             showErrorSnackbar( e.message ?? "Failed to fetch admin config")
             return rejectWithValue(
                 e.message ?? "Failed to fetch admin config"
             )

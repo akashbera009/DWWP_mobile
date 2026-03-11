@@ -12,6 +12,8 @@ import Animated, {
     useSharedValue,
     withSpring,
 } from 'react-native-reanimated'
+import { useAppSelector } from '@dwwp/store/hooks'
+import { getCurrentMonthKey, getTodayKey } from '@dwwp/utils/commonFunctions'
 
 // ─── Tuning constants ─────────────────────────────────────────────────────────
 //
@@ -41,45 +43,53 @@ const clamp = (v: number, lo: number, hi: number) => {
     return Math.max(lo, Math.min(hi, v))
 }
 
-// ─── How it works ─────────────────────────────────────────────────────────────
-//
-//  1. Gyro readings are noisy. We apply an EMA (exponential moving average)
-//     with a low alpha (SMOOTHING=0.05) to smooth out jitter. This introduces
-//     intentional lag that makes motion feel weighty and physical.
-//
-//  2. We track "velocity" (the EMA-filtered gyro value) and apply DECAY each
-//     frame when the raw reading is near-zero. This means the card continues
-//     drifting slightly even after you stop moving, then settles — exactly
-//     like a physical card on a spring.
-//
-//  3. DEADZONE filters out the ambient vibration every phone has at rest.
-//     Without it, the card trembles even on a still desk.
-//
-//  4. When velocity drops below a tiny threshold, we trigger withSpring back
-//     to zero. This gives the "snap home" feel — the card gracefully returns
-//     to flat with a nice spring curve, not a hard cut.
-//
-//  5. MAX_DEG clamps the output so the card never over-rotates even if you
-//     spin the phone quickly. This is the "professional ceiling".
-
-// interface Props {
-//     onlineCount: number
-//     total: number
-//     usagePct?: number        // 0–1, defaults to 0.72
-//     billAmount?: string
-//     billDue?: string
-//     todayUsage?: string | number
-//     monthUsage?: string | number
-// }
-const onlineCount = 2;
-const total = 4;
-const usagePct = 0.72;
-const billAmount = '₹2,340';
-const billDue = 'Due in 8 days';
-const todayUsage = 590;
-const monthUsage = 2300
-
 const HeroSummaryCard: React.FC = () => {
+    const onlineCount = 2;
+    const total = 4;
+    const usagePct = 0.72;
+    const price = useAppSelector(state => state.dashboard.priceConfig?.regularPrice)
+
+    const todayKey = getTodayKey()        // "2026-03-12"
+    const monthKey = getCurrentMonthKey() // "2026-03"
+
+    // Today
+    const todayUsage = useAppSelector(state =>
+        state.usage?.months?.[monthKey]?.days?.[todayKey] ?? 0
+    )
+
+    // Current month total (1237 in your state)
+    const monthTotal = useAppSelector(state =>
+        state.usage?.months?.[monthKey]?.total ?? 0
+    )
+
+    // Limit (2000 in your state)
+    const monthLimit = useAppSelector(state =>
+        state.usage?.months?.[monthKey]?.limit ?? 0
+    )
+
+    // Limit exceeded (false in your state)
+    const limitExceeded = useAppSelector(state =>
+        state.usage?.months?.[monthKey]?.limitExceeded ?? false
+    )
+
+    // Bill amount for today
+    const billAmount = (price && price * todayUsage)?.toFixed(0)
+
+    // Monthly bill amount  
+    const monthBillAmount = (price && price * monthTotal)?.toFixed(0)
+
+    // Usage % for the circle gauge (72% in your screenshot)
+    const usagePercent = monthLimit > 0
+        ? Math.min((monthTotal / monthLimit) * 100, 100).toFixed(0)
+        : 0
+
+    // All-time total — your existing line was correct
+    const allTimeDaysTotal = useAppSelector(state =>
+        state.usage.allTimeDaysTotal
+    ).toFixed(0)
+
+
+
     // const sensor = useAnimatedSensor(SensorType.GYROSCOPE, { interval: 16 })
     const sensor = useAnimatedSensor(SensorType.GRAVITY, { interval: 16 })
 
@@ -169,8 +179,8 @@ const HeroSummaryCard: React.FC = () => {
 
                     <View style={styles.heroRow}>
                         <View style={styles.heroBadge}>
-                            <Text style={styles.heroBadgeText}>{billDue}</Text>
-                        </View>
+                            <Text style={styles.heroBadgeText}>{monthBillAmount}</Text>
+                        </View> 
                     </View>
 
                     <View style={styles.heroStats}>
@@ -180,7 +190,7 @@ const HeroSummaryCard: React.FC = () => {
                         </View>
                         <View style={styles.heroStatDivider} />
                         <View style={styles.heroStatItem}>
-                            <Text style={styles.heroStatValue}>{monthUsage}L</Text>
+                            <Text style={styles.heroStatValue}>{monthTotal}L</Text>
                             <Text style={styles.heroStatUnit}>This month</Text>
                         </View>
                         <View style={styles.heroStatDivider} />

@@ -1,71 +1,38 @@
 
-import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { DashboardState } from "@dwwp/modals"
+import { createSlice } from "@reduxjs/toolkit"
+import { DashboardInitialState } from "@dwwp/modals"
 import {
-    fetchUserDocument,
+    fetchUserDetails,
     fetchCurrentMonth,
-    fetchBroadcasts,
-    updateServoState,
+    // fetchBroadcasts,
     fetchAdminConfig,
-    fetchServoState,
 } from "./dashboardActions"
 
-const initialState: DashboardState = {
-    servoState: false,
-    lastSeen: null,
-    deviceOnline: false,
-    userDetails: null,
-    currentMonth: null,
-    notification: "",
-    broadcasts: [],
 
-    limitConfig: null,
-    priceConfig: null,
-
-    lastSyncedAt: null,
-    isLoading: false,
-    error: null,
-}
 const dashboardSlice = createSlice({
     name: "dashboard",
-    initialState,
+    initialState : DashboardInitialState,
     reducers: {
-
-        setServoState: (state, action: PayloadAction<boolean>) => {
-            state.servoState = action.payload
-        },
-
-        setLastSeen: (state, action: PayloadAction<number>) => {
-            state.lastSeen = action.payload
-            state.deviceOnline = Date.now() - action.payload < 15000
-        },
-
-        refreshDeviceOnline: (state) => {
-            if (state.lastSeen !== null) {
-                state.deviceOnline = Date.now() - state.lastSeen < 15000
-            }
-        },
-
         clearDashboardError: (state) => {
             state.error = null
         },
 
-        resetDashboard: () => initialState,
+        resetDashboard: () => DashboardInitialState,
     },
 
     extraReducers: (builder) => {
 
-        // fetchUserDocument
-        builder.addCase(fetchUserDocument.pending, (state) => {
+        // fetchUserDetails
+        builder.addCase(fetchUserDetails.pending, (state) => {
             state.isLoading = true
         })
-            .addCase(fetchUserDocument.fulfilled, (state, action) => {
+            .addCase(fetchUserDetails.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.userDetails = action.payload.userDetails
                 state.notification = action.payload.notification
             })
 
-            .addCase(fetchUserDocument.rejected, (state, action) => {
+            .addCase(fetchUserDetails.rejected, (state, action) => {
                 state.isLoading = false
                 state.error = action.payload ?? "Failed to load user"
             })
@@ -80,7 +47,6 @@ const dashboardSlice = createSlice({
             .addCase(fetchCurrentMonth.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.currentMonth = action.payload
-                state.lastSyncedAt = Date.now()
             })
 
             .addCase(fetchCurrentMonth.rejected, (state, action) => {
@@ -88,39 +54,21 @@ const dashboardSlice = createSlice({
                 state.error = action.payload ?? "Failed to load month data."
             })
 
-        //  updateServoState
-        builder
-            .addCase(updateServoState.rejected, (state, action) => {
-                state.error = action.payload ?? "Servo update failed."
-            })
-        builder
-            .addCase(fetchServoState.pending, (state, action) => {
-                state.isLoading = true
-                state.error = action.payload ?? "Servo fetch failed."
-                state.error = null
-            })
-            .addCase(fetchServoState.fulfilled, (state, action) => {
-                state.servoState = action.payload ?? "Servo fetch success."
-            })
-            .addCase(fetchServoState.rejected, (state) => {
-                state.isLoading = false
-                state.error = "Servo fetch failed."
-            })
-        // broadcast 
-        builder
-            .addCase(fetchBroadcasts.pending, (state) => {
-                state.isLoading = true
-            })
+       
+        // builder
+        //     .addCase(fetchBroadcasts.pending, (state) => {
+        //         state.isLoading = true
+        //     })
 
-            .addCase(fetchBroadcasts.fulfilled, (state, action) => {
-                state.isLoading = false
-                state.broadcasts = action.payload
-            })
+        //     .addCase(fetchBroadcasts.fulfilled, (state, action) => {
+        //         state.isLoading = false
+        //         state.broadcasts = action.payload
+        //     })
 
-            .addCase(fetchBroadcasts.rejected, (state, action) => {
-                state.isLoading = false
-                state.error = action.payload ?? "Failed to fetch broadcasts"
-            })
+        //     .addCase(fetchBroadcasts.rejected, (state, action) => {
+        //         state.isLoading = false
+        //         state.error = action.payload ?? "Failed to fetch broadcasts"
+        //     })
 
 
         // admin configs like limits and price 
@@ -149,9 +97,6 @@ const dashboardSlice = createSlice({
 })
 
 export const {
-    setServoState,
-    setLastSeen,
-    refreshDeviceOnline,
     clearDashboardError,
     resetDashboard,
 } = dashboardSlice.actions

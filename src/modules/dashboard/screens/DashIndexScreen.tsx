@@ -23,39 +23,66 @@ import MonthlyUsageDetail, { MOCK_ADDONS, MOCK_MONTH_DATA } from '../components/
 
 // redux
 import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks'
-import { fetchAdminConfig, fetchBroadcasts, fetchCurrentMonth, fetchServoState, fetchUserDocument } from '../dashboardActions'
+import { fetchAdminConfig, fetchCurrentMonth, fetchUserDetails } from '../dashboardActions'
+import { fetchServoState } from '../servoActions'
+import DashboardSkeleton from '@dwwp/components/DashboardSkeleton'
+import { fetchAllTimeDays, fetchAllTimeMonths, fetchTodayUsage, listenCurrentMonth, stopCurrentMonthListener } from '../usageActions'
+import { selectCurrentMonthLimit, selectCurrentMonthTotal, selectDailyChartData, selectLifetimeTotal, selectLimitExceeded, selectTodayUsage, selectUsageError, selectUsageLoading } from '../usageSelectors'
 
 const SCREEN_WIDTH = screenWidth
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 const DashIndexScreen = () => {
-
     const dispatch = useAppDispatch()
-    const email = useAppSelector((state) => state.auth.user?.email)
-    const fetchDashboardData = useCallback(() => {
-        if (!email) return
-        dispatch(fetchUserDocument({ email }))
-        dispatch(fetchCurrentMonth({ email }))
-        dispatch(fetchBroadcasts())
-        dispatch(fetchServoState({ email }))
-        dispatch(fetchAdminConfig())
-    }, [email])
-    useEffect(() => {
-
-        if (!email) return
-        fetchDashboardData()
-    }, [email, fetchDashboardData])
-
-    const servoState = useAppSelector((state) => state.dashboard?.servoState)
-
+    // loading state 
     const [userEmail, setUserEmail] = useState<string>('')
     const [notifOpen, setNotifOpen] = useState(false)
     const [profileOpen, setProfileOpen] = useState(false)
     const [activeTab, setActiveTab] = useState<number>(0)
 
+    const email = useAppSelector((state) => state.auth.user?.email)
+    const servoState = useAppSelector((state) => state.servo?.servoState)
+    const { isLoading: dashboardIsLoading } = useAppSelector(
+        state => state.dashboard
+    )
+
+    const fetchDashboardData = useCallback(() => {
+        if (!email) return
+        dispatch(fetchUserDetails({ email }))
+        dispatch(fetchCurrentMonth({ email }))
+
+        dispatch(fetchAllTimeMonths(email))
+        dispatch(fetchAllTimeDays(email))
+        dispatch(fetchTodayUsage(email))
+        dispatch(listenCurrentMonth(email))
+
+        dispatch(fetchServoState({ email }))
+        dispatch(fetchAdminConfig())
+    }, [email])
+
+
+    const todayUsage = useAppSelector(selectTodayUsage)
+    const monthTotal = useAppSelector(selectCurrentMonthTotal)
+    const monthLimit = useAppSelector(selectCurrentMonthLimit)
+    const limitExceeded = useAppSelector(selectLimitExceeded)
+    const dailyData = useAppSelector(selectDailyChartData)
+    const lifetimeTotal = useAppSelector(selectLifetimeTotal)
+    const loading = useAppSelector(selectUsageLoading)
+    const error = useAppSelector(selectUsageError)
+
+    const a = useAppSelector(state => state.usage.allTimeDaysTotal)
+    console.log(todayUsage, monthTotal);
+
+    useEffect(() => {
+        if (!email) return
+        fetchDashboardData()
+        return () => {
+            dispatch(stopCurrentMonthListener(email))
+        }
+    }, [email, fetchDashboardData])
 
     // const [servoState, setServoState] = useState<boolean>(false)
     const [lastSeen, setLastSeen] = useState<number | undefined>(undefined)
-    const [limitExceeded, setLimitExceeded] = useState<boolean>(false)
+    // const [limitExceeded, setLimitExceeded] = useState<boolean>(false)
     const [isSwitchOpen, setIsSwitchOpen] = useState<boolean>(false)
 
     const scrolRef = useRef<ScrollView | null>(null)
@@ -133,54 +160,52 @@ const DashIndexScreen = () => {
                 <ControlSwitchModal
                     userId={userEmail}
                     servoState={servoState}
-                    onToggle={(next) => {
-                        // setServoState(next)
-                        // TODO: write to Firebase:
-                        // firestore().doc(`users/${email}`).update({ servoState: next })
-                    }}
                     onClose={() => setIsSwitchOpen(false)}
                     quotaExceeded={limitExceeded}
                     deviceOffline={deviceOffline}
                 />
             )}
+            {dashboardIsLoading ?
+                <DashboardSkeleton />
+                :
+                <ScrollView
+                    ref={scrolRef}
+                    horizontal
+                    pagingEnabled
+                    scrollEventThrottle={16}
+                    showsHorizontalScrollIndicator={false}
+                    style={styles.scrollView}
+                    onMomentumScrollEnd={(e) => {
+                        const nextIdx = Math.round(e.nativeEvent.contentOffset.x / screenWidth)
+                        setActiveTab(nextIdx)
+                    }}
+                >
+                    <View style={styles.page}>
+                        <DashBoardPage
+                            lastSeen={lastSeen}
+                            servoState={servoState}
+                            setIsSwitchOpen={() => setIsSwitchOpen(true)}
+                            refreshDashboard={fetchDashboardData}
+                        />
+                    </View>
 
-            <ScrollView
-                ref={scrolRef}
-                horizontal
-                pagingEnabled
-                scrollEventThrottle={16}
-                showsHorizontalScrollIndicator={false}
-                style={styles.scrollView}
-                onMomentumScrollEnd={(e) => {
-                    const nextIdx = Math.round(e.nativeEvent.contentOffset.x / screenWidth)
-                    setActiveTab(nextIdx)
-                }}
-            >
-                <View style={styles.page}>
-                    <DashBoardPage
-                        lastSeen={lastSeen}
-                        servoState={servoState}
-                        setIsSwitchOpen={() => setIsSwitchOpen(true)}
-                        refreshDashboard={fetchDashboardData}
-                    />
-                </View>
+                    <View style={styles.page2}>
+                        <DeviceSection
+                            lastSeen={lastSeen}
+                            servoState={servoState}
+                            setIsSwitchOpen={() => setIsSwitchOpen(true)}
+                        />
+                    </View>
 
-                <View style={styles.page2}>
-                    <DeviceSection
-                        lastSeen={lastSeen}
-                        servoState={servoState}
-                        setIsSwitchOpen={() => setIsSwitchOpen(true)}
-                    />
-                </View>
+                    <View style={styles.page2}>
+                        <ScrollView showsVerticalScrollIndicator={false}>
+                            <MonthlyUsageDetail monthData={MOCK_MONTH_DATA} addons={MOCK_ADDONS} />
+                        </ScrollView>
+                    </View>
 
-                <View style={styles.page2}>
-                    <ScrollView showsVerticalScrollIndicator={false}>
-                        <MonthlyUsageDetail monthData={MOCK_MONTH_DATA} addons={MOCK_ADDONS} />
-                    </ScrollView>
-                </View>
+                </ScrollView>
 
-            </ScrollView>
-
+            }
         </View >
     )
 }

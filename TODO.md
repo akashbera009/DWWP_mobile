@@ -14,7 +14,6 @@ in real redmi device test the notch area color
 
 
 servo button missing , 
-reduce animation for bottomsheet in servo control
 
 
 add a subheading for all the bottomtab screens 

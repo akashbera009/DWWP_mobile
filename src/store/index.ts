@@ -17,18 +17,31 @@ import mmkvStorage from "../utils/mmkvStorage";
 import authReducer from '@dwwp/modules/auth/authSlice'
 import dashboardReducer from '@dwwp/modules/dashboard/dashboardSlice'
 import paymentReducer from '@dwwp/modules/paymentsDashboard/paymentSlice'
+import servoReducer from '@dwwp/modules/dashboard/servoSlice'
+import usageReducer from '@dwwp/modules/dashboard/usageSlice'
+
+import {
+    FLUSH,
+    REHYDRATE,
+    PAUSE,
+    PERSIST,
+    PURGE,
+    REGISTER,
+} from 'redux-persist'
 
 // persist 
 const persistConfig = {
     key: 'root',
     storage: mmkvStorage,
-    whitelist: ['auth','payment'],
+    whitelist: ['auth', 'payment', 'usage'],
 }
 
 const rootReducer = combineReducers({
     auth: authReducer,
     dashboard: dashboardReducer,
-    payment: paymentReducer
+    payment: paymentReducer,
+    servo: servoReducer,
+    usage: usageReducer,
 })
 // payment: paymentReducer,
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -37,7 +50,11 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 export const store = configureStore({
     reducer: persistedReducer,
     middleware: getDefaultMiddleware =>
-        getDefaultMiddleware({ serializableCheck: false, }).concat(logger)
+        getDefaultMiddleware({
+            serializableCheck: {
+                ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+            },
+        }).concat(logger)
 })
 
 export const persistor = persistStore(store)
