@@ -9,22 +9,30 @@ import { localImages } from '@dwwp/utils/localimages';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type CustomHeaderScreenProps = {
-    screenName: string
+    screenName: string,
+    subTitle?: string
 }
-export const CustomHeader = ({ screenName }: CustomHeaderScreenProps) => {
+export const CustomHeader = ({ screenName, subTitle }: CustomHeaderScreenProps) => {
     const { top } = useSafeAreaInsets()
     return (
         <View style={[styles.homeHeaderContainer, { paddingTop: top }]}>
             <TouchableOpacity
                 onPress={() => goBack()}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+                style={{marginLeft: vw(2)}}
             >
                 <Image
                     source={localImages.backArrow}
                     style={styles.backArrow}
                 />
             </TouchableOpacity>
-            <Text style={styles.homeHeaderText}>{screenName}</Text>
+            <View
+                style={styles.titleBox}>
+                <Text style={styles.homeHeaderText}>{screenName}</Text>
+                {subTitle && (
+                    <Text style={styles.subTitleText}>{subTitle}</Text>
+                )}
+            </View>
         </View>
     );
 };
@@ -48,10 +56,19 @@ const styles = StyleSheet.create({
         tintColor: colors.white,
         marginHorizontal: vw(16)
     },
+    titleBox:{
+        marginVertical: vh(6),
+    },
     homeHeaderText: {
         fontFamily: fonts.Bold,
         fontSize: normalize(20),
         color: colors.white,
-        marginVertical: vh(6)
     },
+    subTitleText: {
+        fontFamily: fonts.Regular,
+        fontSize: normalize(12),
+        color: colors.white,
+        position : 'relative',
+        top : vh(-2)
+    }
 });

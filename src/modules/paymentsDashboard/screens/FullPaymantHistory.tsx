@@ -1,10 +1,10 @@
 import React, { useRef, useState, useCallback, useMemo } from 'react'
 import {
   View, Text, StyleSheet, FlatList, Pressable,
-  Animated, Dimensions,  ScrollView,
+  Animated, Dimensions, ScrollView,
   Image,
   TouchableOpacity,
-} from 'react-native' 
+} from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
@@ -490,8 +490,8 @@ const FullPaymentHistory: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
   }, [activeTab, switchTab])
 
   const TABS = [
-    { label: localImages.salary, count: filteredPayments.length, total: paymentsHistory?.length ?? 0 },
-    { label: localImages.thunder, count: filteredAddons.length, total: addonsHistory?.length ?? 0 },
+    { label: 'Regular', image: localImages.salary, count: filteredPayments.length, total: paymentsHistory?.length ?? 0 },
+    { label: 'Addons', image: localImages.thunder, count: filteredAddons.length, total: addonsHistory?.length ?? 0 },
   ]
 
   const renderPaymentsPage = () => (
@@ -525,8 +525,9 @@ const FullPaymentHistory: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 
   return (
     <View style={styles.screen} >
-     <CustomHeader
-     screenName='Payment History'/>
+      <CustomHeader
+        screenName='Payment History'
+        subTitle='View all transactions ' />
 
       {/* ── Tab bar ── */}
       <View style={styles.tabBarWrap}>
@@ -550,9 +551,12 @@ const FullPaymentHistory: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                 onPress={() => switchTab(i)}
               >
                 <Image
-                  source={tab.label}
+                  source={tab.image}
                   style={styles.label}
                 />
+                <Text style={[styles.labelText, isActive &&{ color: colors.activeDot }]}>
+                  {tab.label}
+                </Text>
                 <View style={[
                   styles.tabCount,
                   { backgroundColor: isActive ? (i === 0 ? C.primary : C.purple) : C.inputBg },
@@ -648,7 +652,7 @@ const styles = StyleSheet.create({
   filterBadgeText: { fontFamily: fonts.Bold, fontSize: normalize(9), color: C.white },
 
   // Filter bar
-  filterBar: { overflow: 'hidden', backgroundColor: C.card, borderBottomWidth: 1, borderBottomColor: C.border , marginHorizontal : vw(16)},
+  filterBar: { overflow: 'hidden', backgroundColor: C.card, borderBottomWidth: 1, borderBottomColor: C.border, marginHorizontal: vw(16) },
   filterInner: { padding: normalize(14), gap: normalize(10) },
   filterRow: { flexDirection: 'row', alignItems: 'center', gap: normalize(10) },
   filterRowLabel: { fontFamily: fonts.SemiBold, fontSize: normalize(11), color: C.body, width: normalize(46), flexShrink: 0 },
@@ -675,20 +679,21 @@ const styles = StyleSheet.create({
   tabBarWrap: { paddingHorizontal: normalize(16), paddingVertical: normalize(12), backgroundColor: C.bg },
   tabBar: { flexDirection: 'row', backgroundColor: C.card, borderRadius: normalize(16), padding: normalize(4), position: 'relative', borderWidth: 1, borderColor: C.border, shadowColor: C.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 1, shadowRadius: 6, elevation: 2 },
   tabIndicator: { position: 'absolute', top: normalize(4), left: normalize(4), height: normalize(38), borderRadius: normalize(13), borderWidth: 1 },
-  tabBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', height: normalize(38), borderRadius: normalize(13), gap: normalize(6), zIndex: 1 },
+  tabBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', height: normalize(38), borderRadius: normalize(13), gap: normalize(6), zIndex: 1 },
   tabLabelActive: { color: C.primary },
-  label: { height: vh(22), width: vw(22), tintColor: colors.primary, marginHorizontal: vw(8) },
-  tabCount: { paddingHorizontal: normalize(7), paddingVertical: normalize(2), borderRadius: normalize(10), minWidth: normalize(22), alignItems: 'center' },
-  tabCountText: { fontFamily: fonts.Bold, fontSize: normalize(10) },
+  labelText: { fontSize: normalize(16), fontFamily: fonts.SemiBold },
+  label: { height: vh(18), width: vw(18), tintColor: colors.primary, marginLeft: vw(16) },
+  tabCount: {position : 'absolute' , right : vw(10), top :vh(10), paddingHorizontal: normalize(7), paddingVertical: normalize(2), borderRadius: normalize(10), minWidth: normalize(22), alignItems: 'center' },
+  tabCountText: {fontFamily: fonts.Bold, fontSize: normalize(10) },
 
   // filter bar 
-  filterbar:{
-    marginHorizontal :vw(16),
-    flexDirection :'row',
-    marginVertical :vh(8),
-    alignItems:'center',
-    justifyContent :'flex-end',
-  },  
+  filterbar: {
+    marginHorizontal: vw(16),
+    flexDirection: 'row',
+    marginVertical: vh(8),
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
   // Cards
   listContent: { paddingHorizontal: normalize(16), paddingTop: normalize(4), paddingBottom: normalize(30), gap: normalize(10) },
   card: { flexDirection: 'row', backgroundColor: C.card, borderRadius: normalize(18), overflow: 'hidden', shadowColor: C.shadow, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 10, elevation: 3, borderWidth: 1, borderColor: C.border },

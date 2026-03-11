@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,6 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
-import { TRANSACTIONS } from '../mocks/transactionData';
 import TransactionItem from './TransactionItem';
 import { normalize, vh, vw } from '@dwwp/utils/dimensions';
 import colors from '@dwwp/utils/colors';
@@ -22,6 +21,7 @@ import { screenNames } from '@dwwp/utils/screenNames';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '@dwwp/utils/types';
+import { useAppSelector } from '@dwwp/store/hooks';
 
 if (Platform.OS === 'android') {
   if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -35,10 +35,10 @@ type MainStackNavigation = NativeStackNavigationProp<MainStackParamList>;
 const TransactionHistory = ({ scrollToBottom }: TransactionHistoryScreenProps) => {
   const [expanded, setExpanded] = useState(false);
   const rotateAnim = useRef(new Animated.Value(0)).current;
- 
+  const [recentTransactions, setRecentTransactions] = useState<number>(0)
   const mainStackNavigation = useNavigation<MainStackNavigation>()
   const toggle = () => {
-    if(!expanded){
+    if (!expanded) {
       scrollToBottom()
     }
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -60,6 +60,35 @@ const TransactionHistory = ({ scrollToBottom }: TransactionHistoryScreenProps) =
     mainStackNavigation.navigate(screenNames.FullPaymantHistory)
   }
 
+  const { addonsHistory = [], paymentsHistory = [] } =
+    useAppSelector(state => state?.payment?.transactionHistory);
+
+  const latestTransactions = useMemo(() => {
+
+    const addons = addonsHistory.map(item => ({
+      ...item,
+      type: "addon",
+      date: item.addon_date
+    }));
+
+    const payments = paymentsHistory.map(item => ({
+      ...item,
+      type: "payment",
+      date: item.timeStamp
+    }));
+
+    const combined = [...addons, ...payments];
+    setRecentTransactions(combined.length)
+    return combined 
+      .sort((a, b) => {
+        const dateA = a.date ? new Date(a.date).getTime() : 0;
+        const dateB = b.date ? new Date(b.date).getTime() : 0;
+        return dateB - dateA;
+      })
+      .slice(0, 3);
+
+  }, [addonsHistory, paymentsHistory]);
+
   const isTransactionLoading = false
   return (
     <View style={styles.wrapper}>
@@ -74,7 +103,7 @@ const TransactionHistory = ({ scrollToBottom }: TransactionHistoryScreenProps) =
             </View>
             <View>
               <Text style={styles.headerTitle}>Transactions</Text>
-              <Text style={styles.headerSub}>This month • {TRANSACTIONS.length} records</Text>
+              <Text style={styles.headerSub}>This month • {recentTransactions} records</Text>
             </View>
           </View>
           <Animated.View style={[styles.chevron, { transform: [{ rotate: arrowRotate }] }]}>
@@ -88,8 +117,8 @@ const TransactionHistory = ({ scrollToBottom }: TransactionHistoryScreenProps) =
             <View style={styles.divider} />
             {!isTransactionLoading ?
               <>
-                {TRANSACTIONS.slice(0, 3).map((txn, index) => (
-                  <TransactionItem index={index} key={txn.id} item={txn as any} />
+                {latestTransactions.map((txn, index) => (
+                  <TransactionItem index={index} key={index.toString()} item={txn as any} />
                 ))}
               </>
               :

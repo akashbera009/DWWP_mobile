@@ -7,9 +7,17 @@ import {
   Modal,
   Animated,
 } from 'react-native';
-import { Transaction } from '../mocks/transactionData';
 import { vh, vw } from '@dwwp/utils/dimensions';
 import colors from '@dwwp/utils/colors';
+
+export interface Transaction {
+  id: string;
+  date: string;
+  type: 'addon' | 'regular';
+  amount: number;
+  qty: number;
+  status: 'completed' | 'pending';
+}
 
 interface Props {
   item: Transaction;
@@ -60,8 +68,8 @@ const TransactionItem: React.FC<Props> = ({ item, index }) => {
       >
         {/* Left Section */}
         <View style={styles.left}>
-          <Text style={styles.txnId}>{item.id}</Text>
-          <Text style={styles.date}>{item.date}</Text>
+          <Text style={styles.txnId} numberOfLines={1}>{item.id}</Text>
+          <Text style={styles.date} numberOfLines={1}>{item.date}</Text>
         </View>
 
         {/* Middle */}
@@ -137,7 +145,7 @@ const styles = StyleSheet.create({
   },
   left: { flex: 1 },
   middle: { flex: 1 },
-  right: { alignItems: 'flex-end' },
+  right: { alignItems: 'flex-end' , justifyContent : 'center' },
 
   txnId: { fontWeight: '600' },
   date: { fontSize: 12, color: '#6B7280' },

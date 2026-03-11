@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import {
     View, StyleSheet, ScrollView,
     Pressable,
+    StatusBar,
 } from 'react-native'
 
 import { Portal } from '@gorhom/portal'
@@ -101,7 +102,7 @@ const DashIndexScreen = () => {
     }, [])
     return (
         <View style={[styles.safeArea, { paddingTop: top, }]} >
-
+            <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
             {/* ── Header ── */}
             <Header
                 activeTab={activeTab}
