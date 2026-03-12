@@ -69,9 +69,6 @@ const DashIndexScreen = () => {
     const loading = useAppSelector(selectUsageLoading)
     const error = useAppSelector(selectUsageError)
 
-    const a = useAppSelector(state => state.usage.allTimeDaysTotal)
-    console.log(todayUsage, monthTotal);
-
     useEffect(() => {
         if (!email) return
         fetchDashboardData()

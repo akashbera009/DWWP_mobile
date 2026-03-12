@@ -49,8 +49,8 @@ const HeroSummaryCard: React.FC = () => {
     const usagePct = 0.72;
     const price = useAppSelector(state => state.dashboard.priceConfig?.regularPrice)
 
-    const todayKey = getTodayKey()        // "2026-03-12"
-    const monthKey = getCurrentMonthKey() // "2026-03"
+    const todayKey = getTodayKey()        
+    const monthKey = getCurrentMonthKey() 
 
     // Today
     const todayUsage = useAppSelector(state =>
