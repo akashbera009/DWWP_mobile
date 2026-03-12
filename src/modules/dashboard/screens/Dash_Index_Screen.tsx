@@ -10,7 +10,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 // utils 
 import { screenWidth, vh, vw } from '@dwwp/utils/dimensions'
 import colors from '@dwwp/utils/colors'
-import { getStoredUserEmail } from '@dwwp/utils/commonFunctions'
 
 // components
 import Header from '../components/Header'
@@ -27,47 +26,30 @@ import { fetchAdminConfig, fetchCurrentMonth, fetchUserDetails } from '../dashbo
 import { fetchServoState } from '../servoActions'
 import DashboardSkeleton from '@dwwp/components/DashboardSkeleton'
 import { fetchAllTimeDays, fetchAllTimeMonths, fetchTodayUsage, listenCurrentMonth, stopCurrentMonthListener } from '../usageActions'
-import { selectCurrentMonthLimit, selectCurrentMonthTotal, selectDailyChartData, selectLifetimeTotal, selectLimitExceeded, selectTodayUsage, selectUsageError, selectUsageLoading } from '../usageSelectors'
 
 const SCREEN_WIDTH = screenWidth
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
-const DashIndexScreen = () => {
+const Dash_Index_Screen = () => {
     const dispatch = useAppDispatch()
     // loading state 
-    const [userEmail, setUserEmail] = useState<string>('')
     const [notifOpen, setNotifOpen] = useState(false)
     const [profileOpen, setProfileOpen] = useState(false)
     const [activeTab, setActiveTab] = useState<number>(0)
 
     const email = useAppSelector((state) => state.auth.user?.email)
-    const servoState = useAppSelector((state) => state.servo?.servoState)
     const { isLoading: dashboardIsLoading } = useAppSelector(
         state => state.dashboard
     )
 
+
+    // fetching the important data first 
     const fetchDashboardData = useCallback(() => {
         if (!email) return
         dispatch(fetchUserDetails({ email }))
         dispatch(fetchCurrentMonth({ email }))
-
-        dispatch(fetchAllTimeMonths(email))
-        dispatch(fetchAllTimeDays(email))
-        dispatch(fetchTodayUsage(email))
-        dispatch(listenCurrentMonth(email))
-
-        dispatch(fetchServoState({ email }))
         dispatch(fetchAdminConfig())
+
     }, [email])
-
-
-    const todayUsage = useAppSelector(selectTodayUsage)
-    const monthTotal = useAppSelector(selectCurrentMonthTotal)
-    const monthLimit = useAppSelector(selectCurrentMonthLimit)
-    const limitExceeded = useAppSelector(selectLimitExceeded)
-    const dailyData = useAppSelector(selectDailyChartData)
-    const lifetimeTotal = useAppSelector(selectLifetimeTotal)
-    const loading = useAppSelector(selectUsageLoading)
-    const error = useAppSelector(selectUsageError)
 
     useEffect(() => {
         if (!email) return
@@ -77,9 +59,24 @@ const DashIndexScreen = () => {
         }
     }, [email, fetchDashboardData])
 
-    // const [servoState, setServoState] = useState<boolean>(false)
-    // const [lastSeen, setLastSeen] = useState<number | undefined>(undefined)
-    // const [limitExceeded, setLimitExceeded] = useState<boolean>(false)
+    // next stage data which are auxuliary for dashboard  
+    const fetchAdditionalData = () => {
+        if (!email) return
+        dispatch(fetchTodayUsage(email))
+        dispatch(fetchServoState({ email }))
+        dispatch(fetchAllTimeMonths(email))
+        dispatch(fetchAllTimeDays(email))
+        dispatch(listenCurrentMonth(email))
+    }
+    useEffect(() => {
+        if (!email) return
+        const timer = setTimeout(() => {
+            fetchAdditionalData()
+        }, 1500);
+        return () => clearTimeout(timer)
+    }, [email, fetchAdditionalData])
+
+
     const [isSwitchOpen, setIsSwitchModalOpen] = useState<boolean>(false)
 
     const scrolRef = useRef<ScrollView | null>(null)
@@ -100,30 +97,6 @@ const DashIndexScreen = () => {
         }, []
     )
 
-    // demo online status checking
-    // useEffect(() => {
-    //     const unsubscriber = setInterval(() => {
-    //         const timer = Date.now()
-    //         setLastSeen(timer)
-    //     }, 10000)
-    //     return () => clearInterval(unsubscriber)
-    // }, [])
-    // Derive device online level from lastSeen 
-    // const deviceOffline = lastSeen !== undefined
-    //     ? Math.floor((Date.now() - lastSeen) / 1000) > 60
-    //     : false
-
-    useEffect(() => {
-        const getUser = async () => {
-            const userEmail = await getStoredUserEmail()
-            if (!userEmail) {
-                return
-            } else {
-                setUserEmail(userEmail)
-            }
-        }
-        getUser()
-    }, [])
     return (
         <View style={[styles.safeArea, { paddingTop: top, }]} >
             <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
@@ -199,7 +172,7 @@ const DashIndexScreen = () => {
     )
 }
 
-export default DashIndexScreen
+export default Dash_Index_Screen
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({

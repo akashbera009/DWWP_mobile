@@ -19,30 +19,35 @@ const UsageChart = () => {
     })
 
     const [finalObjectArray, setFinalObjectArray] = useState<{ month: string, value: number }[]>([{ month: '', value: 0 }])
-    const currenMonthKey = getCurrentMonthKey()
+    let currenMonthKey = getCurrentMonthKey()
     const thisMonthUsages = useAppSelector(s => s.usage.months[currenMonthKey]?.total)
+    currenMonthKey = getShortMonthNameByMonthKey(currenMonthKey)
 
+    const [activeBar, setActiveBar] = useState(finalObjectArray.length - 1)
     useEffect(() => {
-        const temp = monthKeys.map((month, i) => {
+        let temp = monthKeys.map((month, i) => {
             return {
                 month: month,
                 value: usedInLitres[i]
             }
         })
+        temp = temp.reverse().slice(0, 6).reverse()
         temp.push({ month: currenMonthKey, value: thisMonthUsages })
-        setFinalObjectArray(temp.slice(0, 7))
+        setFinalObjectArray(temp);
     }, [])
+    useEffect(() => {
+        if (finalObjectArray.length === 0) return
+        setActiveBar(finalObjectArray.length - 1)
+    }, [finalObjectArray.length])
 
     const MAX_VAL = Math.floor(Math.max(...finalObjectArray.map((d) => d.value)))
-    const AVG_VAL = Math.floor(finalObjectArray.reduce((prev, d, _) => { return d.value + prev }, 0) / finalObjectArray.length)
-    const [activeBar, setActiveBar] = useState(usedInLitres.length - 1)
-
+    const AVG_VAL = Math.floor(finalObjectArray.reduce((prev, d, _) => (d.value + prev), 0) / finalObjectArray.length)
     return (
         <View style={styles.card}>
             {/* Header */}
             <View style={styles.cardHeaderRow}>
                 <View>
-                    <Text style={styles.cardTitle}>Monthly Usage</Text>
+                    <Text style={styles.cardTitle}>Monthly Usage{activeBar}</Text>
                     <Text style={styles.cardSubtitle}>Kilowatt hours · Jan 2025</Text>
                 </View>
                 <Pill label="This Year" color={colors.primary} bg={colors.primaryLight} />

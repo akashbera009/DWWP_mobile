@@ -63,86 +63,86 @@ const C = {
     shadow: 'rgba(43,101,104,0.12)',
 }
 
-// ─── Big animated valve toggle ────────────────────────────────────────────────
-interface ValveToggleProps {
-    value: boolean
-    disabled?: boolean
-    onToggle: () => void
-}
+// // ─── Big animated valve toggle ────────────────────────────────────────────────
+// interface ValveToggleProps {
+//     value: boolean
+//     disabled?: boolean
+//     onToggle: () => void
+// }
 
-const ValveToggle: React.FC<ValveToggleProps> = ({ value, disabled, onToggle }) => {
-    const anim = useRef(new Animated.Value(value ? 1 : 0)).current
-    const glowAnim = useRef(new Animated.Value(value ? 1 : 0)).current
-    const ripple = useRef(new Animated.Value(0)).current
+// const ValveToggle: React.FC<ValveToggleProps> = ({ value, disabled, onToggle }) => {
+//     const anim = useRef(new Animated.Value(value ? 1 : 0)).current
+//     const glowAnim = useRef(new Animated.Value(value ? 1 : 0)).current
+//     const ripple = useRef(new Animated.Value(0)).current
 
-    useEffect(() => {
-        Animated.spring(anim, { toValue: value ? 1 : 0, friction: 6, tension: 120, useNativeDriver: false }).start()
-        Animated.timing(glowAnim, { toValue: value ? 1 : 0, duration: 300, useNativeDriver: false }).start()
-    }, [value])
+//     useEffect(() => {
+//         Animated.spring(anim, { toValue: value ? 1 : 0, friction: 6, tension: 120, useNativeDriver: false }).start()
+//         Animated.timing(glowAnim, { toValue: value ? 1 : 0, duration: 300, useNativeDriver: false }).start()
+//     }, [value])
 
-    const handlePress = () => {
-        if (disabled) return
-        // ripple burst
-        ripple.setValue(0)
-        Animated.timing(ripple, { toValue: 1, duration: 400, easing: Easing.out(Easing.ease), useNativeDriver: true }).start()
-        onToggle()
-    }
+//     const handlePress = () => {
+//         if (disabled) return
+//         // ripple burst
+//         ripple.setValue(0)
+//         Animated.timing(ripple, { toValue: 1, duration: 400, easing: Easing.out(Easing.ease), useNativeDriver: true }).start()
+//         onToggle()
+//     }
 
-    const TRACK_W = normalize(88)
-    const TRACK_H = normalize(46)
-    const THUMB_D = normalize(36)
+//     const TRACK_W = normalize(88)
+//     const TRACK_H = normalize(46)
+//     const THUMB_D = normalize(36)
 
-    const thumbX = anim.interpolate({ inputRange: [0, 1], outputRange: [normalize(5), TRACK_W - THUMB_D - normalize(5)] })
-    const trackBg = anim.interpolate({ inputRange: [0, 1], outputRange: [C.inputBg, C.cyan] })
-    const glowOp = glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0.4] })
-    const rippleS = ripple.interpolate({ inputRange: [0, 1], outputRange: [0.8, 2.2] })
-    const rippleO = ripple.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0.4, 0.2, 0] })
+//     const thumbX = anim.interpolate({ inputRange: [0, 1], outputRange: [normalize(5), TRACK_W - THUMB_D - normalize(5)] })
+//     const trackBg = anim.interpolate({ inputRange: [0, 1], outputRange: [C.inputBg, C.cyan] })
+//     const glowOp = glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0.4] })
+//     const rippleS = ripple.interpolate({ inputRange: [0, 1], outputRange: [0.8, 2.2] })
+//     const rippleO = ripple.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0.4, 0.2, 0] })
 
-    return (
-        <View style={{ alignItems: 'center', gap: normalize(8) }}>
-            {/* Glow behind track */}
-            <Animated.View style={[
-                styles.toggleGlow,
-                { width: TRACK_W + normalize(20), height: TRACK_H + normalize(20), opacity: glowOp, backgroundColor: C.cyan }
-            ]} />
+//     return (
+//         <View style={{ alignItems: 'center', gap: normalize(8) }}>
+//             {/* Glow behind track */}
+//             <Animated.View style={[
+//                 styles.toggleGlow,
+//                 { width: TRACK_W + normalize(20), height: TRACK_H + normalize(20), opacity: glowOp, backgroundColor: C.cyan }
+//             ]} />
 
-            <Pressable onPress={handlePress} disabled={disabled} style={{ zIndex: 1 }}>
-                <Animated.View style={[styles.toggleTrack, { width: TRACK_W, height: TRACK_H, backgroundColor: disabled ? C.disabledBg : trackBg }]}>
-                    {/* Ripple */}
-                    <Animated.View style={[
-                        styles.toggleRipple,
-                        {
-                            width: THUMB_D, height: THUMB_D, borderRadius: THUMB_D / 2, transform: [{ scale: rippleS }], opacity: rippleO,
-                            left: thumbX, backgroundColor: value ? C.white : C.cyan
-                        }
-                    ]} />
+//             <Pressable onPress={handlePress} disabled={disabled} style={{ zIndex: 1 }}>
+//                 <Animated.View style={[styles.toggleTrack, { width: TRACK_W, height: TRACK_H, backgroundColor: disabled ? C.disabledBg : trackBg }]}>
+//                     {/* Ripple */}
+//                     <Animated.View style={[
+//                         styles.toggleRipple,
+//                         {
+//                             width: THUMB_D, height: THUMB_D, borderRadius: THUMB_D / 2, transform: [{ scale: rippleS }], opacity: rippleO,
+//                             left: thumbX, backgroundColor: value ? C.white : C.cyan
+//                         }
+//                     ]} />
 
-                    {/* Thumb */}
-                    <Animated.View style={[
-                        styles.toggleThumb,
-                        {
-                            width: THUMB_D, height: THUMB_D, borderRadius: THUMB_D / 2, left: thumbX,
-                            backgroundColor: disabled ? C.disabled : C.white
-                        }
-                    ]}>
-                        {/* Icon inside thumb */}
-                        <Text style={[styles.thumbIcon, { opacity: disabled ? 0.4 : 1 }]}>
-                            {value && !disabled ? '💧' : disabled ? '🔒' : '⏸'}
-                        </Text>
-                    </Animated.View>
-                </Animated.View>
-            </Pressable>
+//                     {/* Thumb */}
+//                     <Animated.View style={[
+//                         styles.toggleThumb,
+//                         {
+//                             width: THUMB_D, height: THUMB_D, borderRadius: THUMB_D / 2, left: thumbX,
+//                             backgroundColor: disabled ? C.disabled : C.white
+//                         }
+//                     ]}>
+//                         {/* Icon inside thumb */}
+//                         <Text style={[styles.thumbIcon, { opacity: disabled ? 0.4 : 1 }]}>
+//                             {value && !disabled ? '💧' : disabled ? '🔒' : '⏸'}
+//                         </Text>
+//                     </Animated.View>
+//                 </Animated.View>
+//             </Pressable>
 
-            {/* State label under toggle */}
-            <Text style={[
-                styles.toggleLabel,
-                { color: disabled ? C.disabled : value ? C.cyan : C.bodyText }
-            ]}>
-                {disabled ? 'LOCKED' : value ? 'SUPPLY ACTIVE' : 'SUPPLY PAUSED'}
-            </Text>
-        </View>
-    )
-}
+//             {/* State label under toggle */}
+//             <Text style={[
+//                 styles.toggleLabel,
+//                 { color: disabled ? C.disabled : value ? C.cyan : C.bodyText }
+//             ]}>
+//                 {disabled ? 'LOCKED' : value ? 'SUPPLY ACTIVE' : 'SUPPLY PAUSED'}
+//             </Text>
+//         </View>
+//     )
+// }
 
 // ─── shake hook ──────────────────────────────────────────────────────────────
 function useShake() {

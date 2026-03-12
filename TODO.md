@@ -31,3 +31,6 @@ in device sction (scrollable) it needed to be reconstructed as acording to detai
 notification panel . lets check this with a largenotifcaiton if it is scrollable or just full enrtire screen 
 
 in splash screen background bubble need zindex increment 
+
+
+complaint is not working [ need subhsyan envolvement ]

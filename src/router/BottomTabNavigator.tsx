@@ -11,7 +11,7 @@ import { screenNames } from '@dwwp/utils/screenNames';
 
 import AnalyticsPage from '@dwwp/modules/analytics/screens/AnalyticsPage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import DashIndexScreen from '@dwwp/modules/dashboard/screens/DashIndexScreen';
+import Dash_Index_Screen from '@dwwp/modules/dashboard/screens/Dash_Index_Screen';
 import PaymentsDashboard from '@dwwp/modules/paymentsDashboard/PaymentsIndexDashboard';
 
 // Tab Navigator
@@ -114,7 +114,7 @@ const BottomTabNavigator = () => {
     >
       <Tab.Screen
         name={screenNames.DashBoard}
-        component={DashIndexScreen}
+        component={Dash_Index_Screen}
         options={{
           tabBarIcon: HomeTabIcon,
         }}
