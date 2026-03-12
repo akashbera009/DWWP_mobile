@@ -30,7 +30,7 @@ const UsageChart = () => {
             }
         })
         temp.push({ month: currenMonthKey, value: thisMonthUsages })
-        setFinalObjectArray(temp.slice(0, 6))
+        setFinalObjectArray(temp.slice(0, 7))
     }, [])
 
     const MAX_VAL = Math.floor(Math.max(...finalObjectArray.map((d) => d.value)))

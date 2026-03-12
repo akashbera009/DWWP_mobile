@@ -33,6 +33,7 @@ import { useAppSelector } from '@dwwp/store/hooks'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { CustomButton } from '@dwwp/components/CustomButton'
 import { navigationRef } from '@dwwp/utils/navigationService'
+import { ToastContainer } from '@dwwp/components/ToastContainer'
 
 // ─── theme ────────────────────────────────────────────────────────────────────
 const C = {
@@ -193,119 +194,120 @@ const ControlSwitchModal: React.FC<Props> = ({ onClose }) => {
     return (
         <Modal transparent animationType="none" statusBarTranslucent onRequestClose={close}>
             <GestureHandlerRootView style={{ flex: 1 }}>
-                <Pressable style={styles.overlay} onPress={close}>
-                    <Animated.View style={[styles.sheet, { transform: [{ translateY: sheetAnim }] }]}>
-                        <Pressable onPress={e => e.stopPropagation()}>
-                            {/* Handle */}
-                            <View style={styles.handle} />
-                            {/* ── Header ── */}
-                            <View style={styles.header}>
-                                <View style={styles.headerLeft}>
-                                    <View style={styles.headerIconBox}>
-                                        <Image source={localImages.dwwp_logo} style={styles.logo} />
+                <ToastContainer />
+                    <Pressable style={styles.overlay} onPress={close}>
+                        <Animated.View style={[styles.sheet, { transform: [{ translateY: sheetAnim }] }]}>
+                            <Pressable onPress={e => e.stopPropagation()}>
+                                {/* Handle */}
+                                <View style={styles.handle} />
+                                {/* ── Header ── */}
+                                <View style={styles.header}>
+                                    <View style={styles.headerLeft}>
+                                        <View style={styles.headerIconBox}>
+                                            <Image source={localImages.dwwp_logo} style={styles.logo} />
+                                        </View>
+                                        <View>
+                                            <Text style={styles.title}>Water Supply Control</Text>
+                                            <Text style={styles.subtitle}>DWWP Servo Valve · ESP32</Text>
+                                        </View>
                                     </View>
-                                    <View>
-                                        <Text style={styles.title}>Water Supply Control</Text>
-                                        <Text style={styles.subtitle}>DWWP Servo Valve · ESP32</Text>
-                                    </View>
-                                </View>
-                                <TouchableOpacity onPress={close} style={styles.closeBtn}>
-                                    <Text style={styles.closeBtnText}>✕</Text>
-                                </TouchableOpacity>
-                            </View>
-
-                            {/* ── Quota exceeded banner ── */}
-                            {quotaExceeded && (
-                                <View style={styles.errorBanner}>
-                                    <Text style={styles.bannerIcon}>⛔</Text>
-                                    <View style={{ flex: 1 }}>
-                                        <Text style={styles.errorBannerTitle}>Usage limit reached</Text>
-                                        <Text style={styles.errorBannerSub}>Control disabled. Recharge to continue.</Text>
-                                    </View>
-                                </View>
-                            )}
-
-                            {/* ── Device offline warning ── */}
-                            {deviceOffline && !quotaExceeded && (
-                                <View style={styles.warnBanner}>
-                                    <Text style={styles.bannerIcon}>⚠️</Text>
-                                    <View style={{ flex: 1 }}>
-                                        <Text style={styles.warnBannerTitle}>Device not reachable</Text>
-                                        <Text style={styles.warnBannerSub}>Command will execute once device reconnects</Text>
-                                    </View>
-                                </View>
-                            )}
-
-                            {/* ── Current state card ── */}
-                            <LinearGradient
-                                colors={localState && !isLocked
-                                    ? [C.primary, C.primaryDark]
-                                    : [C.bg, C.bg]}
-                                start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-                                style={[styles.stateCard, !localState && { borderWidth: 1, borderColor: C.border }]}
-                            >
-                                <View style={styles.stateCardLeft}>
-                                    <View style={[styles.stateIconBox, {
-                                        backgroundColor: localState && !isLocked
-                                            ? 'rgba(255,255,255,0.15)' : C.primaryLight
-                                    }]}>
-                                        <Text style={{ fontSize: normalize(22) }}>
-                                            {isLocked ? '🔒' : localState ? '💧' : '⏸️'}
-                                        </Text>
-                                    </View>
-                                    <View>
-                                        <Text style={[styles.stateLabel, {
-                                            color: localState && !isLocked ? C.white : C.black
-                                        }]}>
-                                            {isLocked ? 'Locked' : localState ? 'Water is ON' : 'Water is OFF'}
-                                        </Text>
-                                        <Text style={[styles.stateDesc, {
-                                            color: localState && !isLocked ? 'rgba(255,255,255,0.65)' : C.bodyText
-                                        }]}>
-                                            {isLocked ? 'Quota exceeded' : localState ? 'Valve open · flowing' : 'Valve closed · stopped'}
-                                        </Text>
-                                    </View>
+                                    <TouchableOpacity onPress={close} style={styles.closeBtn}>
+                                        <Text style={styles.closeBtnText}>✕</Text>
+                                    </TouchableOpacity>
                                 </View>
 
-                                {/* Live indicator */}
-                                {!isLocked && (
-                                    <View style={[styles.liveBadge, { backgroundColor: localState ? 'rgba(50,194,202,0.25)' : 'rgba(0,0,0,0.08)' }]}>
-                                        <View style={[styles.liveDot, { backgroundColor: localState ? C.cyan : C.disabled }]} />
-                                        <Text style={[styles.liveText, { color: localState ? C.cyan : C.disabled }]}>
-                                            {localState ? 'LIVE' : 'OFF'}
-                                        </Text>
+                                {/* ── Quota exceeded banner ── */}
+                                {quotaExceeded && (
+                                    <View style={styles.errorBanner}>
+                                        <Text style={styles.bannerIcon}>⛔</Text>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={styles.errorBannerTitle}>Usage limit reached</Text>
+                                            <Text style={styles.errorBannerSub}>Control disabled. Recharge to continue.</Text>
+                                        </View>
                                     </View>
                                 )}
-                            </LinearGradient>
 
-                            {/* ── Big toggle ── */}
-                            <View style={styles.toggleSection}>
-                                <Text style={styles.toggleHint}>
-                                    {isLocked ? 'Recharge your plan to control the valve'
-                                        : 'Tap to toggle water supply'}
-                                </Text>
-                                <ToggleSwitch />
-                            </View>
+                                {/* ── Device offline warning ── */}
+                                {deviceOffline && !quotaExceeded && (
+                                    <View style={styles.warnBanner}>
+                                        <Text style={styles.bannerIcon}>⚠️</Text>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={styles.warnBannerTitle}>Device not reachable</Text>
+                                            <Text style={styles.warnBannerSub}>Command will execute once device reconnects</Text>
+                                        </View>
+                                    </View>
+                                )}
 
-                            {/* ── Info note ── */}
-                            <View style={styles.infoNote}>
-                                <View style={[styles.infoIconBox, { backgroundColor: C.primaryLight }]}>
-                                    <Text style={{ fontSize: normalize(13) }}>ℹ️</Text>
+                                {/* ── Current state card ── */}
+                                <LinearGradient
+                                    colors={localState && !isLocked
+                                        ? [C.primary, C.primaryDark]
+                                        : [C.bg, C.bg]}
+                                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+                                    style={[styles.stateCard, !localState && { borderWidth: 1, borderColor: C.border }]}
+                                >
+                                    <View style={styles.stateCardLeft}>
+                                        <View style={[styles.stateIconBox, {
+                                            backgroundColor: localState && !isLocked
+                                                ? 'rgba(255,255,255,0.15)' : C.primaryLight
+                                        }]}>
+                                            <Text style={{ fontSize: normalize(22) }}>
+                                                {isLocked ? '🔒' : localState ? '💧' : '⏸️'}
+                                            </Text>
+                                        </View>
+                                        <View>
+                                            <Text style={[styles.stateLabel, {
+                                                color: localState && !isLocked ? C.white : C.black
+                                            }]}>
+                                                {isLocked ? 'Locked' : localState ? 'Water is ON' : 'Water is OFF'}
+                                            </Text>
+                                            <Text style={[styles.stateDesc, {
+                                                color: localState && !isLocked ? 'rgba(255,255,255,0.65)' : C.bodyText
+                                            }]}>
+                                                {isLocked ? 'Quota exceeded' : localState ? 'Valve open · flowing' : 'Valve closed · stopped'}
+                                            </Text>
+                                        </View>
+                                    </View>
+
+                                    {/* Live indicator */}
+                                    {!isLocked && (
+                                        <View style={[styles.liveBadge, { backgroundColor: localState ? 'rgba(50,194,202,0.25)' : 'rgba(0,0,0,0.08)' }]}>
+                                            <View style={[styles.liveDot, { backgroundColor: localState ? C.cyan : C.disabled }]} />
+                                            <Text style={[styles.liveText, { color: localState ? C.cyan : C.disabled }]}>
+                                                {localState ? 'LIVE' : 'OFF'}
+                                            </Text>
+                                        </View>
+                                    )}
+                                </LinearGradient>
+
+                                {/* ── Big toggle ── */}
+                                <View style={styles.toggleSection}>
+                                    <Text style={styles.toggleHint}>
+                                        {isLocked ? 'Recharge your plan to control the valve'
+                                            : 'Tap to toggle water supply'}
+                                    </Text>
+                                    <ToggleSwitch />
                                 </View>
-                                <Text style={styles.infoText}>
-                                    This switch controls the servo valve on your DWWP device.
-                                    {deviceOffline ? ' Device is currently offline — command will sync when reconnected.' : ''}
-                                </Text>
-                            </View>
 
-                            <CustomButton
-                                title='Done'
-                                onPress={handleConfirm}
-                            />
+                                {/* ── Info note ── */}
+                                <View style={styles.infoNote}>
+                                    <View style={[styles.infoIconBox, { backgroundColor: C.primaryLight }]}>
+                                        <Text style={{ fontSize: normalize(13) }}>ℹ️</Text>
+                                    </View>
+                                    <Text style={styles.infoText}>
+                                        This switch controls the servo valve on your DWWP device.
+                                        {deviceOffline ? ' Device is currently offline — command will sync when reconnected.' : ''}
+                                    </Text>
+                                </View>
 
-                        </Pressable>
-                    </Animated.View>
-                </Pressable>
+                                <CustomButton
+                                    title='Done'
+                                    onPress={handleConfirm}
+                                />
+
+                            </Pressable>
+                        </Animated.View>
+                    </Pressable>
             </GestureHandlerRootView>
         </Modal>
     )

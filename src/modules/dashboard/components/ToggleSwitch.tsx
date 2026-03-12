@@ -98,7 +98,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
         if (timerRef.current) clearTimeout(timerRef.current)
         timerRef.current = setTimeout(() => {
             isEligibleRef.current = true
-        }, 500)
+        }, 1500)
 
         const newState = !servoStateRef.current
         dispatch(updateServoState({ email, newState }))
