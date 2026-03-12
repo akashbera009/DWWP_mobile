@@ -28,14 +28,13 @@ import { screenNames } from '@dwwp/utils/screenNames'
 import QuickLinks from './Quicklinks'
 
 type DashBoardPagePropsType = {
-    servoState: boolean;
-    setIsSwitchOpen: () => void
+    setIsSwitchModalOpen: () => void
     refreshDashboard: () => void
 }
 
 type BottomStackNavigation = NativeStackNavigationProp<BottomTabParamList>;
 
-const DashBoardPage = ({ servoState, setIsSwitchOpen, refreshDashboard }: DashBoardPagePropsType) => {
+const DashBoardPage = ({ setIsSwitchModalOpen, refreshDashboard }: DashBoardPagePropsType) => {
     const [refreshing, setRefreshing] = React.useState(false);
     const bottomStackNavigation = useNavigation<BottomStackNavigation>()
 
@@ -50,15 +49,7 @@ const DashBoardPage = ({ servoState, setIsSwitchOpen, refreshDashboard }: DashBo
 
     const handleViewMonthlyUsagesPress = () => {
         bottomStackNavigation.navigate(screenNames.AnalyticsPage)
-    }
-
-    const links = [
-        "Raise Complaint",
-        "Give Feedback",
-        "Do a Quick Recharge",
-        "Pay Dues"
-    ]
-
+    } 
     return (
         <View
             style={styles.container}
@@ -86,8 +77,7 @@ const DashBoardPage = ({ servoState, setIsSwitchOpen, refreshDashboard }: DashBo
 
                 {/* Device Control */}
                 <DeviceSection
-                    servoState={servoState}
-                    setIsSwitchOpen={() => setIsSwitchOpen()}
+                    setIsSwitchModalOpen={() => setIsSwitchModalOpen()}
                 />
 
                 {/* Usage Chart */}

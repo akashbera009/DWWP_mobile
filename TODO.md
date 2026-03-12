@@ -22,3 +22,10 @@ check if the the back arrow with the subheading is correct alignment
 3 transactions styling is needed 
 
 listner for lastseens is needed 
+
+controlSwitchModal has older states , need attention 
+
+in device sction (scrollable) it needed to be reconstructed as acording to detail view 
+
+
+notification panel . lets check this with a largenotifcaiton if it is scrollable or just full enrtire screen 

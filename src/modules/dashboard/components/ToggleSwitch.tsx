@@ -1,9 +1,9 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useRef, useState } from "react";
 import {
     View,
-    Text,
     StyleSheet,
     ActivityIndicator,
+    Pressable,
 } from "react-native";
 import Animated, {
     useSharedValue,
@@ -16,6 +16,7 @@ import { GestureDetector, Gesture } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@dwwp/store";
 import { updateServoState } from "../servoActions";
+import { showSuccessSnackbar, showWarningSnackbar } from "@dwwp/utils/showSnackBar";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const SWITCH_WIDTH = 240;
@@ -37,7 +38,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
 
     // ── Redux state ────────────────────────────────────────────────────────────
     const { servoState, isLoading } = useSelector((state: RootState) => state.servo);
-    const email = useSelector((state: RootState) => state.dashboard?.userDetails?.emailId); // adjust selector to your auth slice
+    const email = useSelector((state: RootState) => state.dashboard?.userDetails?.emailId);
 
     // ── Animation ──────────────────────────────────────────────────────────────
     const progress = useSharedValue(servoState ? 1 : 0);
@@ -71,54 +72,71 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
             ["hsl(220, 20%, 70%)", "hsl(220, 20%, 85%)"]
         ),
     }));
+    // ── Refs ───────────────────────────────────────────────────────────────────
+    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const isEligibleRef = useRef<boolean>(true)
+    const servoStateRef = useRef<boolean>(servoState)
 
-    // ── Toggle handler ─────────────────────────────────────────────────────────
-    const handleToggle = useCallback(() => {
-        console.log('clicking');
-        
-        if (!email) return;
-        dispatch(updateServoState({ email, newState: !servoState }));
-    }, [email, servoState, dispatch]);
+    useEffect(() => {
+        servoStateRef.current = servoState
+    }, [servoState])
+
+    // ── Shared toggle logic (refs only, no closure issues) ─────────────────────
+    const executeToggle = () => {
+        if (disabled || !email) return
+
+        if (!isEligibleRef.current) {
+            showWarningSnackbar('Too many requests in short time')
+            progress.value = withTiming(servoStateRef.current ? 1 : 0, {
+                duration: DURATION,
+                easing: EASING,
+            })
+            return
+        }
+
+        isEligibleRef.current = false
+        if (timerRef.current) clearTimeout(timerRef.current)
+        timerRef.current = setTimeout(() => {
+            isEligibleRef.current = true
+        }, 500)
+
+        const newState = !servoStateRef.current
+        dispatch(updateServoState({ email, newState }))
+        showSuccessSnackbar(`Water Supply ${newState ? 'Activated' : 'De-Activated'}`)
+    }
 
     // ── Gestures ───────────────────────────────────────────────────────────────
-    const tap = Gesture.Tap()
-        .runOnJS(true)
-        .onEnd(() => handleToggle());
-
     const pan = Gesture.Pan()
-        // .runOnJS(true)
-        .onTouchesMove(()=>{
-            console.log('touching');
-            
-        })
+        .runOnJS(true)
         .onUpdate((e) => {
-            const base = servoState ? buttonLeft_ON : buttonLeft_OFF;
+            const base = servoStateRef.current ? buttonLeft_ON : buttonLeft_OFF
             const clamped = Math.min(
                 Math.max(base + e.translationX, buttonLeft_OFF),
                 buttonLeft_ON
-            );
-            progress.value = (clamped - buttonLeft_OFF) / (buttonLeft_ON - buttonLeft_OFF);
+            )
+            progress.value = (clamped - buttonLeft_OFF) / (buttonLeft_ON - buttonLeft_OFF)
         })
         .onEnd((e) => {
-            const draggedRight = e.translationX > PAN_THRESHOLD;
-            const draggedLeft = e.translationX < -PAN_THRESHOLD;
+            const draggedRight = e.translationX > PAN_THRESHOLD
+            const draggedLeft = e.translationX < -PAN_THRESHOLD
+            const wasTap = Math.abs(e.translationX) < 10 && Math.abs(e.translationY) < 10
 
-            if ((draggedRight && !servoState) || (draggedLeft && servoState)) {
-                handleToggle();
+            const shouldToggle =
+                wasTap ||
+                (draggedRight && !servoStateRef.current) ||
+                (draggedLeft && servoStateRef.current)
+
+            if (shouldToggle) {
+                executeToggle()
             } else {
-                // Snap back — no state change
-                progress.value = withTiming(servoState ? 1 : 0, {
+                progress.value = withTiming(servoStateRef.current ? 1 : 0, {
                     duration: DURATION,
                     easing: EASING,
-                });
+                })
             }
-        });
+        })
 
-    const gesture = Gesture.Simultaneous(tap, pan);
-
-    // ── Guards ─────────────────────────────────────────────────────────────────
     if (!email) return null;
-
     if (isLoading) {
         return (
             <View style={styles.loadingContainer}>
@@ -126,34 +144,34 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
             </View>
         );
     }
-
-    // ── Render ─────────────────────────────────────────────────────────────────
     return (
         <View style={styles.wrapper}>
-            <GestureDetector gesture={gesture}>
-                <View
-                    style={[
-                        styles.switchTrack,
-                        disabled && styles.switchDisabled,
-                    ]}
-                >
-                    {/* Left indicator (ON / orange) */}
-                    <Animated.View
-                        style={[styles.indicator, styles.indicatorLeft, animatedLeftBgStyle]}
-                    />
+            <Pressable onPress={executeToggle}>
+                <GestureDetector gesture={pan}>
+                    <View
+                        style={[
+                            styles.switchTrack,
+                            disabled && styles.switchDisabled,
+                        ]}
+                    >
+                        {/* Left indicator (ON / orange) */}
+                        <Animated.View
+                            style={[styles.indicator, styles.indicatorLeft, animatedLeftBgStyle]}
+                        />
 
-                    {/* Right indicator (OFF / grey) */}
-                    <Animated.View
-                        style={[styles.indicator, styles.indicatorRight, animatedRightBgStyle]}
-                    />
+                        {/* Right indicator (OFF / grey) */}
+                        <Animated.View
+                            style={[styles.indicator, styles.indicatorRight, animatedRightBgStyle]}
+                        />
 
-                    {/* Sliding button */}
-                    <Animated.View style={[styles.button, animatedButtonStyle]}>
-                        <View style={styles.buttonDotLeft} />
-                        <View style={styles.buttonDotRight} />
-                    </Animated.View>
-                </View>
-            </GestureDetector>
+                        {/* Sliding button — last child, always paints above indicators */}
+                        <Animated.View style={[styles.button, animatedButtonStyle]}>
+                            <View style={styles.buttonDotLeft} />
+                            <View style={styles.buttonDotRight} />
+                        </Animated.View>
+                    </View>
+                </GestureDetector>
+            </Pressable>
         </View>
     );
 };
@@ -172,6 +190,8 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
+
+    // ── Track ──────────────────────────────────────────────────────────────────
     switchTrack: {
         position: "relative",
         width: SWITCH_WIDTH,
@@ -191,6 +211,8 @@ const styles = StyleSheet.create({
     switchDisabled: {
         opacity: 0.55,
     },
+
+    // ── Indicators ─────────────────────────────────────────────────────────────
     indicator: {
         position: "absolute",
         width: "40%",
@@ -212,9 +234,11 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 0,
         backgroundColor: "hsl(220, 20%, 70%)",
     },
+
+    // ── Button ─────────────────────────────────────────────────────────────────
     button: {
         position: "absolute",
-        zIndex: 1,
+        // zIndex removed — last-child paint order handles layering cleanly
         width: BUTTON_WIDTH,
         height: BUTTON_HEIGHT,
         borderRadius: 100,
@@ -227,7 +251,8 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 4, height: 8 },
         shadowOpacity: 0.55,
         shadowRadius: 10,
-        elevation: 6,
+        elevation: 8,        // raises button above indicators on Android
+        overflow: "visible", // prevents dot clipping
     },
     buttonDotLeft: {
         width: "38%",
@@ -243,10 +268,11 @@ const styles = StyleSheet.create({
         width: "38%",
         aspectRatio: 1,
         borderRadius: 100,
-        backgroundColor: "hsl(220, 20%, 88%)",
-        shadowColor: "hsl(220, 20%, 65%)",
+        // Darker than left dot so it's visually distinct from the button bg
+        backgroundColor: "hsl(220, 15%, 78%)",
+        shadowColor: "hsl(220, 20%, 55%)",
         shadowOffset: { width: 1, height: 1 },
-        shadowOpacity: 0.6,
+        shadowOpacity: 0.5,
         shadowRadius: 2,
     },
 });

@@ -10,12 +10,13 @@ import LinearGradient from 'react-native-linear-gradient'
 import colors from '@dwwp/utils/colors'
 import fonts from '@dwwp/utils/fonts'
 import { normalize, vh } from '@dwwp/utils/dimensions'
+import { useAppSelector } from '@dwwp/store/hooks'
 
 type DeviceSectionProp = {
-    servoState: boolean;
-    setIsSwitchOpen: () => void
+    setIsSwitchModalOpen: () => void
 }
-const DeviceSection = ({ servoState, setIsSwitchOpen }: DeviceSectionProp) => {
+const DeviceSection = ({setIsSwitchModalOpen }: DeviceSectionProp) => {
+    const servoState = useAppSelector(s=> s.servo.servoState)
     return (
         <View style={[styles.deviceStatusSection]}>
             {/* Section label */}
@@ -30,7 +31,7 @@ const DeviceSection = ({ servoState, setIsSwitchOpen }: DeviceSectionProp) => {
                 {/* Right – valve state + open sheet button */}
                 <TouchableOpacity
                     style={styles.valveCard}
-                    onPress={() => setIsSwitchOpen()}
+                    onPress={() => setIsSwitchModalOpen()}
                     activeOpacity={0.82}
                 >
                     <LinearGradient

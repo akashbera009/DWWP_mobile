@@ -94,9 +94,6 @@ interface Props {
     onBack?: () => void
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-
 // ─── Animated progress bar ────────────────────────────────────────────────────
 interface ProgressBarProps {
     pct: number        // 0–1

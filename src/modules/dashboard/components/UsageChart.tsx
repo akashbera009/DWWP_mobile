@@ -1,23 +1,41 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
 import LinearGradient from 'react-native-linear-gradient'
 import Pill from './Pill'
 import colors from '@dwwp/utils/colors'
+import { useAppSelector } from '@dwwp/store/hooks'
+import { getCurrentMonthKey, getShortMonthNameByMonthKey } from '@dwwp/utils/commonFunctions'
 
-const USAGE_DATA = [
-    { month: 'Aug', value: 340 },
-    { month: 'Sep', value: 420 },
-    { month: 'Oct', value: 380 },
-    { month: 'Nov', value: 510 },
-    { month: 'Dec', value: 460 },
-    { month: 'Jan', value: 590 },
-]
-const MAX_VAL = Math.max(...USAGE_DATA.map(d => d.value))
 
 const UsageChart = () => {
-    const [activeBar, setActiveBar] = useState(USAGE_DATA.length - 1)
+    const usedHistoryObject = useAppSelector(s => s.usage.allTimeMonths)
+    const monthKeys: string[] = Object.keys(usedHistoryObject).map((e) => {
+        return getShortMonthNameByMonthKey(e)
+    })
+    const usedInLitres: number[] = Object.values(usedHistoryObject).map((e) => {
+        return Number(e.toFixed(0))
+    })
+
+    const [finalObjectArray, setFinalObjectArray] = useState<{ month: string, value: number }[]>([{ month: '', value: 0 }])
+    const currenMonthKey = getCurrentMonthKey()
+    const thisMonthUsages = useAppSelector(s => s.usage.months[currenMonthKey]?.total)
+
+    useEffect(() => {
+        const temp = monthKeys.map((month, i) => {
+            return {
+                month: month,
+                value: usedInLitres[i]
+            }
+        })
+        temp.push({ month: currenMonthKey, value: thisMonthUsages })
+        setFinalObjectArray(temp.slice(0, 6))
+    }, [])
+
+    const MAX_VAL = Math.floor(Math.max(...finalObjectArray.map((d) => d.value)))
+    const AVG_VAL = Math.floor(finalObjectArray.reduce((prev, d, _) => { return d.value + prev }, 0) / finalObjectArray.length)
+    const [activeBar, setActiveBar] = useState(usedInLitres.length - 1)
 
     return (
         <View style={styles.card}>
@@ -30,15 +48,9 @@ const UsageChart = () => {
                 <Pill label="This Year" color={colors.primary} bg={colors.primaryLight} />
             </View>
 
-            {/* Active value callout */}
-            {/* <View style={styles.chartCallout}>
-                <Text style={styles.chartCalloutValue}>{activeData.value} <Text style={styles.chartCalloutUnit}>kWh</Text></Text>
-                <Text style={styles.chartCalloutMonth}>{activeData.month} 2024{activeBar === USAGE_DATA.length - 1 ? '  ·  Current' : ''}</Text>
-            </View> */}
-
             {/* Bars */}
             <View style={styles.chartContainer}>
-                {USAGE_DATA.map((d, i) => {
+                {finalObjectArray.map((d, i) => {
                     const isActive = i === activeBar
                     const barH = Math.round((d.value / MAX_VAL) * 100)
                     return (
@@ -75,11 +87,11 @@ const UsageChart = () => {
             <View style={styles.chartSummaryRow}>
                 <View style={styles.chartSummaryItem}>
                     <View style={[styles.chartSummaryDot, { backgroundColor: colors.activeDot }]} />
-                    <Text style={styles.chartSummaryLabel}>Peak: <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>Nov · 510 kWh</Text></Text>
+                    <Text style={styles.chartSummaryLabel}>Peak: <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>Nov ·{MAX_VAL} Litres</Text></Text>
                 </View>
                 <View style={styles.chartSummaryItem}>
                     <View style={[styles.chartSummaryDot, { backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border }]} />
-                    <Text style={styles.chartSummaryLabel}>Avg: <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>450 kWh</Text></Text>
+                    <Text style={styles.chartSummaryLabel}>Avg: <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>{AVG_VAL} Litres/Month</Text></Text>
                 </View>
             </View>
         </View>

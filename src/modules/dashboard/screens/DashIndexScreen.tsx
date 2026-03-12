@@ -80,7 +80,7 @@ const DashIndexScreen = () => {
     // const [servoState, setServoState] = useState<boolean>(false)
     // const [lastSeen, setLastSeen] = useState<number | undefined>(undefined)
     // const [limitExceeded, setLimitExceeded] = useState<boolean>(false)
-    const [isSwitchOpen, setIsSwitchOpen] = useState<boolean>(false)
+    const [isSwitchOpen, setIsSwitchModalOpen] = useState<boolean>(false)
 
     const scrolRef = useRef<ScrollView | null>(null)
     const { top } = useSafeAreaInsets()
@@ -155,7 +155,7 @@ const DashIndexScreen = () => {
             {/* ── Switch Modal ── */}
             {isSwitchOpen && (
                 <ControlSwitchModal
-                    onClose={() => setIsSwitchOpen(false)}
+                    onClose={() => setIsSwitchModalOpen(false)}
                 />
             )}
             {dashboardIsLoading ?
@@ -175,16 +175,14 @@ const DashIndexScreen = () => {
                 >
                     <View style={styles.page}>
                         <DashBoardPage
-                            servoState={servoState}
-                            setIsSwitchOpen={() => setIsSwitchOpen(true)}
+                            setIsSwitchModalOpen={() => setIsSwitchModalOpen(true)}
                             refreshDashboard={fetchDashboardData}
                         />
                     </View>
 
                     <View style={styles.page2}>
                         <DeviceSection
-                            servoState={servoState}
-                            setIsSwitchOpen={() => setIsSwitchOpen(true)}
+                            setIsSwitchModalOpen={() => setIsSwitchModalOpen(true)}
                         />
                     </View>
 

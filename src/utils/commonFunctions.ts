@@ -64,18 +64,27 @@ export const fmtD = (n: number) => `${n.toFixed(1)}L`
 
 
 export function getCurrentMonthKey(): string {
-    const d = new Date()
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
 }
 export const getToday = () => {
   const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 export function sumDailyUsages(usages: Record<string, number>): number {
-    return Object.values(usages).reduce((s, v) => s + v, 0)
+  return Object.values(usages).reduce((s, v) => s + v, 0)
 }
-
+const months: string[] = [
+  "January", "February", "March", "April",
+  "May", "June", "July", "August",
+  "September", "October", "November", "December"
+];
+export const getShortMonthNameByMonthKey = (monthKey: string) => {
+  const monthId: number = Number(monthKey.split('-')[1]) - 1;;
+  const yearName = monthKey.split('-')[0].split('').slice(-2).join('')
+  return `${months[monthId].slice(0, 3)+'-'+ yearName}`
+}
 // for paymnetss 
 export const normalizeTimestamp = (t: any): string | null => {
   if (!t) return null
