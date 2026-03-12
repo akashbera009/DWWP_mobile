@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import LinearGradient from 'react-native-linear-gradient'
-import { normalize, vh } from '@dwwp/utils/dimensions'
+import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
 import colors from '@dwwp/utils/colors'
 import Animated, {
@@ -44,51 +44,39 @@ const clamp = (v: number, lo: number, hi: number) => {
 }
 
 const HeroSummaryCard: React.FC = () => {
-    const onlineCount = 2;
-    const total = 4;
-    const usagePct = 0.72;
     const price = useAppSelector(state => state.dashboard.priceConfig?.regularPrice)
 
-    const todayKey = getTodayKey()        
-    const monthKey = getCurrentMonthKey() 
+    const todayKey = getTodayKey()
+    const monthKey = getCurrentMonthKey()
 
-    // Today
-    const todayUsage = useAppSelector(state =>
-        state.usage?.months?.[monthKey]?.days?.[todayKey] ?? 0
-    )
+    const { todayUsage, monthTotal, monthLimit } = useAppSelector(state => {
+        const month = state.usage?.months?.[monthKey] || {}
 
-    // Current month total (1237 in your state)
-    const monthTotal = useAppSelector(state =>
-        state.usage?.months?.[monthKey]?.total ?? 0
-    )
+        return {
+            todayUsage: month?.days?.[todayKey] ?? 0,
+            monthTotal: month?.total ?? 0,
+            monthLimit: month?.limit ?? 0,
+            limitExceeded: month?.limitExceeded ?? false,
+        }
+    })
+    const billAmount = React.useMemo(() => {
+        if (!price) return 0
+        return (price * todayUsage).toFixed(0)
+    }, [price, todayUsage])
 
-    // Limit (2000 in your state)
-    const monthLimit = useAppSelector(state =>
-        state.usage?.months?.[monthKey]?.limit ?? 0
-    )
-
-    // Limit exceeded (false in your state)
-    const limitExceeded = useAppSelector(state =>
-        state.usage?.months?.[monthKey]?.limitExceeded ?? false
-    )
-
-    // Bill amount for today
-    const billAmount = (price && price * todayUsage)?.toFixed(0)
-
-    // Monthly bill amount  
-    const monthBillAmount = (price && price * monthTotal)?.toFixed(0)
-
-    // Usage % for the circle gauge (72% in your screenshot)
-    const usagePercent = monthLimit > 0
-        ? Math.min((monthTotal / monthLimit) * 100, 100).toFixed(0)
-        : 0
-
+    const monthBillAmount = React.useMemo(() => {
+        if (!price) return 0
+        return (price * monthTotal).toFixed(0)
+    }, [price, monthTotal])
+    
     // All-time total — your existing line was correct
     const allTimeDaysTotal = useAppSelector(state =>
         state.usage.allTimeDaysTotal
     ).toFixed(0)
 
-
+    const usagePct = monthTotal / monthLimit;
+    const onlineCount = 2;
+    const total = 4;
 
     // const sensor = useAnimatedSensor(SensorType.GYROSCOPE, { interval: 16 })
     const sensor = useAnimatedSensor(SensorType.GRAVITY, { interval: 16 })
@@ -175,12 +163,17 @@ const HeroSummaryCard: React.FC = () => {
                 {/* ── Left: text ── */}
                 <View style={styles.heroLeft}>
                     <Text style={styles.heroLabel}>Current Bill</Text>
-                    <Text style={styles.heroAmount}>{billAmount}</Text>
-
+                    <Text style={styles.heroBadgeTextRupee}>₹</Text>
+                    <View style={styles.heroAmountBox} >
+                        <Text style={styles.heroAmount}>{monthBillAmount}</Text>
+                        <Text style={styles.heroThisMonth}>This Month</Text>
+                    </View>
                     <View style={styles.heroRow}>
                         <View style={styles.heroBadge}>
-                            <Text style={styles.heroBadgeText}>{monthBillAmount}</Text>
-                        </View> 
+                            <Text style={styles.heroBadgeTextSmall}>Today </Text>
+                            <Text style={styles.heroBadgeTextRupeeSmall}>₹</Text>
+                            <Text style={styles.heroBadgeText}>{billAmount}</Text>
+                        </View>
                     </View>
 
                     <View style={styles.heroStats}>
@@ -274,15 +267,43 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.65)',
         letterSpacing: 0.8, textTransform: 'uppercase',
     },
+    heroBadgeTextRupee: {
+        position: 'absolute',
+        top: vh(18),
+        left: 0,
+        fontFamily: fonts.light, fontSize: normalize(12),
+        color: colors.white, lineHeight: normalize(36),
+    },
+    heroAmountBox: {
+        flexDirection: 'row',
+        alignItems: 'flex-end'
+    },
     heroAmount: {
         fontFamily: fonts.Bold, fontSize: normalize(32),
         color: colors.white, lineHeight: normalize(36),
+        marginLeft: vw(6)
+    },
+    heroThisMonth: {
+        fontFamily: fonts.ExtraLight,
+        fontSize: normalize(16),
+        marginLeft: vw(8),
+        color: colors.placeholderText,
     },
     heroRow: { flexDirection: 'row' },
     heroBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
         paddingHorizontal: normalize(10), paddingVertical: normalize(4),
         borderRadius: normalize(20),
         backgroundColor: 'rgba(50,194,202,0.18)',
+    },
+    heroBadgeTextSmall: {
+        fontFamily: fonts.ExtraLight, fontSize: normalize(11),
+        color: colors.activeBorder,
+    },
+    heroBadgeTextRupeeSmall: {
+        fontFamily: fonts.SemiBold, fontSize: normalize(11),
+        color: colors.activeDot,
     },
     heroBadgeText: {
         fontFamily: fonts.SemiBold, fontSize: normalize(11),

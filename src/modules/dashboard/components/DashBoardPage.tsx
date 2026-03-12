@@ -28,7 +28,6 @@ import { screenNames } from '@dwwp/utils/screenNames'
 import QuickLinks from './Quicklinks'
 
 type DashBoardPagePropsType = {
-    lastSeen: number | undefined;
     servoState: boolean;
     setIsSwitchOpen: () => void
     refreshDashboard: () => void
@@ -36,7 +35,7 @@ type DashBoardPagePropsType = {
 
 type BottomStackNavigation = NativeStackNavigationProp<BottomTabParamList>;
 
-const DashBoardPage = ({ lastSeen, servoState, setIsSwitchOpen, refreshDashboard }: DashBoardPagePropsType) => {
+const DashBoardPage = ({ servoState, setIsSwitchOpen, refreshDashboard }: DashBoardPagePropsType) => {
     const [refreshing, setRefreshing] = React.useState(false);
     const bottomStackNavigation = useNavigation<BottomStackNavigation>()
 
@@ -77,7 +76,7 @@ const DashBoardPage = ({ lastSeen, servoState, setIsSwitchOpen, refreshDashboard
                 }
             >
                 {/* Welcome Row */}
-                <WelcomeBanner userName={'Akash Bera'} />
+                <WelcomeBanner/>
 
                 {/* Hero Summary Card */}
                 <HeroSummaryCard />
@@ -87,7 +86,6 @@ const DashBoardPage = ({ lastSeen, servoState, setIsSwitchOpen, refreshDashboard
 
                 {/* Device Control */}
                 <DeviceSection
-                    lastSeen={lastSeen}
                     servoState={servoState}
                     setIsSwitchOpen={() => setIsSwitchOpen()}
                 />

@@ -23,10 +23,10 @@ const Bone = ({
     inputRange: [0, 0.5, 1],
     outputRange: dark
       ? [
-          'rgba(255,255,255,0.08)',
-          'rgba(255,255,255,0.18)',
-          'rgba(255,255,255,0.08)',
-        ]
+        'rgba(255,255,255,0.08)',
+        'rgba(255,255,255,0.18)',
+        'rgba(255,255,255,0.08)',
+      ]
       : [colors.inputBackground, '#E2E7EC', colors.inputBackground],
   })
 
@@ -74,7 +74,7 @@ const DashboardSkeleton = () => {
       {/* ── GREETING ── */}
       <View style={styles.greeting}>
         <Bone width={vw(118)} height={vh(15)} borderRadius={normalize(6)} shimmerValue={shimmer} />
-        <Bone width={vw(180)} height={vh(26)} borderRadius={normalize(7)} shimmerValue={shimmer} style={{ marginTop: vh(8) }} />
+        <Bone width={vw(180)} height={vh(22)} borderRadius={normalize(7)} shimmerValue={shimmer} style={{ marginTop: vh(8) }} />
       </View>
 
       {/* ── BILL CARD ── */}
@@ -125,13 +125,17 @@ const DashboardSkeleton = () => {
         {[0, 1, 2, 3].map((i) => (
           <View key={i} style={styles.gridCard}>
             {/* Icon circle */}
-            <Bone width={vw(38)} height={vw(38)} borderRadius={vw(19)} shimmerValue={shimmer} style={{ marginBottom: vh(10) }} />
-            {/* Label */}
-            <Bone width={vw(50)} height={vh(12)} borderRadius={normalize(4)} shimmerValue={shimmer} style={{ marginBottom: vh(6) }} />
-            {/* Value */}
-            <Bone width={vw(62)} height={vh(22)} borderRadius={normalize(6)} shimmerValue={shimmer} style={{ marginBottom: vh(8) }} />
+            <View style={styles.upperGrid}>
+              <Bone width={vw(38)} height={vw(38)} borderRadius={vw(12)} shimmerValue={shimmer} style={{ marginBottom: vh(0) }} />
+              {/* Label */}
+              <View style={styles.gripRight}>
+                <Bone width={vw(70)} height={vh(12)} borderRadius={normalize(4)} shimmerValue={shimmer} style={{ marginBottom: vh(6) }} />
+                {/* Value */}
+                <Bone width={vw(42)} height={vh(22)} borderRadius={normalize(6)} shimmerValue={shimmer} style={{ marginBottom: vh(8) }} />
+              </View>
+            </View>
             {/* Trend badge */}
-            <Bone width={vw(55)} height={vh(14)} borderRadius={normalize(8)} shimmerValue={shimmer} />
+            <Bone width={vw(100)} height={vh(12)} borderRadius={normalize(8)} shimmerValue={shimmer} style={{marginLeft: vw(18) , marginTop:(-8)}}/>
           </View>
         ))}
       </View>
@@ -143,7 +147,7 @@ const DashboardSkeleton = () => {
           <View style={styles.deviceRow}>
             {[0, 1].map((i) => (
               <View key={i} style={styles.deviceItem}>
-                <Bone width={vw(90)} height={vh(80)} borderRadius={normalize(14)} shimmerValue={shimmer} />
+                <Bone width={vw(150)} height={vh(80)} borderRadius={normalize(14)} shimmerValue={shimmer} />
                 <Bone width={vw(60)} height={vh(12)} borderRadius={normalize(4)} shimmerValue={shimmer} style={{ marginTop: vh(8) }} />
                 <Bone width={vw(40)} height={vh(10)} borderRadius={normalize(4)} shimmerValue={shimmer} style={{ marginTop: vh(4) }} />
               </View>
@@ -167,7 +171,7 @@ const styles = StyleSheet.create({
   },
   // Greeting
   greeting: {
-    marginTop: vh(24),
+    marginTop: vh(12),
   },
 
   // Bill card
@@ -238,15 +242,16 @@ const styles = StyleSheet.create({
 
   // Grid
   grid: {
-    marginTop: vh(20),
+    marginTop: vh(8),
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: vh(12),
+    justifyContent :'space-around',
+    marginHorizontal :vw(8),
+    gap: vh(8),
   },
   gridCard: {
-    width: vw(44),
-    minHeight: vh(115),
+    width: vw(150),
+    height: vh(105),
     borderRadius: normalize(18),
     backgroundColor: colors.background,
     padding: vw(12),
@@ -258,7 +263,13 @@ const styles = StyleSheet.create({
     borderTopWidth: 3,
     borderTopColor: colors.inputBackground,
   },
-
+  upperGrid: {
+    flexDirection: 'row',
+    paddingVertical: vh(12)
+  },
+  gripRight :{
+    marginHorizontal : vw(12)
+  },
   // Device section
   deviceSection: {
     marginTop: vh(24),

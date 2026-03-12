@@ -12,11 +12,10 @@ import fonts from '@dwwp/utils/fonts'
 import { normalize, vh } from '@dwwp/utils/dimensions'
 
 type DeviceSectionProp = {
-    lastSeen: number | undefined;
     servoState: boolean;
     setIsSwitchOpen: () => void
 }
-const DeviceSection = ({ lastSeen, servoState, setIsSwitchOpen }: DeviceSectionProp) => {
+const DeviceSection = ({ servoState, setIsSwitchOpen }: DeviceSectionProp) => {
     return (
         <View style={[styles.deviceStatusSection]}>
             {/* Section label */}
@@ -26,10 +25,7 @@ const DeviceSection = ({ lastSeen, servoState, setIsSwitchOpen }: DeviceSectionP
             <View style={styles.statusRow}>
 
                 {/* Left – animated WiFi / online status */}
-                <OnlineStatus
-                    lastSeen={lastSeen}
-                    onPress={() => { /* optional: navigate to device detail */ }}
-                />
+                <OnlineStatus/>
 
                 {/* Right – valve state + open sheet button */}
                 <TouchableOpacity

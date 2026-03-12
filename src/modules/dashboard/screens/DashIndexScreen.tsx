@@ -78,7 +78,7 @@ const DashIndexScreen = () => {
     }, [email, fetchDashboardData])
 
     // const [servoState, setServoState] = useState<boolean>(false)
-    const [lastSeen, setLastSeen] = useState<number | undefined>(undefined)
+    // const [lastSeen, setLastSeen] = useState<number | undefined>(undefined)
     // const [limitExceeded, setLimitExceeded] = useState<boolean>(false)
     const [isSwitchOpen, setIsSwitchOpen] = useState<boolean>(false)
 
@@ -101,17 +101,17 @@ const DashIndexScreen = () => {
     )
 
     // demo online status checking
-    useEffect(() => {
-        const unsubscriber = setInterval(() => {
-            const timer = Date.now()
-            setLastSeen(timer)
-        }, 10000)
-        return () => clearInterval(unsubscriber)
-    }, [])
+    // useEffect(() => {
+    //     const unsubscriber = setInterval(() => {
+    //         const timer = Date.now()
+    //         setLastSeen(timer)
+    //     }, 10000)
+    //     return () => clearInterval(unsubscriber)
+    // }, [])
     // Derive device online level from lastSeen 
-    const deviceOffline = lastSeen !== undefined
-        ? Math.floor((Date.now() - lastSeen) / 1000) > 60
-        : false
+    // const deviceOffline = lastSeen !== undefined
+    //     ? Math.floor((Date.now() - lastSeen) / 1000) > 60
+    //     : false
 
     useEffect(() => {
         const getUser = async () => {
@@ -155,11 +155,7 @@ const DashIndexScreen = () => {
             {/* ── Switch Modal ── */}
             {isSwitchOpen && (
                 <ControlSwitchModal
-                    userId={userEmail}
-                    servoState={servoState}
                     onClose={() => setIsSwitchOpen(false)}
-                    quotaExceeded={limitExceeded}
-                    deviceOffline={deviceOffline}
                 />
             )}
             {dashboardIsLoading ?
@@ -179,7 +175,6 @@ const DashIndexScreen = () => {
                 >
                     <View style={styles.page}>
                         <DashBoardPage
-                            lastSeen={lastSeen}
                             servoState={servoState}
                             setIsSwitchOpen={() => setIsSwitchOpen(true)}
                             refreshDashboard={fetchDashboardData}
@@ -188,7 +183,6 @@ const DashIndexScreen = () => {
 
                     <View style={styles.page2}>
                         <DeviceSection
-                            lastSeen={lastSeen}
                             servoState={servoState}
                             setIsSwitchOpen={() => setIsSwitchOpen(true)}
                         />

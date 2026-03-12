@@ -20,3 +20,5 @@ add a subheading for all the bottomtab screens
 check if the the back arrow with the subheading is correct alignment 
 
 3 transactions styling is needed 
+
+listner for lastseens is needed 

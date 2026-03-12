@@ -10,13 +10,14 @@
  *   onPress   – optional callback when card is tapped
  */
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
     View, Text, StyleSheet, Animated, Pressable, Easing,
 } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
+import { useAppSelector } from '@dwwp/store/hooks'
 
 // ─── theme ────────────────────────────────────────────────────────────────────
 const C = {
@@ -122,21 +123,26 @@ function usePulse(active: boolean) {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 interface Props {
-    lastSeen?: number
-    onPress?: () => void
+
 }
 
-export const OnlineStatus: React.FC<Props> = ({ lastSeen, onPress }) => {
+export const OnlineStatus: React.FC<Props> = () => {
     // Refresh label every 5 s
-    const [tick, setTick] = React.useState(0)
+
+    const lastSeen = useAppSelector(state => state.servo.lastSeen)
+
+    const [tick, setTick] = useState(0)
+
+    // trigger re-render every 5 seconds
     useEffect(() => {
-        const id = setInterval(() =>
-            setTick(t => t + 1), 5000)
+        const id = setInterval(() => {
+            setTick(t => t + 1)
+        }, 1000)
         return () => clearInterval(id)
     }, [])
 
-    const level = calcLevel(lastSeen)
-    const label = calcLabel(lastSeen)
+    const level = calcLevel(Number(lastSeen))
+    const label = calcLabel(Number(lastSeen))
     const isOnline = level == 'online'
     const dot = levelColor[level]
 
@@ -162,7 +168,7 @@ export const OnlineStatus: React.FC<Props> = ({ lastSeen, onPress }) => {
 
     return (
         <Animated.View style={[styles.shadow, { transform: [{ scale: Animated.multiply(entryScale, pressScale) }] }]}>
-            <Pressable onPressIn={onPressIn} onPressOut={onPressOut} onPress={onPress}>
+            <Pressable onPressIn={onPressIn} onPressOut={onPressOut} onPress={() => { }}>
                 <LinearGradient colors={bgColors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.card}>
 
                     {/* Glass border overlay */}
