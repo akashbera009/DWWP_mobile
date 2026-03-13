@@ -11,7 +11,7 @@ import EffectiveTotal from '../components/EffectiveTotal'
 import DailyBreakDown from '../components/DailyBreakDown'
 import MonthlyBreakDown from '../components/MonthlyBreakDown'
 import { localImages } from '@dwwp/utils/localimages'
-import { MOCK_ADDONS, MOCK_MONTH_DATA } from '@dwwp/modules/dashboard/components/Monthlyusagedetail'
+import { MOCK_ADDONS, MOCK_MONTH_DATA } from '@dwwp/modules/dashboard/screens/Usages_Tab'
 
 const SCREEN_WIDTH = screenWidth;
 const MARGIN_BOTH_SIDE = vw(16)
@@ -125,12 +125,13 @@ const AnalyticsPage = () => {
               height: vh(22),
               width: vh(22),
               borderRadius: normalize(20),
-              padding : normalize(12),
+              padding: normalize(12),
               position: 'relative',
               right: vw(30),
               top: '50%',
               backgroundColor: colors.activeDotLight,
-              transform: [{ rotate: '-90deg' }]
+              transform: [{ rotate: '-90deg' }],
+              objectFit: 'contain'
             }} />
 
           <View style={styles.page}>

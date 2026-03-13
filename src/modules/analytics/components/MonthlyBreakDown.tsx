@@ -1,10 +1,12 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
 import LinearGradient from 'react-native-linear-gradient'
 import colors from '@dwwp/utils/colors'
 import Pill from '@dwwp/modules/dashboard/components/Pill'
+import { getCurrentMonthKey, getShortMonthNameByMonthKey } from '@dwwp/utils/commonFunctions'
+import { useAppSelector } from '@dwwp/store/hooks'
 
 
 const C = {
@@ -37,16 +39,39 @@ const C = {
 }
 
 const MonthlyBreakDown = () => {
-  const USAGE_DATA = [
-    { month: 'Aug', value: 340 },
-    { month: 'Sep', value: 420 },
-    { month: 'Oct', value: 380 },
-    { month: 'Nov', value: 510 },
-    { month: 'Dec', value: 460 },
-    { month: 'Jan', value: 590 },
-  ]
-  const MAX_VAL = Math.max(...USAGE_DATA.map(d => d.value))
-  const [activeBar, setActiveBar] = useState(USAGE_DATA.length - 1)
+ const usedHistoryObject = useAppSelector(s => s.usage.allTimeMonths)
+     const monthKeys: string[] = Object.keys(usedHistoryObject).map((e) => {
+         return getShortMonthNameByMonthKey(e)
+     })
+     const usedInLitres: number[] = Object.values(usedHistoryObject).map((e) => {
+         return Number(e.toFixed(0))
+     })
+ 
+     const [finalObjectArray, setFinalObjectArray] = useState<{ month: string, value: number }[]>([{ month: '', value: 0 }])
+     let currenMonthKey = getCurrentMonthKey()
+     const thisMonthUsages = useAppSelector(s => s.usage.months[currenMonthKey]?.total)
+     currenMonthKey = getShortMonthNameByMonthKey(currenMonthKey)
+ 
+     const [activeBar, setActiveBar] = useState(finalObjectArray.length - 1)
+     useEffect(() => {
+         let temp = monthKeys.map((month, i) => {
+             return {
+                 month: month,
+                 value: usedInLitres[i]
+             }
+         })
+         temp = temp.reverse().slice(0, 6).reverse()
+         temp.push({ month: currenMonthKey, value: thisMonthUsages })
+         setFinalObjectArray(temp);
+     }, [])
+     useEffect(() => {
+         if (finalObjectArray.length === 0) return
+         setActiveBar(finalObjectArray.length - 1)
+     }, [finalObjectArray.length])
+ 
+     const MAX_VAL = Math.floor(Math.max(...finalObjectArray.map((d) => d.value)))
+     const AVG_VAL = Math.floor(finalObjectArray.reduce((prev, d, _) => (d.value + prev), 0) / finalObjectArray.length)
+     
   return (
     <>
       <View style={styles.sectionLabel}>
@@ -65,18 +90,18 @@ const MonthlyBreakDown = () => {
           <View style={styles.chartLegendRow}>
             <View style={[styles.legendDot, { backgroundColor: C.error, marginLeft: normalize(10) }]} />
             <Text style={styles.legendText}>Peak:
-              <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>Nov · 510 kWh</Text>
+              <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>NOv: {MAX_VAL} L</Text>
             </Text>
             <View style={[styles.legendDot, { backgroundColor: C.cyan }]} />
             <Text style={styles.legendText}>
               Avg:
-              <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>450 kWh</Text>
+              <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>{AVG_VAL} L/Month</Text>
             </Text>
           </View>
         </View>
 
         <View style={styles.chartContainer}>
-          {USAGE_DATA.map((d, i) => {
+          {finalObjectArray.map((d, i) => {
             const isActive = i === activeBar
             const barH = Math.round((d.value / MAX_VAL) * 100)
             return (

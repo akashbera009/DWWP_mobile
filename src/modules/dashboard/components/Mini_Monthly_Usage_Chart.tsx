@@ -9,7 +9,7 @@ import { useAppSelector } from '@dwwp/store/hooks'
 import { getCurrentMonthKey, getShortMonthNameByMonthKey } from '@dwwp/utils/commonFunctions'
 
 
-const UsageChart = () => {
+const Mini_Monthly_Usage_Chart = () => {
     const usedHistoryObject = useAppSelector(s => s.usage.allTimeMonths)
     const monthKeys: string[] = Object.keys(usedHistoryObject).map((e) => {
         return getShortMonthNameByMonthKey(e)
@@ -92,7 +92,7 @@ const UsageChart = () => {
             <View style={styles.chartSummaryRow}>
                 <View style={styles.chartSummaryItem}>
                     <View style={[styles.chartSummaryDot, { backgroundColor: colors.activeDot }]} />
-                    <Text style={styles.chartSummaryLabel}>Peak: <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>Nov ·{MAX_VAL} Litres</Text></Text>
+                    <Text style={styles.chartSummaryLabel}>Peak: <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>Nov__: ·{MAX_VAL} Litres</Text></Text>
                 </View>
                 <View style={styles.chartSummaryItem}>
                     <View style={[styles.chartSummaryDot, { backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border }]} />
@@ -104,7 +104,7 @@ const UsageChart = () => {
 }
 
 
-export default UsageChart
+export default Mini_Monthly_Usage_Chart
 
 const styles = StyleSheet.create({
     card: {

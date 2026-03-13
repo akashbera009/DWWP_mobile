@@ -35,7 +35,7 @@ const StatGrid = () => {
         setStatGrid ([
             { icon: '⚡', label: 'Today', value: todayUse.toString(), subScript: 'litres', sub: '+12% vs last mo', accent: colors.activeDot, trend: 12, bg: 'rgba(50,194,202,0.08)' },
             { icon: '🚨', label: 'Penalty', value: '₹0', sub: '2 need attention', accent: colors.warning, trend: undefined, bg: 'rgba(243,156,18,0.08)' },
-            { icon: '📡', label: 'Regular Price', value: '₹0', sub: 'All zones active', accent: colors.success, trend: undefined, bg: 'rgba(39,174,96,0.08)' },
+            { icon: '📡', label: 'Regular Price', value: '₹-', sub: 'All zones active', accent: colors.success, trend: undefined, bg: 'rgba(39,174,96,0.08)' },
             { icon: '📅', label: 'Billing Cycle', value: `${billingCycle}`, subScript: 'days', sub: `${nextBillRemainingdays} days Until next bill`, accent: colors.secondary, trend: undefined, bg: colors.primaryLight },
         ])
     }, [])

@@ -14,6 +14,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { useAppSelector } from '@dwwp/store/hooks'
 import { getCurrentMonthKey, getTodayKey } from '@dwwp/utils/commonFunctions'
+import { selectCurrentMonthLimit, selectCurrentMonthTotal, selectLimitExceeded, selectTodayUsage } from '../usageSelectors'
 
 // ─── Tuning constants ─────────────────────────────────────────────────────────
 //
@@ -46,19 +47,25 @@ const clamp = (v: number, lo: number, hi: number) => {
 const HeroSummaryCard: React.FC = () => {
     const price = useAppSelector(state => state.dashboard.priceConfig?.regularPrice)
 
-    const todayKey = getTodayKey()
-    const monthKey = getCurrentMonthKey()
+    // const todayKey = getTodayKey()
+    // const monthKey = getCurrentMonthKey()
 
-    const { todayUsage, monthTotal, monthLimit } = useAppSelector(state => {
-        const month = state.usage?.months?.[monthKey] || {}
+    const todayUsage = useAppSelector(selectTodayUsage)
+    const monthTotal = useAppSelector(selectCurrentMonthTotal)
+    const monthLimit = useAppSelector(selectCurrentMonthLimit)
+    // const limitExceeded = useAppSelector(selectLimitExceeded)
 
-        return {
-            todayUsage: month?.days?.[todayKey] ?? 0,
-            monthTotal: month?.total ?? 0,
-            monthLimit: month?.limit ?? 0,
-            limitExceeded: month?.limitExceeded ?? false,
-        }
-    })
+    // const allTimeDaysTotal = useAppSelector(selectAllTimeDaysTotal)
+    // const { todayUsage, monthTotal, monthLimit } = useAppSelector(state => {
+    //     const month = state.usage?.months?.[monthKey] || {}
+
+    //     return {
+    //         todayUsage: month?.days?.[todayKey] ?? 0,
+    //         monthTotal: month?.total ?? 0,
+    //         monthLimit: month?.limit ?? 0,
+    //         limitExceeded: month?.limitExceeded ?? false,
+    //     }
+    // })
     const billAmount = React.useMemo(() => {
         if (!price) return 0
         return (price * todayUsage).toFixed(0)
@@ -68,12 +75,13 @@ const HeroSummaryCard: React.FC = () => {
         if (!price) return 0
         return (price * monthTotal).toFixed(0)
     }, [price, monthTotal])
-    
-    // All-time total — your existing line was correct
-    const allTimeDaysTotal = useAppSelector(state =>
-        state.usage.allTimeDaysTotal
-    ).toFixed(0)
 
+    // All-time total — your existing line was correct
+    // const allTimeDaysTotal = useAppSelector(state =>
+    //     state.usage.allTimeDaysTotal
+    // ).toFixed(0)
+
+    if(monthLimit === null) return 
     const usagePct = monthTotal / monthLimit;
     const onlineCount = 2;
     const total = 4;

@@ -17,8 +17,8 @@ import ProfilePanel from '../components/ProfilePanel'
 import NotificationPanel from '../components/NotificationPanel'
 import ControlSwitchModal from '../components/ControlSwitchModal'
 import DeviceSection from '../components/DeviceSection'
-import DashBoardPage from '../components/DashBoardPage'
-import MonthlyUsageDetail, { MOCK_ADDONS, MOCK_MONTH_DATA } from '../components/Monthlyusagedetail'
+import DashBoardPage from './DashBoardPage'
+import Usages_Tab, { MOCK_ADDONS, MOCK_MONTH_DATA } from './Usages_Tab'
 
 // redux
 import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks'
@@ -26,6 +26,7 @@ import { fetchAdminConfig, fetchCurrentMonth, fetchUserDetails } from '../dashbo
 import { fetchServoState } from '../servoActions'
 import DashboardSkeleton from '@dwwp/components/DashboardSkeleton'
 import { fetchAllTimeDays, fetchAllTimeMonths, fetchTodayUsage, listenCurrentMonth, stopCurrentMonthListener } from '../usageActions'
+import Device_Info_Tab from './Device_Info_Tab'
 
 const SCREEN_WIDTH = screenWidth
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
@@ -154,14 +155,15 @@ const Dash_Index_Screen = () => {
                     </View>
 
                     <View style={styles.page2}>
-                        <DeviceSection
+                        {/* <DeviceSection
                             setIsSwitchModalOpen={() => setIsSwitchModalOpen(true)}
-                        />
+                        /> */}
+                        <Device_Info_Tab/>
                     </View>
 
                     <View style={styles.page2}>
                         <ScrollView showsVerticalScrollIndicator={false}>
-                            <MonthlyUsageDetail monthData={MOCK_MONTH_DATA} addons={MOCK_ADDONS} />
+                            <Usages_Tab monthData={MOCK_MONTH_DATA} addons={MOCK_ADDONS} />
                         </ScrollView>
                     </View>
 

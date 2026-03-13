@@ -11,12 +11,12 @@ import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import { showSnackbar } from '@dwwp/utils/showSnackBar'
 
 // components
-import FixedCharges from './FixedCharges'
-import WelcomeBanner from './WelcomeBanner'
-import HeroSummaryCard from './HeroSummaryCard'
-import UsageChart from './UsageChart'
-import StatGrid from './StatGrid'
-import DeviceSection from './DeviceSection'
+import FixedCharges from '../components/FixedCharges'
+import WelcomeBanner from '../components/WelcomeBanner'
+import HeroSummaryCard from '../components/HeroSummaryCard'
+import Mini_Monthly_Usage_Chart from '../components/Mini_Monthly_Usage_Chart'
+import StatGrid from '../components/StatGrid'
+import DeviceSection from '../components/DeviceSection'
 import colors from '@dwwp/utils/colors'
 import fonts from '@dwwp/utils/fonts'
 import { localImages } from '@dwwp/utils/localimages'
@@ -25,7 +25,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { BottomTabParamList, MainStackParamList } from '@dwwp/utils/types'
 import { useNavigation } from '@react-navigation/native'
 import { screenNames } from '@dwwp/utils/screenNames'
-import QuickLinks from './Quicklinks'
+import QuickLinks from '../components/Quicklinks'
 
 type DashBoardPagePropsType = {
     setIsSwitchModalOpen: () => void
@@ -82,7 +82,7 @@ const DashBoardPage = ({ setIsSwitchModalOpen, refreshDashboard }: DashBoardPage
 
                 {/* Usage Chart */}
                 <View style={styles.card}>
-                    <UsageChart />
+                    <Mini_Monthly_Usage_Chart />
                     <TouchableOpacity
                         onPress={handleViewMonthlyUsagesPress}
                         style={styles.viewAllContainer}>

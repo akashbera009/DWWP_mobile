@@ -1,12 +1,12 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useMemo, useRef } from 'react'
 import DayBar from './DayBar'
 import fonts from '@dwwp/utils/fonts'
 import { normalize } from '@dwwp/utils/dimensions'
-import { MOCK_MONTH_DATA } from '@dwwp/modules/dashboard/components/Monthlyusagedetail'
-import { fmtD } from '@dwwp/utils/commonFunctions'
+import { fmtD, getCurrentMonthKey } from '@dwwp/utils/commonFunctions'
 import Pill from '@dwwp/modules/dashboard/components/Pill'
 import colors from '@dwwp/utils/colors'
+import { useAppSelector } from '@dwwp/store/hooks'
 
 const C = {
     primary: '#2B6568',
@@ -38,15 +38,71 @@ const C = {
 }
 
 const DailyBreakDown = () => {
-    const monthData = MOCK_MONTH_DATA
+    const monthKey = useMemo(() => getCurrentMonthKey(), [])
+    const rawdata = useAppSelector(s => s.usage?.months[monthKey]?.days)
 
-    const totalConsumed = Object.values(monthData.dailyUsages).reduce((s, v) => s + v, 0)
-    const entries = Object.entries(monthData.dailyUsages).sort(([a], [b]) => a.localeCompare(b))
-    const maxDay = Math.max(...entries.map(([, v]) => v), 1)
-    const avgDay = totalConsumed / Math.max(entries.length, 1)
-    const today = new Date().toISOString().slice(0, 10)
+    const {
+        monthKeys,
+        values,
+        monthData,
+        totalConsumed,
+        entries,
+        maxDay,
+        avgDay,
+        today,
+        avgUsagesPerDay
+    } = useMemo(() => {
+        if (!rawdata) {
+            return {
+                monthKeys: [],
+                values: [],
+                monthData: [],
+                totalConsumed: 0,
+                entries: [],
+                maxDay: 1,
+                avgDay: 0,
+                today: new Date().toISOString().slice(0, 10),
+                avgUsagesPerDay: 0
+            };
+        }
 
-    const avgUsagesPerDay =fmtD(avgDay) 
+        const monthKeys = Object.keys(rawdata);
+
+        const values = Object.values(rawdata).map((e) =>
+            Number(e.toFixed(0))
+        );
+
+        const monthData = values.map((e, i) => ({
+            day: monthKeys[i],
+            value: e
+        }));
+
+        const totalConsumed = values.reduce((s, v) => s + v, 0);
+
+        const entries = [...monthData].sort((a, b) =>
+            a.day.localeCompare(b.day)
+        )
+
+        const maxDay = Math.max(...entries.map((v) => v.value), 1);
+
+        const avgDay = totalConsumed / Math.max(entries.length, 1);
+
+        const today = new Date().toISOString().slice(0, 10);
+
+        const avgUsagesPerDay = fmtD(avgDay);
+
+        return {
+            monthKeys,
+            values,
+            monthData,
+            totalConsumed,
+            entries,
+            maxDay,
+            avgDay,
+            today,
+            avgUsagesPerDay
+        };
+    }, [rawdata]);
     return (
         <>
             <View style={styles.sectionLabel}>
@@ -78,15 +134,15 @@ const DailyBreakDown = () => {
 
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.dayChartScroll}>
                     <View style={styles.dayChartInner}>
-                        {entries.map(([dateStr, val]) => {
-                            const day = dateStr.slice(-2)
+                        {entries.map((currDay, i ) => {
+                            const day = currDay?.day.slice(-2)
                             return (
                                 <DayBar
-                                    key={dateStr}
+                                    key={i}
                                     day={day}
-                                    value={val}
+                                    value={currDay?.value}
                                     max={maxDay}
-                                    isToday={dateStr === today}
+                                    isToday={currDay?.day === today}
                                     avg={avgDay}
                                 />
                             )
