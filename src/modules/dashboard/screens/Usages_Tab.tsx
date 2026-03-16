@@ -25,7 +25,7 @@
  *   />
  */
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
     View, Text, StyleSheet, ScrollView,
     TouchableOpacity, Animated, Dimensions,
@@ -38,7 +38,8 @@ import fonts from '@dwwp/utils/fonts'
 // import Mini_Monthly_Usage_Chart from './Mini_Monthly_Usage_Chart'
 import { localImages } from '@dwwp/utils/localimages'
 import { rotate } from '@shopify/react-native-skia'
-import { fmt } from '@dwwp/utils/commonFunctions'
+import { fmt, getCurrentMonthKey } from '@dwwp/utils/commonFunctions'
+import { useAppSelector } from '@dwwp/store/hooks'
 
 // ─── Theme ────────────────────────────────────────────────────────────────────
 const C = {
@@ -88,10 +89,10 @@ export interface MonthData {
 }
 
 interface Props {
-    monthData: MonthData
-    addons?: AddonEntry[]
-    monthLabel?: string                      // e.g. "January 2025"
-    onBack?: () => void
+    // monthData: MonthData
+    // addons?: AddonEntry[]
+    // monthLabel?: string                      // e.g. "January 2025"
+    // onBack?: () => void
 }
 
 // ─── Animated progress bar ────────────────────────────────────────────────────
@@ -157,67 +158,81 @@ interface GaugeProps {
     label: string
     value: string
 }
-
 const CircleGauge: React.FC<GaugeProps> = ({ pct, size, color, label, value }) => {
-    const anim = useRef(new Animated.Value(0)).current
-    const R = (size - normalize(12)) / 2
-    const CIRC = 2 * Math.PI * R
-    const cx = size / 2
-    const cy = size / 2
+  const anim = useRef(new Animated.Value(0)).current
+  const stroke = normalize(9)             // desired ring thickness
+  const R = (size - stroke) / 2
+  const cx = size / 2
+  const cy = size / 2
 
-    useEffect(() => {
-        Animated.timing(anim, {
-            toValue: Math.min(pct, 1),
-            duration: 1100,
-            easing: Easing.out(Easing.cubic),
-            useNativeDriver: false,
-        }).start()
-    }, [pct])
+  useEffect(() => {
+    Animated.timing(anim, {
+      toValue: Math.min(pct, 1),
+      duration: 1100,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start()
+  }, [pct])
 
-    // We fake the arc with a border trick using rotation + clip
-    // For a proper arc we layer two half-circle views
-    const safePct = Math.min(pct, 1)
-    const degrees = safePct * 360
+  const safePct = Math.min(Math.max(pct, 0), 1)
+  const degrees = safePct * 360
 
-    return (
-        <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-            {/* Track ring */}
-            <View style={[styles.gaugeTrack, {
-                width: size, height: size, borderRadius: size / 2,
-                borderWidth: normalize(8), borderColor: C.inputBg,
-            }]} />
+  return (
+    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+      {/* Pale track as filled background (no border) */}
+      <View style={{
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        backgroundColor: C.inputBg,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }} />
 
-            {/* Filled arc using clip rotation trick */}
-            {/* Left half */}
-            <View style={[styles.gaugeClipLeft, { width: size / 2, height: size, left: 0 }]}>
-                <View style={[styles.gaugeHalf, {
-                    width: size, height: size, borderRadius: size / 2,
-                    borderWidth: normalize(8),
-                    borderColor: degrees > 0 ? color : 'transparent',
-                    transform: [{ rotate: `${Math.min(degrees, 180) - 180}deg` }],
-                }]} />
-            </View>
+      {/* Left clip - shows left half of colored border when degrees > 0 */}
+      <View style={[styles.gaugeClipLeft, {
+        width: size / 2,
+        height: size,
+        left: 0,
+      }]}>
+        <View style={[styles.gaugeHalf, {
+          width: size,
+          height: size,
+          borderRadius: size / 2,
+          borderWidth: stroke,
+          borderColor: degrees > 0 ? color : 'transparent',
+          backgroundColor: 'transparent',
+          transform: [{ rotate: `${Math.min(degrees, 180) - 180}deg` }],
+          // ensure border is drawn inside clip
+        }]} />
+      </View>
 
-            {/* Right half */}
-            {degrees > 180 && (
-                <View style={[styles.gaugeClipRight, { width: size / 2, height: size, right: 0 }]}>
-                    <View style={[styles.gaugeHalf, {
-                        width: size, height: size, borderRadius: size / 2,
-                        borderWidth: normalize(8),
-                        borderColor: color,
-                        transform: [{ rotate: `${degrees - 360}deg` }],
-                        right: 0,
-                    }]} />
-                </View>
-            )}
-
-            {/* Center text */}
-            <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
-                <Text style={[styles.gaugeValue, { color }]}>{value}</Text>
-                <Text style={styles.gaugeLabel}>{label}</Text>
-            </View>
+      {/* Right clip - used only for > 180deg */}
+      {degrees > 180 && (
+        <View style={[styles.gaugeClipRight, {
+          width: size / 2,
+          height: size,
+          right: 0,
+        }]}>
+          <View style={[styles.gaugeHalf, {
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            borderWidth: stroke,
+            borderColor: color,
+            backgroundColor: 'transparent',
+            transform: [{ rotate: `${degrees - 360}deg` }],
+          }]} />
         </View>
-    )
+      )}
+
+      {/* Center text */}
+      <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
+        <Text style={[styles.gaugeValue, { color }]}>{value}</Text>
+        <Text style={styles.gaugeLabel}>{label}</Text>
+      </View>
+    </View>
+  )
 }
 
 
@@ -275,41 +290,107 @@ const AddonCard: React.FC<AddonCardProps> = ({ addon, consumedFromAddon, index }
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
-const Usages_Tab: React.FC<Props> = ({
-    monthData,
-    addons = [],
-}) => {
+const Usages_Tab= () => {
+    const monthKeyId = getCurrentMonthKey()
+
+    const monthData = useAppSelector(s => s.usage?.months?.[monthKeyId] ?? {})
+    const addons = useAppSelector(s => s.payment.addons ?? [])
+    const todayUse = useAppSelector(s => s.usage.todayUsage ?? 0)
+
+    const monthLimit = monthData?.limit ?? 0
+
     // ── Derived values ────────────────────────────────────────────────────────
-    const totalConsumed = Object.values(monthData.dailyUsages).reduce((s, v) => s + v, 0)
-    const totalAddonLiters = addons.reduce((s, a) => s + a.quantityDone, 0)
-    const effectiveLimit = monthData.limit + totalAddonLiters
-    const baseConsumed = Math.min(totalConsumed, monthData.limit)
-    const addonConsumed = Math.max(totalConsumed - monthData.limit, 0)
-    const remaining = Math.max(effectiveLimit - totalConsumed, 0)
-    const overUsed = Math.max(totalConsumed - effectiveLimit, 0)
-    const basePct = Math.min(baseConsumed / Math.max(monthData.limit, 1), 1)
-    const overallPct = Math.min(totalConsumed / Math.max(effectiveLimit, 1), 1)
+    const {
+        totalConsumed,
+        totalAddonLiters,
+        effectiveLimit,
+        baseConsumed,
+        addonConsumed,
+        remaining,
+        overUsed,
+        basePct,
+        overallPct,
+        filteredAddons
+    } = useMemo(() => {
+
+        const days = monthData?.days ?? {}
+
+        // daily usage
+        const daySum = Object.values(days).reduce((s, v) => s + v, 0)
+
+        const totalConsumed = daySum + todayUse
+
+        // filter addons for current month
+        const filteredAddons = addons.filter((a: any) => a.forMonth === monthKeyId)
+
+        // addon liters
+        const totalAddonLiters = filteredAddons.reduce(
+            (s, a) => s + (a.quantityDone ?? 0) * (a.refill ?? 0),
+            0
+        )
+
+        const effectiveLimit = monthLimit + totalAddonLiters
+
+        const baseConsumed = Math.min(totalConsumed, monthLimit)
+
+        const addonConsumed = Math.max(totalConsumed - monthLimit, 0)
+
+        const remaining = Math.max(effectiveLimit - totalConsumed, 0)
+
+        const overUsed = Math.max(totalConsumed - effectiveLimit, 0)
+
+        const basePct = Math.min(baseConsumed / Math.max(monthLimit, 1), 1)
+
+        const overallPct = Math.min(totalConsumed / Math.max(effectiveLimit, 1), 1)
+
+        return {
+            totalConsumed,
+            totalAddonLiters,
+            effectiveLimit,
+            baseConsumed,
+            addonConsumed,
+            remaining,
+            overUsed,
+            basePct,
+            overallPct,
+            filteredAddons
+        }
+
+    }, [monthData, todayUse, addons, monthKeyId])
 
     const [baseQuotaCollapse, setBaseQuotaCollapse] = useState<boolean>(false)
     const [addonSectionCollapse, setAddonSectionCollapse] = useState<boolean>(true)
 
     // Per-addon consumed (waterfall: base limit consumed first, then addons in order)
     let remaining_to_assign = addonConsumed
-    const addonConsumedArr = addons.map(a => {
-        const consumed = Math.min(remaining_to_assign, a.quantityDone)
+
+    const addonConsumedArr = filteredAddons.map(a => {
+
+        const addonLiters = (a.quantityDone ?? 0) * (a.refill ?? 0)
+
+        const consumed = Math.min(remaining_to_assign, addonLiters)
+
         remaining_to_assign = Math.max(remaining_to_assign - consumed, 0)
+
         return consumed
     })
 
     // Status
     const statusColor =
-        monthData.limitExceeded ? C.error :
-            overallPct > 0.85 ? C.warning : C.success
+        monthData.limitExceeded
+            ? C.error
+            : overallPct > 0.85
+                ? C.warning
+                : C.success
 
     // Header scroll for parallax feel
     const scrollY = useRef(new Animated.Value(0)).current
-    const headerH = scrollY.interpolate({ inputRange: [0, 80], outputRange: [normalize(160), normalize(100)], extrapolate: 'clamp' })
 
+    const headerH = scrollY.interpolate({
+        inputRange: [0, 80],
+        outputRange: [normalize(160), normalize(100)],
+        extrapolate: 'clamp'
+    })
     return (
         <View style={styles.screen}>
 
@@ -321,7 +402,7 @@ const Usages_Tab: React.FC<Props> = ({
                 onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
                 scrollEventThrottle={16}
             >
-
+ 
                 {/* ── Hero summary card ── */}
                 <LinearGradient
                     colors={monthData.limitExceeded
@@ -417,17 +498,17 @@ const Usages_Tab: React.FC<Props> = ({
                                 <View style={styles.quotaStatRow}>
                                     <View style={[styles.quotaStatDot, { backgroundColor: C.inputBg, borderWidth: 1, borderColor: C.border }]} />
                                     <View>
-                                        <Text style={styles.quotaStatVal}>{fmt(monthData.limit)}</Text>
+                                        <Text style={styles.quotaStatVal}>{fmt(monthLimit)}</Text>
                                         <Text style={styles.quotaStatLbl}>Base allocation</Text>
                                     </View>
                                 </View>
                                 <View style={styles.quotaStatRow}>
-                                    <View style={[styles.quotaStatDot, { backgroundColor: baseConsumed >= monthData.limit ? C.error : C.success }]} />
+                                    <View style={[styles.quotaStatDot, { backgroundColor: baseConsumed >= monthLimit ? C.error : C.success }]} />
                                     <View>
                                         <Text style={[styles.quotaStatVal, {
-                                            color: baseConsumed >= monthData.limit ? C.error : C.success
+                                            color: baseConsumed >= monthLimit ? C.error : C.success
                                         }]}>
-                                            {baseConsumed >= monthData.limit ? 'Exhausted' : fmt(monthData.limit - baseConsumed) + ' left'}
+                                            {baseConsumed >= monthLimit ? 'Exhausted' : fmt(monthLimit - baseConsumed) + ' left'}
                                         </Text>
                                         <Text style={styles.quotaStatLbl}>Base remaining</Text>
                                     </View>
@@ -445,7 +526,7 @@ const Usages_Tab: React.FC<Props> = ({
                             />
                             <View style={styles.barEndLabels}>
                                 <Text style={styles.barEndLabel}>0L</Text>
-                                <Text style={styles.barEndLabel}>{fmt(monthData.limit)}</Text>
+                                <Text style={styles.barEndLabel}>{fmt(monthLimit)}</Text>
                             </View>
                         </View>
                     </View>
@@ -498,7 +579,7 @@ const Usages_Tab: React.FC<Props> = ({
                                 {addons.map((addon, i) => (
                                     <AddonCard
                                         key={addon.id}
-                                        addon={addon}
+                                        addon={addon as any}
                                         consumedFromAddon={addonConsumedArr[i]}
                                         index={i}
                                     />

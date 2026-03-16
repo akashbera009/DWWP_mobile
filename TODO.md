@@ -35,3 +35,10 @@ user wifi id and password displaying component is needed to addd
 
 grid coponentes are not reactive to changes 
 do take real data in Usages_Tab.tsx 
+
+need the herocard to be listen to recharges 
+
+need a listner for the recharge section if it is done , it trigger and calculate the things [limit , etc etc ]
+
+
+circlegauge is having double arcs in the usage_tab.tsx 

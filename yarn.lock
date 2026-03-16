@@ -6364,6 +6364,11 @@ react-native-nitro-modules@^0.34.1:
   resolved "https://registry.yarnpkg.com/react-native-nitro-modules/-/react-native-nitro-modules-0.34.1.tgz#cfddce7046d0fd8cc113170299f75c11cd415004"
   integrity sha512-ga6MBmG5CXBJ69d7BXXOMZ4sI3mEz6Q5pOjV1lyWEV60B/Ma/zGJGBNowsix1wx74zQEvq7gf+O0ovgazE4IKA==
 
+react-native-razorpay@^2.3.1:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/react-native-razorpay/-/react-native-razorpay-2.3.1.tgz#d4d16cdad4a1607719c9e624d4cc309cfa52fba2"
+  integrity sha512-aEod2YigiWx9Vik+2YRpTh9kNKK9KZbfhrRpk5tU8z8ZPDdLt57rRsqd7lVuDybqqO6nLY6ughPjMN+FPyX8Ag==
+
 react-native-reanimated@^4.2.2:
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-4.2.2.tgz#c7a25bac7c493387e03f53ab22ee2644f32cc528"

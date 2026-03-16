@@ -23,6 +23,7 @@ import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks';
 import Avatar from '../dashboard/components/Avatar';
 import { logout } from '../auth/authAction';
 import { LoadingPopup } from '../auth/components/LoadingPopup';
+import Pill from '../dashboard/components/Pill';
 
 const ViewProfileScreen = () => {
   const { top } = useSafeAreaInsets()
@@ -85,7 +86,14 @@ const ViewProfileScreen = () => {
               )}
             </View>
             <Text style={styles.name}>{userDetails?.fullName}</Text>
-            <Text style={styles.email}>{userDetails?.emailId}</Text>
+            {userDetails?.emailId && (
+              <Pill
+                label={userDetails?.emailId}
+                color={colors.secondary}
+                bg={colors.primaryLight}
+              />
+            )
+            }
           </View>
 
           {/* Info Card */}
@@ -185,11 +193,6 @@ const styles = StyleSheet.create({
     color: colors.primaryBlack,
   },
 
-  email: {
-    fontSize: normalize(14),
-    fontFamily: fonts.Regular,
-    color: colors.secondary,
-  },
 
   card: {
     backgroundColor: colors.white,

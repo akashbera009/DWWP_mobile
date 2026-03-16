@@ -174,7 +174,8 @@ const styles = StyleSheet.create({
   },
   scrollview: {
     backgroundColor: colors.overlayBackground,
-    paddingTop: vh(16)
+    paddingTop: vh(16),
+    paddingBottom : vh(16)
   },
   horizontalScrollView: {
     paddingHorizontal: vw(16),

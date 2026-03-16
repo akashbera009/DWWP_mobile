@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useMemo } from 'react'
 import fonts from '@dwwp/utils/fonts'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
-import { MOCK_ADDONS, MOCK_MONTH_DATA } from '@dwwp/modules/dashboard/screens/Usages_Tab'
+import { getCurrentMonthKey } from '@dwwp/utils/commonFunctions'
+import { useAppSelector } from '@dwwp/store/hooks'
 
 const fmt = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(2)}kL` : `${Math.round(n)}L`
 
@@ -35,20 +36,70 @@ const C = {
     purpleBg: 'rgba(123,104,238,0.10)',
 }
 
-const addons = MOCK_ADDONS
-const monthData = MOCK_MONTH_DATA
-
 const EffectiveTotal = () => {
-    const totalConsumed = Object.values(monthData.dailyUsages).reduce((s, v) => s + v, 0)
-    const totalAddonLiters = addons.reduce((s, a) => s + a.quantityDone, 0)
-    const effectiveLimit = monthData.limit + totalAddonLiters
-    const baseConsumed = Math.min(totalConsumed, monthData.limit)
-    const addonConsumed = Math.max(totalConsumed - monthData.limit, 0)
-    const remaining = Math.max(effectiveLimit - totalConsumed, 0)
-    const overUsed = Math.max(totalConsumed - effectiveLimit, 0)
-    const basePct = Math.min(baseConsumed / Math.max(monthData.limit, 1), 1)
+    const monthKeyId = getCurrentMonthKey()
+
+    const monthData = useAppSelector(s => s.usage?.months?.[monthKeyId] ?? {})
+    const todayUse = useAppSelector(s => s.usage.todayUsage ?? 0)
+    const addons = useAppSelector(s => s.payment.addons ?? [])
+    const {
+        totalConsumed,
+        totalAddonLiters,
+        effectiveLimit,
+        baseConsumed,
+        addonConsumed,
+        remaining,
+        overUsed,
+        basePct
+    } = useMemo(() => {
+
+        const days = monthData?.days ?? {}
+        const monthLimit = monthData?.limit ?? 0
+
+        // daily usage sum
+        const daySum = Object.values(days).reduce((sum, v) => sum + v, 0)
+
+        const totalConsumed = daySum + todayUse
+
+        // filter addons for current month
+        const currentMonthAddons = addons.filter(
+            (addon: any) => addon?.forMonth === monthKeyId
+        )
+        console.log(currentMonthAddons);
+
+        // addon liters
+        const totalAddonLiters = currentMonthAddons.reduce(
+            (sum, addon) => sum + (addon.quantityDone ?? 0) * (addon.refill ?? 0),
+            0
+        )
+
+        const effectiveLimit = monthLimit + totalAddonLiters
+
+        const baseConsumed = Math.min(totalConsumed, monthLimit)
+
+        const addonConsumed = Math.max(totalConsumed - monthLimit, 0)
+
+        const remaining = Math.max(effectiveLimit - totalConsumed, 0)
+
+        const overUsed = Math.max(totalConsumed - effectiveLimit, 0)
+
+        const basePct = Math.min(baseConsumed / Math.max(monthLimit, 1), 1)
+
+        return {
+            totalConsumed,
+            totalAddonLiters,
+            effectiveLimit,
+            baseConsumed,
+            addonConsumed,
+            remaining,
+            overUsed,
+            basePct
+        }
+
+    }, [monthData, todayUse, addons, monthKeyId])
+    const monthLimit = monthData?.limit ?? 0
     return (
-        <>
+        <View style={styles.container}>
             <View style={styles.sectionLabel}>
                 <Text style={styles.sectionLabelText}>Effective Total</Text>
                 <View style={styles.sectionLine} />
@@ -59,7 +110,7 @@ const EffectiveTotal = () => {
                     {fmt(totalConsumed)} <Text style={styles.effectiveOf}>of</Text> {fmt(effectiveLimit)}
                 </Text>
                 <Text style={styles.effectiveSub}>
-                    Base {fmt(monthData.limit)} + Addon {fmt(totalAddonLiters)}
+                    Base {monthLimit && fmt(monthLimit)} + Addon {fmt(totalAddonLiters)}
                 </Text>
 
                 <View style={styles.stackedBarWrap}>
@@ -94,7 +145,7 @@ const EffectiveTotal = () => {
                 </View>
 
                 {[
-                    { label: 'Base quota', val: fmt(monthData.limit), color: C.cyan, bg: C.cyanBg },
+                    { label: 'Base quota', val: monthLimit && fmt(monthLimit), color: C.cyan, bg: C.cyanBg },
                     { label: 'Addon quota', val: fmt(totalAddonLiters), color: C.purple, bg: C.purpleBg },
                     { label: 'Total consumed', val: fmt(totalConsumed), color: C.primary, bg: C.primaryLight },
                     {
@@ -113,7 +164,7 @@ const EffectiveTotal = () => {
                     </View>
                 ))}
             </View>
-        </>
+        </View>
     )
 }
 
@@ -121,7 +172,10 @@ export default EffectiveTotal
 
 const styles = StyleSheet.create({
 
-
+    container: {
+        paddingBottom: vh(16),
+        marginBottom: vh(16)
+    },
     //section labels
     sectionLabel: {
         flexDirection: 'row', alignItems: 'center',
@@ -139,7 +193,7 @@ const styles = StyleSheet.create({
         padding: normalize(18), marginBottom: normalize(12),
         shadowColor: 'rgba(43,101,104,0.08)',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 1, shadowRadius: 10, elevation: 3,
+        shadowOpacity: 1, shadowRadius: 10, elevation: 10,
     },
 
     // Summary rows
