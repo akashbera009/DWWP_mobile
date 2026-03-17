@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react'
 import {
   View, Text, StyleSheet, ScrollView,
   TouchableOpacity, Animated, Platform,
+  ActivityIndicator,
 } from 'react-native'
 
 import LinearGradient from 'react-native-linear-gradient'
@@ -10,15 +11,18 @@ import colors from '@dwwp/utils/colors'
 import { useAppSelector } from '@dwwp/store/hooks'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import { generateAndShareReceiptPDF } from '@dwwp/utils/generateAndDownloadPDF'
-import { RouteProp, useNavigation } from '@react-navigation/native'
+import { RouteProp } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { MainStackParamList } from '@dwwp/utils/types'
+import { buildReceiptHTML } from '@dwwp/utils/buildReceiptHTML'
+import { QuotaBar } from '../components/QuotaBar'
+import { strings } from '@dwwp/utils/strings'
+import { CustomButton } from '@dwwp/components/CustomButton'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-
 type Props = {
-  route: RouteProp<MainStackParamList , 'PaymentSuccessScreen'>;
-  navigation: NativeStackNavigationProp<MainStackParamList , 'PaymentSuccessScreen'>;
+  route: RouteProp<MainStackParamList, 'PaymentSuccessScreen'>;
+  navigation: NativeStackNavigationProp<MainStackParamList, 'PaymentSuccessScreen'>;
 }
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatINR(paise: number) {
@@ -57,244 +61,6 @@ const Dashes = () => (
     ))}
   </View>
 )
-
-// ─── Quota bar component ──────────────────────────────────────────────────────
-const QuotaBar: React.FC<{
-  previousLimit: number
-  addedLimit: number
-  currentUsage: number
-  newLimit: number
-}> = ({ previousLimit, addedLimit, currentUsage, newLimit }) => {
-
-  // We animate two things:
-  // 1. The "used" bar — stays the same width, just redraws against new total
-  // 2. The "added" segment — grows from 0 to its final width after a short delay
-  const addedAnim = useRef(new Animated.Value(0)).current
-  const labelOpacity = useRef(new Animated.Value(0)).current
-
-  useEffect(() => {
-    Animated.sequence([
-      Animated.delay(600),
-      Animated.parallel([
-        Animated.spring(addedAnim, { toValue: 1, friction: 7, tension: 40, useNativeDriver: false }),
-        Animated.timing(labelOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
-      ]),
-    ]).start()
-  }, [])
-
-  const usedPct = Math.min((currentUsage / newLimit) * 100, 100)
-  const addedPct = Math.min((addedLimit / newLimit) * 100, 100)
-  const prevUsedPct = Math.min((currentUsage / previousLimit) * 100, 100)
-
-  const addedBarWidth = addedAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0%', `${addedPct.toFixed(2)}%`],
-  })
-
-  return (
-    <View style={qStyles.wrap}>
-      {/* Title row */}
-      <View style={qStyles.titleRow}>
-        <Text style={qStyles.title}>Quota Updated</Text>
-        <Animated.View style={[qStyles.addedBadge, { opacity: labelOpacity }]}>
-          <Text style={qStyles.addedBadgeText}>+{addedLimit.toLocaleString()} L added</Text>
-        </Animated.View>
-      </View>
-
-      {/* Bar track */}
-      <View style={qStyles.track}>
-        {/* Used portion */}
-        <View style={[qStyles.usedBar, { width: `${usedPct.toFixed(2)}%` as any }]} />
-        {/* Added portion — animated */}
-        <Animated.View style={[qStyles.addedBar, { width: addedBarWidth }]} />
-      </View>
-
-      {/* Labels below bar */}
-      <View style={qStyles.labelsRow}>
-        <View style={qStyles.labelItem}>
-          <View style={[qStyles.dot, { backgroundColor: colors.primary }]} />
-          <Text style={qStyles.labelText}>Used: {currentUsage.toLocaleString()} L</Text>
-        </View>
-        <Animated.View style={[qStyles.labelItem, { opacity: labelOpacity }]}>
-          <View style={[qStyles.dot, { backgroundColor: colors.primary }]} />
-          <Text style={qStyles.labelText}>Added: {addedLimit.toLocaleString()} L</Text>
-        </Animated.View>
-        <View style={qStyles.labelItem}>
-          <View style={[qStyles.dot, { backgroundColor: colors.border }]} />
-          <Text style={qStyles.labelText}>New limit: {newLimit.toLocaleString()} L</Text>
-        </View>
-      </View>
-
-      {/* Before → After pill */}
-      <Animated.View style={[qStyles.limitChange, { opacity: labelOpacity }]}>
-        <Text style={qStyles.limitChangeOld}>{previousLimit.toLocaleString()} L</Text>
-        <Text style={qStyles.limitChangeArrow}> → </Text>
-        <Text style={qStyles.limitChangeNew}>{newLimit.toLocaleString()} L</Text>
-        <Text style={qStyles.limitChangeLabel}> monthly limit</Text>
-      </Animated.View>
-    </View>
-  )
-}
-
-const qStyles = StyleSheet.create({
-  wrap: {
-    backgroundColor: colors.background,
-    borderRadius: normalize(14),
-    padding: normalize(14),
-    marginHorizontal: normalize(18),
-    marginBottom: normalize(4),
-    marginTop: normalize(4),
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: normalize(12),
-  },
-  title: {
-    fontFamily: fonts.SemiBold,
-    fontSize: normalize(12),
-    color: colors.black,
-  },
-  addedBadge: {
-    backgroundColor: colors.primaryLight,
-    borderRadius: normalize(20),
-    paddingHorizontal: normalize(10),
-    paddingVertical: normalize(3),
-  },
-  addedBadgeText: {
-    fontFamily: fonts.Bold,
-    fontSize: normalize(11),
-    color: colors.primary,
-  },
-  track: {
-    height: normalize(10),
-    backgroundColor: colors.border,
-    borderRadius: normalize(10),
-    overflow: 'hidden',
-    flexDirection: 'row',
-    marginBottom: normalize(10),
-  },
-  usedBar: {
-    height: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: normalize(10),
-  },
-  addedBar: {
-    height: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: normalize(10),
-  },
-  labelsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: normalize(10),
-    marginBottom: normalize(10),
-  },
-  labelItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: normalize(5),
-  },
-  dot: {
-    width: normalize(7),
-    height: normalize(7),
-    borderRadius: normalize(4),
-  },
-  labelText: {
-    fontFamily: fonts.Regular,
-    fontSize: normalize(11),
-    color: colors.black,
-  },
-  limitChange: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.white,
-    borderRadius: normalize(8),
-    paddingHorizontal: normalize(12),
-    paddingVertical: normalize(7),
-    alignSelf: 'flex-start',
-  },
-  limitChangeOld: {
-    fontFamily: fonts.SemiBold,
-    fontSize: normalize(12),
-    color: colors.black,
-    textDecorationLine: 'line-through',
-  },
-  limitChangeArrow: {
-    fontFamily: fonts.Regular,
-    fontSize: normalize(12),
-    color: colors.black,
-  },
-  limitChangeNew: {
-    fontFamily: fonts.Bold,
-    fontSize: normalize(13),
-    color: colors.primary,
-  },
-  limitChangeLabel: {
-    fontFamily: fonts.Regular,
-    fontSize: normalize(11),
-    color: colors.black,
-  },
-})
-
-// ─── PDF HTML ─────────────────────────────────────────────────────────────────
-function buildReceiptHTML(p: {
-  payment_id: string; amount: string; qty: number
-  refill: number; addon?: string; date: string
-  previousLimit: number; newLimit: number; currentUsage: number
-}) {
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"/>
-    <style>
-      body{font-family:Arial,sans-serif;padding:40px;color:#111;background:#fff}
-      .brand{font-size:26px;font-weight:700;color:#1a6b6e;letter-spacing:2px;text-align:center}
-      .sub{font-size:13px;color:#6b7280;text-align:center;margin-top:4px}
-      .badge{display:inline-block;background:#e1f5ee;color:#065f46;font-size:13px;font-weight:600;padding:6px 18px;border-radius:20px;margin:12px auto 24px;display:block;width:fit-content}
-      .amt{text-align:center;background:#f0faf9;border-radius:16px;padding:24px;margin:0 0 24px}
-      .amt-lbl{font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px}
-      .amt-val{font-size:36px;font-weight:700;color:#1a6b6e;margin-top:6px}
-      table{width:100%;border-collapse:collapse;margin-top:8px}
-      td{padding:10px 0;font-size:13px;border-bottom:1px solid #f3f4f6}
-      td:last-child{text-align:right;font-weight:600}
-      .quota{background:#f0faf9;border-radius:12px;padding:16px;margin-top:20px}
-      .quota-title{font-size:12px;font-weight:600;color:#1a6b6e;margin-bottom:10px}
-      .bar-bg{height:10px;background:#e5e7eb;border-radius:10px;overflow:hidden;display:flex}
-      .bar-used{height:100%;background:#1a6b6e}
-      .bar-add{height:100%;background:#5eead4}
-      .footer{text-align:center;font-size:11px;color:#9ca3af;margin-top:40px;border-top:1px solid #f3f4f6;padding-top:20px}
-    </style></head><body>
-      <div class="brand">DWWP</div>
-      <div class="sub">Domestic Water Wastage Prevention</div>
-      <div class="badge">✓ Payment Successful</div>
-      <div class="amt">
-        <div class="amt-lbl">Amount Paid</div>
-        <div class="amt-val">${p.amount}</div>
-      </div>
-      <table>
-        <tr><td>Payment Type</td><td>Water Quota Refill</td></tr>
-        <tr><td>Plan / Addon</td><td>${p.addon ?? '—'}</td></tr>
-        <tr><td>Quantity</td><td>${p.qty} unit${p.qty !== 1 ? 's' : ''}</td></tr>
-        <tr><td>Quota Added</td><td>${p.refill.toLocaleString()} L</td></tr>
-        <tr><td>Transaction ID</td><td style="word-break:break-all">${p.payment_id}</td></tr>
-        <tr><td>Date & Time</td><td>${p.date}</td></tr>
-      </table>
-      <div class="quota">
-        <div class="quota-title">Quota Updated · ${p.previousLimit.toLocaleString()} L → ${p.newLimit.toLocaleString()} L</div>
-        <div class="bar-bg">
-          <div class="bar-used" style="width:${Math.min((p.currentUsage / p.newLimit) * 100, 100).toFixed(1)}%"></div>
-          <div class="bar-add"  style="width:${Math.min((p.refill / p.newLimit) * 100, 100).toFixed(1)}%"></div>
-        </div>
-        <div style="font-size:11px;color:#6b7280;margin-top:8px">
-          Used: ${p.currentUsage.toLocaleString()} L &nbsp;|&nbsp;
-          Added: ${p.refill.toLocaleString()} L &nbsp;|&nbsp;
-          New limit: ${p.newLimit.toLocaleString()} L
-        </div>
-      </div>
-      <div class="footer">Thank you for using DWWP · This is a computer-generated receipt</div>
-    </body></html>`
-}
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // MAIN SCREEN
@@ -346,11 +112,13 @@ const PaymentSuccessScreen = ({ navigation, route }: Props) => {
   // ── Handlers ──────────────────────────────────────────────────────────────
   const handleDone = () => navigation?.goBack()
 
+  const [isDownloadLoading, setIsDownloadLoading] = useState(false)
   const handleDownloadPDF = async () => {
+    setIsDownloadLoading(true)
     try {
       const html = buildReceiptHTML({
         payment_id: payment_id,
-        amount: String(amount),
+        amount: String(amount / 100),
         qty: qty,
         refill: refill,
         addon: addon,
@@ -362,6 +130,8 @@ const PaymentSuccessScreen = ({ navigation, route }: Props) => {
       await generateAndShareReceiptPDF(html, `DWWP_Receipt_${payment_id}`)
     } catch (err) {
       console.error('PDF error:', err)
+    } finally {
+      setIsDownloadLoading(false)
     }
   }
 
@@ -394,9 +164,20 @@ const PaymentSuccessScreen = ({ navigation, route }: Props) => {
           <Text style={S.amountValue}>{formattedAmount}</Text>
         </Animated.View>
 
+        {/* ── Quota bar (only for addon purchases) ── */}
+        {isAddon && addedQuota > 0 && (
+          <>
+            <Dashes />
+            <QuotaBar
+              previousLimit={previousLimit}
+              addedLimit={addedQuota}
+              currentUsage={currentUsage}
+              newLimit={newLimit}
+            />
+          </>
+        )}
         {/* ── Receipt card ── */}
         <Animated.View style={[S.receipt, { opacity: cardOpacity, transform: [{ translateY: cardSlide }] }]}>
-
           {/* Notch top */}
           <View style={S.notchRow}>
             <View style={S.notchCircle} />
@@ -422,19 +203,6 @@ const PaymentSuccessScreen = ({ navigation, route }: Props) => {
             <Row label="Status" value="Successful ✓" accent />
           </View>
 
-          {/* ── Quota bar (only for addon purchases) ── */}
-          {isAddon && addedQuota > 0 && (
-            <>
-              <Dashes />
-              <QuotaBar
-                previousLimit={previousLimit}
-                addedLimit={addedQuota}
-                currentUsage={currentUsage}
-                newLimit={newLimit}
-              />
-            </>
-          )}
-
           {/* Notch bottom */}
           <View style={[S.notchRow, { marginTop: normalize(8) }]}>
             <View style={S.notchCircle} />
@@ -443,7 +211,7 @@ const PaymentSuccessScreen = ({ navigation, route }: Props) => {
           </View>
 
           <Text style={S.receiptFooter}>
-            Thank you for using DWWP{'\n'}This is a computer-generated receipt
+            {strings.paymentFooterText}
           </Text>
         </Animated.View>
 
@@ -452,19 +220,19 @@ const PaymentSuccessScreen = ({ navigation, route }: Props) => {
 
       {/* ── Fixed bottom buttons ── */}
       <Animated.View style={[S.bottomBar, { opacity: btnOpacity }]}>
-        <TouchableOpacity style={S.pdfBtn} onPress={handleDownloadPDF} activeOpacity={0.8}>
-          <Text style={S.pdfIcon}>⬇</Text>
-          <Text style={S.pdfText}>Download Receipt</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={S.doneBtn} onPress={handleDone} activeOpacity={0.85}>
-          <LinearGradient
-            colors={[colors.primary, colors.primaryDark]}
-            start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-            style={S.doneBtnInner}
-          >
-            <Text style={S.doneBtnText}>Done</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+        <CustomButton
+          title='Share Receipt'
+          variant='outline'
+          onPress={handleDownloadPDF}
+          loading={isDownloadLoading}
+          disabled={isDownloadLoading}
+        />
+        <CustomButton
+          title='Done'
+          style={{flexGrow:1}}
+          onPress={handleDone}
+          variant='primary'
+        />
       </Animated.View>
     </View>
   )
@@ -483,7 +251,7 @@ const S = StyleSheet.create({
     width: normalize(72), height: normalize(72), borderRadius: normalize(36),
     alignItems: 'center', justifyContent: 'center',
   },
-  iconCheck: { fontSize: normalize(34), color: '#fff', fontFamily: fonts.Bold },
+  iconCheck: { fontSize: normalize(34), color: colors.white, fontFamily: fonts.Bold },
   iconRing: {
     position: 'absolute',
     width: normalize(90), height: normalize(90), borderRadius: normalize(45),
@@ -491,33 +259,36 @@ const S = StyleSheet.create({
   },
 
   // Heading
-  heading: { fontFamily: fonts.Bold, fontSize: normalize(22), color: colors.black, marginBottom: normalize(6), textAlign: 'center' },
-  subheading: { fontFamily: fonts.Regular, fontSize: normalize(13), color: colors.black, textAlign: 'center', marginBottom: normalize(22) },
+  heading: { fontFamily: fonts.Bold, fontSize: normalize(22), color: colors.black, marginBottom: vh(6), textAlign: 'center' },
+  subheading: { fontFamily: fonts.Regular, fontSize: normalize(13), color: colors.black, textAlign: 'center', marginBottom: vh(8) },
 
   // Amount pill
   amountPill: {
     alignItems: 'center', backgroundColor: colors.primaryLight,
-    borderRadius: normalize(16), paddingVertical: normalize(14),
-    paddingHorizontal: normalize(36), marginBottom: normalize(22),
+    borderRadius: normalize(16), paddingVertical: normalize(10),
+    paddingHorizontal: normalize(36), marginBottom: normalize(12),
   },
-  amountLabel: { fontFamily: fonts.Regular, fontSize: normalize(11), color: colors.primary, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: normalize(4) },
+  amountLabel: { fontFamily: fonts.Regular, fontSize: normalize(11), color: colors.primary, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: normalize(0) },
   amountValue: { fontFamily: fonts.Bold, fontSize: normalize(28), color: colors.primary },
 
   // Receipt
   receipt: {
     width: '100%', backgroundColor: colors.white,
+    marginTop: vh(8),
+    borderTopWidth: normalize(1),
+    borderTopColor: colors.primary,
     borderRadius: normalize(18), overflow: 'hidden',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08, shadowRadius: 16, elevation: 4,
+    shadowColor: colors.black, shadowOffset: { width: 2, height: 4 },
+    shadowOpacity: 0.08, shadowRadius: 16, elevation: 10,
   },
   notchRow: { flexDirection: 'row', alignItems: 'center' },
   notchCircle: {
     width: normalize(14), height: normalize(14), borderRadius: normalize(7),
-    backgroundColor: colors.background,
+    backgroundColor: colors.primary,
     marginHorizontal: -normalize(7),
   },
   receiptTitle: {
-    flex: 1, fontFamily: fonts.Bold, fontSize: normalize(11),
+    flex: 1, fontFamily: fonts.Bold, fontSize: normalize(14),
     color: colors.black, letterSpacing: 1.2, textTransform: 'uppercase',
     textAlign: 'center', paddingVertical: normalize(12),
   },

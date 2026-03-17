@@ -52,5 +52,7 @@ export const strings = {
     minLimitReached: 'Minimum Selectable quantity is 1',
 
     viewFullHistory : 'View Full History',
-    viewUsagesAnalytics: 'View Usages Analytics'
+    viewUsagesAnalytics: 'View Usages Analytics',
+
+    paymentFooterText :"Thank you for using DWWP{'\n'}This is a computer-generated receipt",
 }

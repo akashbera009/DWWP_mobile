@@ -18,17 +18,16 @@ export const displayNotification = async ({ title, body, data }: notificationTyp
             id: 'Payment',
             name: 'Payment Channel',
             importance: AndroidImportance.HIGH,
+            sound: 'ring_drop',
         });
 
         // Display a notification
         await notifee.displayNotification({
-            // title: title || 'Notification Title',
-            // body: body || 'Main body content of the notification',
-            // data,
-            title: `<span style="color: #4caf50;"><b>${title }</b></span>`,
+
+            title: `<span style="color: #4caf50;"><b>${title}</b></span>`,
             subtitle: '&#127881;',
             body:
-              `<span style="text-decoration: line-through;">${body}</span>` +
+                `<span style="text-decoration: line-through;">${body}</span>` +
                 `<span style="color:#ffffff; background-color:#9c27b0;"><i>${data?.type}</i></span> &#127881;!`,
             android: {
                 channelId,
@@ -56,7 +55,7 @@ export const displayNotification = async ({ title, body, data }: notificationTyp
                 },
                 actions: [
                     {
-                        title: 'done',
+                        title: 'Done',
                         pressAction: { id: 'mark-read' }
                     }
                 ],

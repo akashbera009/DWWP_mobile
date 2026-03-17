@@ -10,9 +10,12 @@ type ConfirmationPayModalProps = {
     visible: boolean
     onProceedPayment: () => void
     onCancelProceed: () => void
+    amount?: number
+    type?: string
+    refill?: string
 }
 
-const ConfirmationPayModal = ({ visible, onProceedPayment, onCancelProceed }: ConfirmationPayModalProps) => {
+const ConfirmationPayModal = ({ visible, onProceedPayment, onCancelProceed, amount, type, refill }: ConfirmationPayModalProps) => {
     return (
         <Modal
             visible={visible}
@@ -26,14 +29,18 @@ const ConfirmationPayModal = ({ visible, onProceedPayment, onCancelProceed }: Co
                     <Text style={styles.title}>Confirm Payment</Text>
 
                     <Text style={styles.message}>
-                       {strings.paymentSureHeader}
+                        {strings.paymentSureHeader}
+                    </Text>
+
+                    <Text style={styles.message}>
+                        {type} of ₹{amount} for {refill}L
                     </Text>
 
                     <CustomButton
                         title={strings.cancel}
                         variant='outline'
                         onPress={onCancelProceed}
-                        textStyle ={{color: colors.warning}}
+                        textStyle={{ color: colors.warning }}
                     />
                     <CustomButton
                         title={strings.proceed}

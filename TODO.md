@@ -48,4 +48,7 @@ crash in first install=> HeroSummaryCard.tsx:90 React has detected a change in t
  undefined           =>      useRef
 
 
-cancle button on payment modal confirmation is not working 
+payment modal header text be modified professionally 
+
+notification sound is not working 
+date and time of the payment receipt be added from props , not now()

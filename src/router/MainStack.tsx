@@ -11,7 +11,7 @@ import PaymentsIndexDashboard from '@dwwp/modules/paymentsDashboard/PaymentsInde
 import IndividualPaymentHistory from '@dwwp/modules/paymentsDashboard/screens/IndividualPaymentHistory';
 import FullPaymantHistory from '@dwwp/modules/paymentsDashboard/screens/FullPaymantHistory';
 import AddonRechargesScreen from '@dwwp/modules/paymentsDashboard/screens/AddonRechargesScreen';
-import PaymentSuccessScreen from '@dwwp/modules/paymentsDashboard/components/PaymentSuccessScreen';
+import PaymentSuccessScreen from '@dwwp/modules/paymentsDashboard/screens/PaymentSuccessScreen';
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
@@ -32,7 +32,7 @@ export default function MainStackNavigator() {
       <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
       <Stack.Screen name="RaiseComplaintScreen" component={RaiseComplaintScreen}   options={{ headerShown: false }}/>
 
-      {/* <Stack.Screen name="PaymentSuccessScreen" component={PaymentSuccessScreen}   options={{ headerShown: false }}/> */}
+      <Stack.Screen name="PaymentSuccessScreen" component={PaymentSuccessScreen}   options={{ headerShown: false }}/>
 
 
     </Stack.Navigator>

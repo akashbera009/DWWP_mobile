@@ -41,9 +41,9 @@ const isLastDayOfMonth = () => {
     return true;
 };
 type MainStackNavigationProp = NativeStackNavigationProp<MainStackParamList>;
-const navigation = useNavigation<MainStackNavigationProp>();
 
 const CurrentBillComponent = () => {
+    const navigation = useNavigation<MainStackNavigationProp>();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     const dummyBillObject = {
         amount: 250.75,
@@ -104,7 +104,7 @@ const CurrentBillComponent = () => {
         try {
             setLoading(true)
             setIsModalOpen(true)
-            const res = await handlePayment(dummyBillObject?.amount)
+            const res = await handlePayment(amount)
             const { success, payment_id } = res
             if (success) {
                 if (payment_id)
@@ -112,7 +112,7 @@ const CurrentBillComponent = () => {
                         payment_id,
                         amount,
                         refill,
-                        qty
+                        qty,
                     })
             } else {
                 showWarningSnackbar('Payment Cancelled by User')
@@ -171,7 +171,7 @@ const CurrentBillComponent = () => {
             // navigate to success screen 
             navigation.navigate(screenNames.PaymentSuccessScreen, {
                 payment_id,
-                amount,
+                amount : amount* 100,
                 qty,
                 refill,
                 addon : 'addon'
@@ -267,6 +267,9 @@ const CurrentBillComponent = () => {
                 visible={isModalOpen}
                 onProceedPayment={onProceedPayment}
                 onCancelProceed={onCancelProceed}
+                amount={10}
+                type ={'recharge'}
+                refill='10'
             />
 
             <Modal

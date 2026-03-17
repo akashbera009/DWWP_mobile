@@ -16,6 +16,7 @@ import notifee, { EventType } from '@notifee/react-native';
 import { store } from "@dwwp/store";
 import { persistor } from "@dwwp/store/index";
 import { RootNavigator } from "@dwwp/router";
+
 function App() {
   useEffect(() => {
     const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
