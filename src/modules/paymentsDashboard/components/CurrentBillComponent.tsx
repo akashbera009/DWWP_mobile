@@ -21,7 +21,7 @@ import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks';
 import { confirmAddonPayment } from '../paymentAction';
 import { addBroadcast } from '@dwwp/modules/dashboard/dashboardSlice';
 import { useNavigation } from '@react-navigation/native';
-import { MainStackParamList } from '@dwwp/utils/types';
+import { MainStackParamList, payCurrentBillType, successPayload } from '@dwwp/utils/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { screenNames } from '@dwwp/utils/screenNames';
 
@@ -94,11 +94,6 @@ const CurrentBillComponent = () => {
 
     const { handlePayment } = useRazorpayPayment();
 
-    interface payCurrentBillType {
-        amount: number,
-        refill: number
-        qty: number
-    }
     const payCurrentBill = async ({ amount, refill, qty }: payCurrentBillType): Promise<void> => {
         console.log('initiating payment... ');
         try {
@@ -127,23 +122,15 @@ const CurrentBillComponent = () => {
         }
     };
 
-    interface successPayload {
-        payment_id: string,
-        amount: number,
-        refill: number,
-        qty: number,
-        addon?: 'regular' | 'addon'
-    }
     const onSuccess = async ({ payment_id, amount, qty = 1, refill, addon }: successPayload) => {
         try {
             setLoading(true)
             displayNotification({
-                title: '<p style="color:#2B6568;"><b>⚡ Recharge Successful</b></p>',
+                title: '⚡ Recharge Successful',
                 body:
-                    `<p>Your recharge of ₹${amount} was for refill ${refill}L processed successfully
-                        Transaction ID: <b>${payment_id}</b>
-                    </p>
-                <p style="color:#1e4a4d;"><i>Thank you for helping prevent water wastage 🌍</i></p>`,
+                    `Your recharge of ₹${amount} was for refill ${refill}L processed successfully
+                        Transaction ID:${payment_id}
+                        Thank you for helping prevent water wastage 🌍`,
                 data: {
                     subtitle: '<p style="color:#7B68EE;">Water Service Activated</p>',
                     type: 'recharge',

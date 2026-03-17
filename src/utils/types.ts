@@ -59,3 +59,18 @@ export type StoredUser = {
     uid: string;
     email: string;
 };
+
+
+// paymenst 
+export interface payCurrentBillType {
+    amount: number,
+    refill: number
+    qty: number
+}
+export interface successPayload {
+    payment_id: string,
+    amount: number,
+    refill: number,
+    qty: number,
+    addon?: 'regular' | 'addon'
+}

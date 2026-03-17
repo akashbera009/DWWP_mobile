@@ -20,12 +20,9 @@ export const generateAndShareReceiptPDF = async (html: string, filename: string)
         if (Platform.OS === 'android') {
             const destPath = `${RNFS.DownloadDirectoryPath}/${filename}.pdf`
 
-            await RNFS.copyFile(file.filePath, destPath) 
+            await RNFS.copyFile(file.filePath, destPath)
             finalPath = destPath
         }
-
-        console.log('Final path:', finalPath)
-
         showSuccessSnackbar("Receipt saved to Downloads")
         await Share.open({
             url: `file://${finalPath}`,

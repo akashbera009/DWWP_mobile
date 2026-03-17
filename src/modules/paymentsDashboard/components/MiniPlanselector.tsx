@@ -14,13 +14,22 @@ import Animated, {
   withSpring,
   withTiming,
   interpolateColor,
-  Easing,
 } from 'react-native-reanimated';
+import { useNavigation } from '@react-navigation/native';
 import { normalize, vh, vw } from '@dwwp/utils/dimensions';
 import colors from '@dwwp/utils/colors';
 import fonts from '@dwwp/utils/fonts';
 import { PLANS } from '../mocks/planData';
 import QtyModal from './QtyModal';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { MainStackParamList, payCurrentBillType, successPayload } from '@dwwp/utils/types';
+import { showErrorSnackbar, showWarningSnackbar } from '@dwwp/utils/showSnackBar';
+import { useRazorpayPayment } from '@dwwp/utils/razorpayPaymentFunciton';
+import { displayNotification } from '@dwwp/utils/displayNotification';
+import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks';
+import { confirmAddonPayment } from '../paymentAction';
+import { screenNames } from '@dwwp/utils/screenNames';
+import { addBroadcast } from '@dwwp/modules/dashboard/dashboardSlice';
 
 export interface Plan {
   id: string;
@@ -32,6 +41,7 @@ export interface Plan {
   badge?: string;
   badgeColor?: string;
 }
+type MainStackNavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
 interface PlanSelectorProps {
   onSelect?: (plan: Plan, qty: number, totalPrice: number, totalVolume: number) => void;
@@ -152,10 +162,11 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
   // onPaymentInitiated,
   // defaultSelected = 'premium',
 }) => {
+  const navigation = useNavigation<MainStackNavigationProp>();
   const [selectedId, setSelectedId] = useState<string>('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  const dispatch = useAppDispatch()
   const selectedPlan = PLANS.find((p) => p.id === selectedId);
 
   const handleSelect = (plan: Plan) => {
@@ -169,15 +180,86 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
 
   const handleQtyConfirm = (qty: number, totalPrice: number, totalVolume: number) => {
     if (!selectedPlan) return;
-
-    setIsLoading(true);
-
-    // Close modal after a short delay
-    setTimeout(() => {
-      setIsModalVisible(false);
-      setIsLoading(false);
-    }, 500);
+    payCurrentBill({
+      amount: totalPrice,
+      refill: 1000,
+      qty: qty
+    })
   };
+  const { handlePayment } = useRazorpayPayment();
+  const emailId = useAppSelector(s => s.dashboard?.userDetails?.emailId)
+
+  const payCurrentBill = async ({ amount, refill, qty }: payCurrentBillType): Promise<void> => {
+    console.log('initiating payment... ');
+    try {
+      setIsLoading(true);
+      const res = await handlePayment(amount)
+      const { success, payment_id } = res
+      if (success) {
+        if (payment_id)
+          onSuccess({
+            payment_id,
+            amount,
+            refill,
+            qty,
+          })
+      } else {
+        showWarningSnackbar('Payment Cancelled by User')
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+      showErrorSnackbar('Payment failed ')
+    } finally {
+      setIsLoading(false);
+    } 
+  };
+
+  const onSuccess = async ({ payment_id, amount, qty = 1, refill, addon }: successPayload) => {
+    try {
+      displayNotification({
+        title: '⚡ Recharge Successful',
+        body: `Your recharge of ₹${amount} was for refill ${refill}L processed successfully
+                          Transaction ID:${payment_id}
+                          Thank you for helping prevent water wastage 🌍`,
+        data: {
+          subtitle: '<p style="color:#7B68EE;">Water Service Activated</p>',
+          type: 'recharge',
+        }
+      });
+
+      if (addon === 'addon' && emailId) {
+        dispatch(confirmAddonPayment({
+          email: emailId,
+          razorPayId: payment_id,
+          amount: amount,
+          quantityDone: 0,
+          refill: refill,
+        })).then(res => {
+          console.log('firebase writing response is ', res);
+        })
+        dispatch(addBroadcast({
+          icon: '⚡️',
+          message: `Recharge of ₹${amount} for ${refill}L was done. Payment ID: ${payment_id}`,
+          timestamp: new Date().toISOString(),
+        }))
+      } else {
+        console.log('need to write regular payment logic ');
+      }
+      // navigate to success screen 
+      navigation.navigate(screenNames.PaymentSuccessScreen, {
+        payment_id,
+        amount: amount * 100,
+        qty,
+        refill,
+        addon: 'addon'
+      })
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleQtyCancel = () => {
     setIsModalVisible(false);

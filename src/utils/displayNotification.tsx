@@ -24,11 +24,11 @@ export const displayNotification = async ({ title, body, data }: notificationTyp
         // Display a notification
         await notifee.displayNotification({
 
-            title: `<span style="color: #4caf50;"><b>${title}</b></span>`,
+            title: `${title}`,
             subtitle: '&#127881;',
             body:
-                `<span style="text-decoration: line-through;">${body}</span>` +
-                `<span style="color:#ffffff; background-color:#9c27b0;"><i>${data?.type}</i></span> &#127881;!`,
+                `${body}` +
+                `${data?.type}!`,
             android: {
                 channelId,
                 sound: 'ring_drop',
