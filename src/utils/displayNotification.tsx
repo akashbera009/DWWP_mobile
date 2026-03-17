@@ -1,4 +1,5 @@
 import notifee, { AndroidBadgeIconType, AndroidImportance, AndroidStyle } from '@notifee/react-native';
+import colors from './colors';
 
 // type notofication = 
 type notificationType = {
@@ -6,7 +7,7 @@ type notificationType = {
     title: string | undefined;
     data?: { [key: string]: any };
 }
-export const displayNOtification = async ({ title, body, data }: notificationType) => {
+export const displayNotification = async ({ title, body, data }: notificationType) => {
 
     try {
         // Required for iOS
@@ -21,25 +22,30 @@ export const displayNOtification = async ({ title, body, data }: notificationTyp
 
         // Display a notification
         await notifee.displayNotification({
-            title: title || 'Notification Title',
-            body: body || 'Main body content of the notification',
-            data,
+            // title: title || 'Notification Title',
+            // body: body || 'Main body content of the notification',
+            // data,
+            title: `<span style="color: #4caf50;"><b>${title }</b></span>`,
+            subtitle: '&#127881;',
+            body:
+              `<span style="text-decoration: line-through;">${body}</span>` +
+                `<span style="color:#ffffff; background-color:#9c27b0;"><i>${data?.type}</i></span> &#127881;!`,
             android: {
                 channelId,
-                // sound: 'hollow',
-                color: '#13958c',
-                // smallIcon: 'ic_launcher_foreground',
-                largeIcon: 'https://imgs.search.brave.com/u2tjOLnBiYESXy8qC1uF1k7phFV09UOW7uVXDTAyJE0/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91eHdp/bmcuY29tL3dwLWNv/bnRlbnQvdGhlbWVz/L3V4d2luZy9kb3du/bG9hZC9icmFuZHMt/YW5kLXNvY2lhbC1t/ZWRpYS9nb29nbGUt/ZmlyZWJhc2UtaWNv/bi5zdmc',
+                sound: 'ring_drop',
+                color: colors.primary,
+                smallIcon: 'ic_launcher',
+                largeIcon: 'https://github.com/akashbera009/DWWP_2.0/blob/main/DWWP%20LOGO.png?raw=true',
                 badgeIconType: AndroidBadgeIconType.SMALL,  // badge 
                 importance: AndroidImportance.HIGH,// importance
                 // style: {
                 //   type: AndroidStyle.BIGPICTURE,
                 //   picture: 'https://imgs.search.brave.com/sIT_rkJ_HDXYstSOy2NQ99Wa_Y1LOuuaouxUEoAuBLA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/Z2VyLmdvb2dsZXVz/ZXJjb250ZW50LmNv/bS9pbWcvYi9SMjl2/WjJ4bC9BVnZYc0Vn/VDlld3p4Yi1tSEpu/STNsQWVGVjVzclgz/NTIwZlVqeFBVZ0FB/VXlZUWZSekNfcTY2/Ukk0TWpfbjBRSkdL/RVlhRFBRZldjbnFy/cjdxQmp0S1FERDFk/d2doUE9OcXdqdGQ4/WGhCczlCdWN5dGpB/ckI5b3hYcWhueG1V/TFNURXRwMEdaZ0hY/bzh3RzFaYXcvczY0/MC1ydy9hbGwtYWJv/dXQtZG9ncy5qcGc',
                 // },
-                style: {
-                    type: AndroidStyle.BIGTEXT,
-                    text: 'Ypur recharge has been done .'
-                },
+                // style: {
+                //     type: AndroidStyle.BIGTEXT,
+                //     text: 'Ypur recharge has been done .'
+                // },
                 // style: {
                 //   type: AndroidStyle.INBOX,
                 //   lines: ['First Message', 'Second Message', 'Third Message', 'Forth Message'],

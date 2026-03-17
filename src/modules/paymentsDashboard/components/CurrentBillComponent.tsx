@@ -6,13 +6,24 @@ import {
     TouchableOpacity,
     Animated,
     Image,
+    Modal,
+    ActivityIndicator,
 } from 'react-native';
 import colors from '@dwwp/utils/colors';
 import { normalize, vh, vw } from '@dwwp/utils/dimensions';
 import fonts from '@dwwp/utils/fonts';
-import { displayNOtification } from '@dwwp/utils/displayNotification';
+import { displayNotification } from '@dwwp/utils/displayNotification';
 import { localImages } from '@dwwp/utils/localimages';
 import ConfirmationPayModal from './ConfirmationPayMpdal';
+import { useRazorpayPayment } from '@dwwp/utils/razorpayPaymentFunciton';
+import { showErrorSnackbar, showWarningSnackbar } from '@dwwp/utils/showSnackBar';
+import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks';
+import { confirmAddonPayment } from '../paymentAction';
+import { addBroadcast } from '@dwwp/modules/dashboard/dashboardSlice';
+import { useNavigation } from '@react-navigation/native';
+import { MainStackParamList } from '@dwwp/utils/types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { screenNames } from '@dwwp/utils/screenNames';
 
 export interface BillingCardProps {
     amount: number;
@@ -29,6 +40,8 @@ const isLastDayOfMonth = () => {
     // return tomorrow.getDate() === 1;
     return true;
 };
+type MainStackNavigationProp = NativeStackNavigationProp<MainStackParamList>;
+const navigation = useNavigation<MainStackNavigationProp>();
 
 const CurrentBillComponent = () => {
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -45,7 +58,9 @@ const CurrentBillComponent = () => {
     const isMonthEnd = isLastDayOfMonth();
     const isDisabled = dummyBillObject.isPaid || !isMonthEnd;
     const isPaid = dummyBillObject.isPaid;
-
+    const [loading, setLoading] = useState(false)
+    const dispatch = useAppDispatch()
+    const emailId = useAppSelector(s => s.dashboard?.userDetails?.emailId)
     // Pulse the status dot when pending
     useEffect(() => {
         if (!isPaid) {
@@ -65,24 +80,108 @@ const CurrentBillComponent = () => {
         Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, damping: 10 }).start();
 
 
-    const onSuccess = useCallback(() => {
-        setIsModalOpen(false)
+    const onProceedPayment = useCallback(() => {
+        payCurrentBill({
+            amount: 40,
+            refill: 100,
+            qty: 1
+        })
     }, [])
-    const payCurrentBill = () => {
-        console.log('initiating payment ');
+    const onCancelProceed = useCallback(() => {
+        setIsModalOpen(false)
+        setLoading(false)
+    }, [loading])
+
+    const { handlePayment } = useRazorpayPayment();
+
+    interface payCurrentBillType {
+        amount: number,
+        refill: number
+        qty: number
+    }
+    const payCurrentBill = async ({ amount, refill, qty }: payCurrentBillType): Promise<void> => {
+        console.log('initiating payment... ');
         try {
+            setLoading(true)
             setIsModalOpen(true)
-            const success = false
+            const res = await handlePayment(dummyBillObject?.amount)
+            const { success, payment_id } = res
             if (success) {
-                displayNOtification({
-                    title: 'Payment Successful',
-                    body: 'Your payment has been processed successfully.',
-                });
+                if (payment_id)
+                    onSuccess({
+                        payment_id,
+                        amount,
+                        refill,
+                        qty
+                    })
+            } else {
+                showWarningSnackbar('Payment Cancelled by User')
+                setLoading(false)
             }
         } catch (error) {
             console.log(error);
+            showErrorSnackbar('Payment failed ')
+        } finally {
+            setIsModalOpen(false)
+            setLoading(false)
         }
     };
+
+    interface successPayload {
+        payment_id: string,
+        amount: number,
+        refill: number,
+        qty: number,
+        addon?: 'regular' | 'addon'
+    }
+    const onSuccess = async ({ payment_id, amount, qty = 1, refill, addon }: successPayload) => {
+        try {
+            setLoading(true)
+            displayNotification({
+                title: '<p style="color:#2B6568;"><b>⚡ Recharge Successful</b></p>',
+                body:
+                    `<p>Your recharge of ₹${amount} was for refill ${refill}L processed successfully
+                        Transaction ID: <b>${payment_id}</b>
+                    </p>
+                <p style="color:#1e4a4d;"><i>Thank you for helping prevent water wastage 🌍</i></p>`,
+                data: {
+                    subtitle: '<p style="color:#7B68EE;">Water Service Activated</p>',
+                    type: 'recharge',
+                }
+            });
+
+            if (addon === 'addon' && emailId) {
+                dispatch(confirmAddonPayment({
+                    email: emailId,
+                    razorPayId: payment_id,
+                    amount: amount,
+                    quantityDone: 0,
+                    refill: refill,
+                })).then(res => {
+                    console.log('firebase writing response is ', res);
+                })
+                dispatch(addBroadcast({
+                    icon: '⚡️',
+                    message: `Recharge of ₹${amount} for ${refill}L was done. Payment ID: ${payment_id}`,
+                    timestamp: new Date().toISOString(),
+                }))
+            } else {
+                console.log('need to write regular payment logic ');
+            }
+            // navigate to success screen 
+            navigation.navigate(screenNames.PaymentSuccessScreen, {
+                payment_id,
+                amount,
+                qty,
+                refill,
+                addon : 'addon'
+            })
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const monthLabel = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
 
@@ -151,7 +250,7 @@ const CurrentBillComponent = () => {
                     <TouchableOpacity
                         style={[styles.button, isDisabled && styles.disabledButton]}
                         disabled={isDisabled}
-                        onPress={payCurrentBill}
+                        onPress={() => setIsModalOpen(true)}
                         onPressIn={handlePressIn}
                         onPressOut={handlePressOut}
                         activeOpacity={1}
@@ -166,15 +265,23 @@ const CurrentBillComponent = () => {
 
             <ConfirmationPayModal
                 visible={isModalOpen}
-                onSuccess={() => {
-                    setIsModalOpen(false)
-                    displayNOtification({
-                        title: 'Payment Successful',
-                        body: 'Your payment has been processed successfully.',
-                    })
-                }}
-                onCancel={() => setIsModalOpen(false)}
+                onProceedPayment={onProceedPayment}
+                onCancelProceed={onCancelProceed}
             />
+
+            <Modal
+                visible={loading}
+                transparent
+                animationType="fade"
+                statusBarTranslucent
+            >
+                <View style={styles.loadingOverlay}>
+                    <View style={styles.loaderBox}>
+                        <ActivityIndicator size="large" color={colors.primary} />
+                        <Text style={styles.loaderText}>Processing payment...</Text>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 };
@@ -354,5 +461,33 @@ const styles = StyleSheet.create({
         fontSize: normalize(15),
         color: colors.white,
         letterSpacing: 0.2,
+    },
+
+    // loading 
+    loadingOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.35)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    loaderBox: {
+        backgroundColor: colors.white,
+        paddingVertical: vh(24),
+        paddingHorizontal: vw(30),
+        borderRadius: normalize(16),
+        alignItems: 'center',
+        elevation: 10,
+        shadowColor: '#000',
+        shadowOpacity: 0.25,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 5 },
+    },
+
+    loaderText: {
+        marginTop: vh(10),
+        fontFamily: fonts.Medium,
+        fontSize: normalize(13),
+        color: colors.neutralBodyText,
     },
 });

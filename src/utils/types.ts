@@ -31,14 +31,22 @@ export type BottomTabParamList = {
 export type MainStackParamList = {
     BottomTabs: NavigatorScreenParams<BottomTabParamList>;
 
-    PaymentsIndexDashboard : undefined
-    FullPaymantHistory : undefined
-    AddonRechargesScreen : undefined
-    IndividualPaymentHistory : undefined // be a transaction data 
+    PaymentsIndexDashboard: undefined
+    FullPaymantHistory: undefined
+    AddonRechargesScreen: undefined
+    IndividualPaymentHistory: undefined // be a transaction data 
 
     ViewProfileScreen: undefined;
     SettingsScreen: undefined;
     RaiseComplaintScreen: undefined;
+
+    PaymentSuccessScreen: {
+        payment_id: string,
+        amount: number,
+        qty: number,
+        refill: number,
+        addon: string,
+    }
 };
 export type RootStackParamList = {
     SplashScreen: undefined;

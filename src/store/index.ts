@@ -33,7 +33,7 @@ import {
 const persistConfig = {
     key: 'root',
     storage: mmkvStorage,
-    whitelist: ['auth', 'payment', 'usage'],
+    whitelist: ['auth', 'payment', 'usage' ,'dashboard'],
 }
 
 const rootReducer = combineReducers({

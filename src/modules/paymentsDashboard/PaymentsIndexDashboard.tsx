@@ -36,6 +36,8 @@ const PaymentsIndexDashboard = () => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    if (!email) return;
+    dispatch(fetchAllPaymentsAndAddons({ email }))
     setTimeout(() => {
       showSnackbar({ message: 'Data refreshed!', type: 'success' })
       setRefreshing(false);

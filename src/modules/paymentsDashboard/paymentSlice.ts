@@ -66,7 +66,6 @@ const paymentSlice = createSlice({
             state.isProcessing = false
             state.error = null
         },
-
         clearPaymentError: (state) => { state.error = null },
 
         resetPayment: () => PaymentInitialState,

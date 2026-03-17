@@ -21,6 +21,11 @@ export interface RegisterPayload {
 }
 
 // dashboardTypes
+export interface Broadcast {
+  icon: string
+  message: string
+  timestamp: string
+}
 export interface UserDetails {
   fullName: string
   mobileNo: string

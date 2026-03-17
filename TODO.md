@@ -42,3 +42,10 @@ need a listner for the recharge section if it is done , it trigger and calculate
 
 
 circlegauge is having double arcs in the usage_tab.tsx 
+
+
+crash in first install=> HeroSummaryCard.tsx:90 React has detected a change in the order of Hooks called by HeroSummaryCard. 
+ undefined           =>      useRef
+
+
+cancle button on payment modal confirmation is not working 

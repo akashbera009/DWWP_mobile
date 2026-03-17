@@ -115,7 +115,12 @@ const Dash_Index_Screen = () => {
             {notifOpen && (
                 <Portal hostName="safe">
                     <Pressable style={styles.dropdownBackdrop} onPress={closeDropdowns}>
-                        <NotificationPanel onClose={closeDropdowns} />
+
+                        {/* This prevents closing when touching inside */}
+                        <Pressable onPress={() => { }}>
+                            <NotificationPanel onClose={closeDropdowns} />
+                        </Pressable>
+
                     </Pressable>
                 </Portal>
             )}
@@ -158,12 +163,12 @@ const Dash_Index_Screen = () => {
                         {/* <DeviceSection
                             setIsSwitchModalOpen={() => setIsSwitchModalOpen(true)}
                         /> */}
-                        <Device_Info_Tab/>
+                        <Device_Info_Tab />
                     </View>
 
                     <View style={styles.page2}>
                         <ScrollView showsVerticalScrollIndicator={false}>
-                            <Usages_Tab monthData={MOCK_MONTH_DATA} addons={MOCK_ADDONS} />
+                            <Usages_Tab />
                         </ScrollView>
                     </View>
 

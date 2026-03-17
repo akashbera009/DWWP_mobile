@@ -1,6 +1,6 @@
 
-import { createSlice } from "@reduxjs/toolkit"
-import { DashboardInitialState } from "@dwwp/modals"
+import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { Broadcast, DashboardInitialState } from "@dwwp/modals"
 import {
     fetchUserDetails,
     fetchCurrentMonth,
@@ -11,12 +11,14 @@ import {
 
 const dashboardSlice = createSlice({
     name: "dashboard",
-    initialState : DashboardInitialState,
+    initialState: DashboardInitialState,
     reducers: {
         clearDashboardError: (state) => {
             state.error = null
         },
-
+        addBroadcast(state, action: PayloadAction<Broadcast>) {
+            state.broadcasts.unshift(action.payload)
+        },
         resetDashboard: () => DashboardInitialState,
     },
 
@@ -54,7 +56,7 @@ const dashboardSlice = createSlice({
                 state.error = action.payload ?? "Failed to load month data."
             })
 
-       
+
         // builder
         //     .addCase(fetchBroadcasts.pending, (state) => {
         //         state.isLoading = true
@@ -98,6 +100,7 @@ const dashboardSlice = createSlice({
 
 export const {
     clearDashboardError,
+    addBroadcast,
     resetDashboard,
 } = dashboardSlice.actions
 

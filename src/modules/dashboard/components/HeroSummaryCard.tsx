@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React, { useEffect } from 'react'
+import React from 'react'
 import LinearGradient from 'react-native-linear-gradient'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
@@ -13,7 +13,6 @@ import Animated, {
     withSpring,
 } from 'react-native-reanimated'
 import { useAppSelector } from '@dwwp/store/hooks'
-import { getCurrentMonthKey, getTodayKey } from '@dwwp/utils/commonFunctions'
 import { selectCurrentMonthLimit, selectCurrentMonthTotal, selectLimitExceeded, selectTodayUsage } from '../usageSelectors'
 
 // ─── Tuning constants ─────────────────────────────────────────────────────────

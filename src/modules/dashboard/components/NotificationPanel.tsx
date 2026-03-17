@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
@@ -6,10 +6,11 @@ import fonts from '@dwwp/utils/fonts'
 import colors from '@dwwp/utils/colors'
 import { useAppSelector } from '@dwwp/store/hooks'
 import { BroadcastMsg } from '@dwwp/modals'
+import { TouchableWithoutFeedback } from '@gorhom/bottom-sheet'
 
 const NotificationPanel = ({ onClose }: { onClose: () => void }) => {
     const [notifications, setNoticications] = useState<BroadcastMsg[] | null>([])
-    const notificationSelector = useAppSelector(state => state.dashboard.broadcasts)
+    const notificationSelector = useAppSelector(state => state?.dashboard.broadcasts)
     useEffect(() => {
         if (notificationSelector?.length !== 0) {
             setNoticications(notificationSelector)
@@ -23,19 +24,32 @@ const NotificationPanel = ({ onClose }: { onClose: () => void }) => {
                     <Text style={styles.notifBadgeText}>{notifications?.length}</Text>
                 </View>
             </View>
-            {notifications?.map((n: BroadcastMsg, id: number) => (
-                <View key={id} style={styles.notifRow}>
-                    <View style={[styles.notifIconBox, {
-                        backgroundColor:`${colors.activeDot}18`
-                    }]}>
-                        <Text style={{ fontSize: 15 }}>{n.icon}</Text>
-                    </View>
-                    <View style={{ flex: 1 }}>
-                        <Text style={styles.notifTitle}>{n.message}</Text>
-                        <Text style={styles.notifTime}>{n.timestamp}</Text>
-                    </View>
-                </View>
-            ))}
+
+            <View style={styles.scrollviewWrapper}>
+                <ScrollView
+                    nestedScrollEnabled
+                    showsVerticalScrollIndicator={false}
+                >
+                    {notifications?.map((n: BroadcastMsg, id: number) => (
+                        <View key={id} style={styles.notifRow}>
+                            <View
+                                style={[
+                                    styles.notifIconBox,
+                                    { backgroundColor: `${colors.activeDot}18` },
+                                ]}
+                            >
+                                <Text style={{ fontSize: 15 }}>{n.icon}</Text>
+                            </View>
+
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.notifTitle}>{n.message}</Text>
+                                <Text style={styles.notifTime}>{n.timestamp}</Text>
+                            </View>
+                        </View>
+                    ))}
+                </ScrollView>
+            </View>
+
             <TouchableOpacity onPress={onClose} style={styles.dropdownFooter}>
                 <Text style={styles.dropdownFooterText}>View All</Text>
             </TouchableOpacity>
@@ -84,6 +98,10 @@ const styles = StyleSheet.create({
         fontFamily: fonts.SemiBold,
         fontSize: normalize(12),
         color: colors.primary,
+    },
+    scrollviewWrapper: {
+        flex: 1,
+        maxHeight: vh(200)
     },
     notifBadge: {
         width: normalize(20),

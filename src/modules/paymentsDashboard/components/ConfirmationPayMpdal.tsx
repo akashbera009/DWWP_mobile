@@ -8,11 +8,11 @@ import { strings } from '@dwwp/utils/strings'
 
 type ConfirmationPayModalProps = {
     visible: boolean
-    onSuccess: () => void
-    onCancel: () => void
+    onProceedPayment: () => void
+    onCancelProceed: () => void
 }
 
-const ConfirmationPayModal = ({ visible, onSuccess, onCancel }: ConfirmationPayModalProps) => {
+const ConfirmationPayModal = ({ visible, onProceedPayment, onCancelProceed }: ConfirmationPayModalProps) => {
     return (
         <Modal
             visible={visible}
@@ -32,13 +32,14 @@ const ConfirmationPayModal = ({ visible, onSuccess, onCancel }: ConfirmationPayM
                     <CustomButton
                         title={strings.cancel}
                         variant='outline'
-                        onPress={onCancel}
+                        onPress={onCancelProceed}
                         textStyle ={{color: colors.warning}}
                     />
                     <CustomButton
                         title={strings.proceed}
-                        onPress={onSuccess}
+                        onPress={onProceedPayment}
                     />
+
                 </View>
 
             </View>
