@@ -1,7 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react'
 import {
     View, Text, ScrollView, StyleSheet, Animated,
-    TouchableOpacity, Platform
+    TouchableOpacity,
+    Image
 } from 'react-native'
 
 import ToggleSwitch from '../components/ToggleSwitch'
@@ -9,6 +10,8 @@ import { useAppSelector } from '@dwwp/store/hooks'
 import LinearGradient from 'react-native-linear-gradient'
 import fonts from '@dwwp/utils/fonts'
 import { normalize, vh } from '@dwwp/utils/dimensions'
+import colors from '@dwwp/utils/colors'
+import { localImages } from '@dwwp/utils/localimages'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ConnLevel = 'online' | 'recent' | 'stale' | 'offline' | 'loading'
@@ -147,8 +150,8 @@ const DeviceStatusCard: React.FC = () => {
 
             {/* Header */}
             <View style={dStyles.headerRow}>
-                <View style={dStyles.iconBox}>
-                    <Text style={{ fontSize: normalize(18) }}>📶</Text>
+                <View style={dStyles.iconBox}>  
+                    <Image source={localImages.chip} style={dStyles.chip}/>
                 </View>
                 <View style={{ flex: 1, marginLeft: normalize(10) }}>
                     <Text style={dStyles.titleText}>ESP32 · Servo Valve</Text>
@@ -162,7 +165,7 @@ const DeviceStatusCard: React.FC = () => {
                 </View>
             </View>
 
-            <View style={sharedStyles.divider} />
+            {/* <View style={sharedStyles.divider} /> */}
 
             {/* Meta grid — 2 columns */}
             <View style={dStyles.metaGrid}>
@@ -214,22 +217,29 @@ const dStyles = StyleSheet.create({
         backgroundColor: C.white,
         borderRadius: normalize(18),
         overflow: 'hidden',
-        shadowColor: '#000',
+        shadowColor:colors.shadowBlack,
         shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.07,
+        shadowOpacity: 1,
         shadowRadius: 12,
-        elevation: 3,
+        elevation: 10,
+        borderWidth : normalize(1),
+        borderColor : colors.border
     },
     headerRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: normalize(14),
+        paddingHorizontal: normalize(14),
+        paddingTop : vh(14)
     },
     iconBox: {
         width: normalize(40), height: normalize(40),
         borderRadius: normalize(11),
         backgroundColor: C.cyanBg,
         alignItems: 'center', justifyContent: 'center',
+    },
+     chip:{
+        height : vh(32),
+        width : vh(32)
     },
     titleText: {
         fontFamily: fonts.Bold,
@@ -240,7 +250,6 @@ const dStyles = StyleSheet.create({
         fontFamily: fonts.Regular,
         fontSize: normalize(11),
         color: C.black,
-        marginTop: vh(2),
     },
     statusPill: {
         flexDirection: 'row',
@@ -262,10 +271,12 @@ const dStyles = StyleSheet.create({
         gap: normalize(8),
     },
     metaCell: {
+        borderWidth : normalize(1),
+        borderColor : colors.border,
         width: '47%',
         backgroundColor: C.bg,
         borderRadius: normalize(10),
-        padding: normalize(10),
+        padding: normalize(7),
     },
     metaLabel: {
         fontFamily: fonts.Regular,
@@ -337,11 +348,11 @@ const WaterControlCard: React.FC = () => {
             {/* Offline banner */}
             {deviceOffline && !quotaExceeded && (
                 <View style={wStyles.warnBanner}>
-                    <Text style={{ fontSize: normalize(15) }}>⚠️</Text>
+                    <Text style={{ fontSize: normalize(22) }}>⚠️</Text>
                     <View style={{ flex: 1 }}>
                         <Text style={wStyles.warnTitle}>Device not reachable</Text>
                         <Text style={wStyles.warnSub}>
-                            Command will execute once device reconnects.
+                            Controlling available upon connected to WIFI
                         </Text>
                     </View>
                 </View>
@@ -378,11 +389,11 @@ const WaterControlCard: React.FC = () => {
             {/* Toggle row OR locked row */}
             {!isLocked ? (
                 <View style={wStyles.toggleRow}>
-                    <Text style={wStyles.toggleHint}>
+                    {/* <Text style={wStyles.toggleHint}>
                         {deviceOffline
                             ? 'Device offline — toggle will queue and sync on reconnect'
                             : 'Tap to toggle water supply. Changes apply instantly.'}
-                    </Text>
+                    </Text> */}
                     <ToggleSwitch disabled={false} />
                 </View>
             ) : (
@@ -397,7 +408,7 @@ const WaterControlCard: React.FC = () => {
 
             {/* Info note */}
             <View style={wStyles.infoNote}>
-                <Text style={{ fontSize: normalize(12) }}>ℹ️</Text>
+                 <Image source={localImages.info} style={wStyles.info}/>
                 <Text style={wStyles.infoText}>
                     {deviceOffline
                         ? 'Device is offline. Showing last known state. Commands sync automatically on reconnect.'
@@ -426,7 +437,7 @@ const wStyles = StyleSheet.create({
         padding: normalize(13),
     },
     warnBanner: {
-        flexDirection: 'row', alignItems: 'flex-start', gap: normalize(10),
+        flexDirection: 'row', alignItems: 'center', gap: normalize(10),
         backgroundColor: C.warningBg,
         borderBottomWidth: 1, borderBottomColor: C.warningBorder,
         padding: normalize(13),
@@ -439,7 +450,8 @@ const wStyles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: normalize(16),
+        paddingHorizontal: normalize(16),
+        paddingVertical : vh(6)
     },
     stateLabel: {
         fontFamily: fonts.Bold,
@@ -448,7 +460,6 @@ const wStyles = StyleSheet.create({
     stateDesc: {
         fontFamily: fonts.Regular,
         fontSize: normalize(12),
-        marginTop: vh(3),
     },
     liveBadge: {
         flexDirection: 'row', alignItems: 'center', gap: normalize(5),
@@ -463,9 +474,9 @@ const wStyles = StyleSheet.create({
     toggleRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: normalize(16),
-        paddingVertical: normalize(14),
+        justifyContent : 'center',
+        // paddingHorizontal: normalize(16),
+        // paddingVertical: normalize(14),
         borderTopWidth: 1,
         borderTopColor: C.border,
         gap: normalize(12),
@@ -507,8 +518,12 @@ const wStyles = StyleSheet.create({
         fontSize: normalize(13),
         color: C.white,
     },
+    info:{
+        height : vh(18),
+        width : vh(18)
+    },
     infoNote: {
-        flexDirection: 'row', alignItems: 'flex-start', gap: normalize(8),
+        flexDirection: 'row', alignItems: 'center', gap: normalize(8),
         backgroundColor: C.primaryLight,
         margin: normalize(12),
         borderRadius: normalize(10),

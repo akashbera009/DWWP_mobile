@@ -15,7 +15,7 @@ export const displayNotification = async ({ title, body, data }: notificationTyp
 
         // Create a channel (required for Android)
         const channelId = await notifee.createChannel({
-            id: 'Payment',
+            id: 'Payment Channel ID',
             name: 'Payment Channel',
             importance: AndroidImportance.HIGH,
             sound: 'ring_drop',

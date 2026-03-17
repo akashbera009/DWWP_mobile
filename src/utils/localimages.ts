@@ -32,6 +32,7 @@ export const localImages = {
     close: require('../assets/images/close.png'),
     angle: require('../assets/images/angle.png'),
     filter: require('../assets/images/filter.png'),
+    chip: require('../assets/images/chip.png'),
 
     hide: require('../assets/images/hide.png'),
     view: require('../assets/images/view.png'),

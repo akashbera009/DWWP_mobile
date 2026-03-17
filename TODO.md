@@ -52,3 +52,7 @@ payment modal header text be modified professionally
 
 notification sound is not working 
 date and time of the payment receipt be added from props , not now()
+we will reuse paymentsuccessscreen , as part of view details of payments screen 
+
+
+usage_tab view all button is not working 

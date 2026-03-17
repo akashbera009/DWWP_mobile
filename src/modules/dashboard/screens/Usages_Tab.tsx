@@ -27,19 +27,20 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
-    View, Text, StyleSheet, ScrollView,
-    TouchableOpacity, Animated, Dimensions,
-    StatusBar, Platform, Easing,
-    Image,
+    View, Text, StyleSheet,
+    TouchableOpacity, Animated, Easing, Image,
 } from 'react-native'
+import Svg, { Circle } from 'react-native-svg'
 import LinearGradient from 'react-native-linear-gradient'
-import { normalize, screenWidth, vh, vw } from '@dwwp/utils/dimensions'
+import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
 // import Mini_Monthly_Usage_Chart from './Mini_Monthly_Usage_Chart'
 import { localImages } from '@dwwp/utils/localimages'
-import { rotate } from '@shopify/react-native-skia'
 import { fmt, getCurrentMonthKey } from '@dwwp/utils/commonFunctions'
 import { useAppSelector } from '@dwwp/store/hooks'
+import { CustomButton } from '@dwwp/components/CustomButton'
+import { navigationRef } from '@dwwp/utils/navigationService'
+import { screenNames } from '@dwwp/utils/screenNames'
 
 // ─── Theme ────────────────────────────────────────────────────────────────────
 const C = {
@@ -158,81 +159,55 @@ interface GaugeProps {
     label: string
     value: string
 }
-const CircleGauge: React.FC<GaugeProps> = ({ pct, size, color, label, value }) => {
-  const anim = useRef(new Animated.Value(0)).current
-  const stroke = normalize(9)             // desired ring thickness
-  const R = (size - stroke) / 2
-  const cx = size / 2
-  const cy = size / 2
+const CircleGauge = ({ pct, size, color, label, value }: GaugeProps) => {
+    const strokeWidth = 10
+    const radius = (size - strokeWidth) / 2
+    const circumference = 2 * Math.PI * radius
 
-  useEffect(() => {
-    Animated.timing(anim, {
-      toValue: Math.min(pct, 1),
-      duration: 1100,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: false,
-    }).start()
-  }, [pct])
+    const progress = Math.min(Math.max(pct, 0), 1)
+    const strokeDashoffset = circumference * (1 - progress)
 
-  const safePct = Math.min(Math.max(pct, 0), 1)
-  const degrees = safePct * 360
+    return (
+        <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+            <Svg width={size} height={size}>
+                {/* Background circle */}
+                <Circle
+                    stroke="#EAEFF2"
+                    fill="none"
+                    cx={size / 2}
+                    cy={size / 2}
+                    r={radius}
+                    strokeWidth={strokeWidth}
+                />
 
-  return (
-    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-      {/* Pale track as filled background (no border) */}
-      <View style={{
-        width: size,
-        height: size,
-        borderRadius: size / 2,
-        backgroundColor: C.inputBg,
-        alignItems: 'center',
-        justifyContent: 'center',
-      }} />
+                {/* Progress circle */}
+                <Circle
+                    stroke={color}
+                    fill="none"
+                    cx={size / 2}
+                    cy={size / 2}
+                    r={radius}
+                    strokeWidth={strokeWidth}
+                    strokeDasharray={circumference}
+                    strokeDashoffset={strokeDashoffset}
+                    strokeLinecap="round"
+                    rotation="90"
+                    origin={`${size / 2}, ${size / 2}`}
+                    scale={-1}
+                />
+            </Svg>
 
-      {/* Left clip - shows left half of colored border when degrees > 0 */}
-      <View style={[styles.gaugeClipLeft, {
-        width: size / 2,
-        height: size,
-        left: 0,
-      }]}>
-        <View style={[styles.gaugeHalf, {
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          borderWidth: stroke,
-          borderColor: degrees > 0 ? color : 'transparent',
-          backgroundColor: 'transparent',
-          transform: [{ rotate: `${Math.min(degrees, 180) - 180}deg` }],
-          // ensure border is drawn inside clip
-        }]} />
-      </View>
-
-      {/* Right clip - used only for > 180deg */}
-      {degrees > 180 && (
-        <View style={[styles.gaugeClipRight, {
-          width: size / 2,
-          height: size,
-          right: 0,
-        }]}>
-          <View style={[styles.gaugeHalf, {
-            width: size,
-            height: size,
-            borderRadius: size / 2,
-            borderWidth: stroke,
-            borderColor: color,
-            backgroundColor: 'transparent',
-            transform: [{ rotate: `${degrees - 360}deg` }],
-          }]} />
+            {/* Center text */}
+            <View style={{ position: 'absolute', alignItems: 'center' }}>
+                <Text style={{ fontSize: 18, fontWeight: 'bold', color }}>
+                    {value}
+                </Text>
+                <Text style={{ fontSize: 12, color: '#6A7C92' }}>
+                    {label}
+                </Text>
+            </View>
         </View>
-      )}
-
-      {/* Center text */}
-      <View style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
-        <Text style={[styles.gaugeValue, { color }]}>{value}</Text>
-        <Text style={styles.gaugeLabel}>{label}</Text>
-      </View>
-    </View>
-  )
+    )
 }
 
 
@@ -290,7 +265,7 @@ const AddonCard: React.FC<AddonCardProps> = ({ addon, consumedFromAddon, index }
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
-const Usages_Tab= () => {
+const Usages_Tab = () => {
     const monthKeyId = getCurrentMonthKey()
 
     const monthData = useAppSelector(s => s.usage?.months?.[monthKeyId] ?? {})
@@ -402,7 +377,7 @@ const Usages_Tab= () => {
                 onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], { useNativeDriver: false })}
                 scrollEventThrottle={16}
             >
- 
+
                 {/* ── Hero summary card ── */}
                 <LinearGradient
                     colors={monthData.limitExceeded
@@ -576,7 +551,7 @@ const Usages_Tab= () => {
                                 </View>
 
                                 {/* Individual addon cards */}
-                                {addons.map((addon, i) => (
+                                {addons.slice(0, 5).map((addon, i) => (
                                     <AddonCard
                                         key={addon.id}
                                         addon={addon as any}
@@ -584,6 +559,11 @@ const Usages_Tab= () => {
                                         index={i}
                                     />
                                 ))}
+                                <CustomButton
+                                    title='View all'
+                                    variant='secondary'
+                                    onPress={() => navigationRef?.current?.getParent()?.navigate(screenNames.FullPaymantHistory)}
+                                />
                             </>
                         )}
                     </>

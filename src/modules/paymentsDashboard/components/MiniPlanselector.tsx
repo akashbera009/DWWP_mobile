@@ -5,20 +5,22 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Modal,
+  ActivityIndicator
 } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
-  withTiming,
   withSpring,
+  withTiming,
   interpolateColor,
+  Easing,
 } from 'react-native-reanimated';
 import { normalize, vh, vw } from '@dwwp/utils/dimensions';
 import colors from '@dwwp/utils/colors';
-import { showWarningSnackbar } from '@dwwp/utils/showSnackBar';
-import { strings } from '@dwwp/utils/strings';
 import fonts from '@dwwp/utils/fonts';
 import { PLANS } from '../mocks/planData';
+import QtyModal from './QtyModal';
 
 export interface Plan {
   id: string;
@@ -32,7 +34,13 @@ export interface Plan {
 }
 
 interface PlanSelectorProps {
-  onSelect?: (plan: Plan) => void;
+  onSelect?: (plan: Plan, qty: number, totalPrice: number, totalVolume: number) => void;
+  onPaymentInitiated?: (payload: {
+    plan: Plan;
+    qty: number;
+    totalPrice: number;
+    totalVolume: number;
+  }) => void;
   defaultSelected?: string;
 }
 
@@ -40,44 +48,42 @@ const PlanCard: React.FC<{
   plan: Plan;
   selected: boolean;
   onPress: () => void;
-}> = ({ plan, selected, onPress }) => {
+  onAddToCart: () => void;
+}> = ({ plan, selected, onPress, onAddToCart }) => {
   const progress = useSharedValue(selected ? 1 : 0);
-  const [qty, setQty] = useState<number>(1);
+  const scaleAnim = useSharedValue(1);
 
   React.useEffect(() => {
-    progress.value = withSpring(selected ? 1 : 0, { damping: 16, stiffness: 120 });
+    progress.value = withSpring(selected ? 1 : 0, {
+      damping: 14,
+      stiffness: 100,
+      mass: 0.8,
+    });
   }, [selected]);
 
   const animatedCardStyle = useAnimatedStyle(() => ({
     borderColor: interpolateColor(progress.value, [0, 1], ['#E5E7EB', colors.primary]),
     borderWidth: withTiming(progress.value > 0.5 ? 2 : 1, { duration: 200 }),
-    transform: [{ translateY: withSpring(progress.value > 0.5 ? -6 : 0, { damping: 16 }) }],
-    shadowOpacity: withTiming(progress.value > 0.5 ? 0.18 : 0.05, { duration: 200 }),
+    transform: [
+      // { translateY: withSpring(progress.value > 0.5 ? -8 : 0, { damping: 14, stiffness: 100 }) },
+      { scale: scaleAnim.value },
+    ],
+    shadowOpacity: withTiming(progress.value > 0.5 ? 0.22 : 0.06, { duration: 200 }),
   }));
 
   const animatedHeaderStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(progress.value, [0, 1], ['#FFFFFF', 'rgba(43,101,104,0.04)']),
+    backgroundColor: interpolateColor(progress.value, [0, 1], ['#FFFFFF', 'rgba(43,101,104,0.05)']),
   }));
 
-  const increment = () =>
-    setQty((q) => {
-      if (q < 10) return q + 1;
-      showWarningSnackbar(strings.maxLimitReached);
-      return q;
+  const handlePress = () => {
+    scaleAnim.value = withTiming(0.98, { duration: 100 }, () => {
+      scaleAnim.value = withTiming(1, { duration: 100 });
     });
-
-  const decrement = () =>
-    setQty((q) => {
-      if (q > 1) return q - 1;
-      showWarningSnackbar(strings.minLimitReached);
-      return q;
-    });
-
-  const totalPrice = plan.price * qty;
-  const totalVolume = plan.volume * qty;
+    onPress();
+  };
 
   return (
-    <TouchableOpacity activeOpacity={0.88} onPress={onPress}>
+    <TouchableOpacity activeOpacity={0.75} onPress={handlePress}>
       <Animated.View style={[styles.card, animatedCardStyle]}>
 
         {/* Header */}
@@ -119,31 +125,17 @@ const PlanCard: React.FC<{
 
           {selected && (
             <Animated.View>
-              {/* Qty control */}
-              <View style={styles.qtyRow}>
-                <TouchableOpacity style={styles.qtyBtn} onPress={decrement}>
-                  <Text style={styles.qtyBtnText}>−</Text>
-                </TouchableOpacity>
-                <View style={styles.qtyDisplay}>
-                  <Text style={styles.qtyText}>{qty}</Text>
+              {/* Add to Cart Button */}
+              <TouchableOpacity
+                style={styles.selectButton}
+                activeOpacity={0.8}
+                onPress={onAddToCart}
+              >
+                <View style={styles.selectButtonContent}>
+                  <Text style={styles.selectButtonEmoji}>🛒</Text>
+                  <Text style={styles.selectButtonText}>Add to Cart</Text>
+                  <Text style={styles.selectButtonArrow}>→</Text>
                 </View>
-                <TouchableOpacity style={styles.qtyBtn} onPress={increment}>
-                  <Text style={styles.qtyBtnText}>+</Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* Total */}
-              <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>Total</Text>
-                <View style={styles.totalRight}>
-                  <Text style={styles.totalVolume}>{totalVolume} L</Text>
-                  <Text style={styles.totalPrice}>₹{totalPrice}</Text>
-                </View>
-              </View>
-
-              {/* Add button */}
-              <TouchableOpacity style={styles.addButton} activeOpacity={0.85}>
-                <Text style={styles.addButtonText}>Add to Cart  •  ₹{totalPrice}</Text>
               </TouchableOpacity>
             </Animated.View>
           )}
@@ -154,33 +146,105 @@ const PlanCard: React.FC<{
   );
 };
 
-// ─── Main ────────────────────────────────────────────────────────────────────
+// ─── Main Component ────────────────────────────────────────────────────
 
 const PlanSelector: React.FC<PlanSelectorProps> = ({
-  onSelect,
-  defaultSelected = 'premium',
+  // onPaymentInitiated,
+  // defaultSelected = 'premium',
 }) => {
-  const [selectedId, setSelectedId] = useState<string>(defaultSelected);
+  const [selectedId, setSelectedId] = useState<string>('');
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const selectedPlan = PLANS.find((p) => p.id === selectedId);
 
   const handleSelect = (plan: Plan) => {
     setSelectedId(plan.id);
-    onSelect?.(plan);
+  };
+
+  const handleAddToCart = () => {
+    // Modal opens immediately when "Add to Cart" is tapped
+    setIsModalVisible(true);
+  };
+
+  const handleQtyConfirm = (qty: number, totalPrice: number, totalVolume: number) => {
+    if (!selectedPlan) return;
+
+    setIsLoading(true);
+
+    // Close modal after a short delay
+    setTimeout(() => {
+      setIsModalVisible(false);
+      setIsLoading(false);
+    }, 500);
+  };
+
+  const handleQtyCancel = () => {
+    setIsModalVisible(false);
+    setIsLoading(false);
   };
 
   return (
-    <View style={styles.root}>
-      <ScrollView
-      horizontal>
-      {PLANS.map((plan) => (
-        <PlanCard
-        key={plan.id}
-        plan={plan}
-        selected={selectedId === plan.id}
-        onPress={() => handleSelect(plan)}
-        />
-      ))}
-      </ScrollView>
-    </View>
+    <>
+      <View style={styles.root}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          scrollEventThrottle={16}
+          contentContainerStyle={styles.scrollContent}
+          snapToInterval={vw(300)}
+          decelerationRate="fast"
+        >
+          {PLANS.map((plan) => (
+            <View key={plan.id} style={styles.cardWrapper}>
+              <PlanCard
+                plan={plan}
+                selected={selectedId === plan.id}
+                onPress={() => handleSelect(plan)}
+                onAddToCart={handleAddToCart}
+              />
+            </View>
+          ))}
+        </ScrollView>
+
+        {/* Carousel indicators */}
+        <View style={styles.indicators}>
+          {PLANS.map((plan) => (
+            <TouchableOpacity
+              key={plan.id}
+              style={[
+                styles.indicator,
+                selectedId === plan.id && styles.indicatorActive,
+              ]}
+              onPress={() => handleSelect(plan)}
+            />
+          ))}
+        </View>
+      </View>
+
+      {/* Quantity Modal - Bottom Sheet */}
+      <QtyModal
+        visible={isModalVisible}
+        plan={selectedPlan || null}
+        onConfirm={handleQtyConfirm}
+        onCancel={handleQtyCancel}
+        isLoading={isLoading}
+      />
+
+      <Modal
+        visible={isLoading}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+      >
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loaderBox}>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={styles.loaderText}>Processing payment...</Text>
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 };
 
@@ -188,20 +252,25 @@ export default PlanSelector;
 
 const styles = StyleSheet.create({
   root: {
-    // marginHorizontal: vw(16),
-   
-    gap: 12,
+    gap: vw(16),
+    marginBottom: vh(8),
   },
-
+  scrollContent: {
+    paddingHorizontal: vw(16),
+    gap: vw(12),
+  },
+  cardWrapper: {
+    width: vw(280),
+  },
   card: {
-    borderRadius: 16,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: '#E5E7EB',
     backgroundColor: '#FFFFFF',
     overflow: 'hidden',
     elevation: 6,
     shadowColor: colors.primaryDark,
-    shadowRadius: 10,
+    shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
   },
   cardHeader: {
@@ -214,7 +283,8 @@ const styles = StyleSheet.create({
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: vw(10),
+    gap: vw(12),
+    flex: 1,
   },
   headerRight: {
     flexDirection: 'row',
@@ -222,9 +292,9 @@ const styles = StyleSheet.create({
     gap: vw(8),
   },
   iconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: '#E5E7EB',
     alignItems: 'center',
@@ -236,7 +306,7 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
   },
   iconText: {
-    fontSize: 18,
+    fontSize: 20,
   },
   planName: {
     fontSize: normalize(15),
@@ -296,98 +366,30 @@ const styles = StyleSheet.create({
   priceRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    marginBottom: vh(4),
+    marginBottom: vh(8),
   },
   priceLarge: {
-    fontSize: normalize(34),
+    fontSize: normalize(32),
     fontFamily: fonts.Bold,
     color: colors.neutralBlack,
     letterSpacing: -1,
   },
   priceUnit: {
-    fontSize: normalize(14),
+    fontSize: normalize(13),
     fontFamily: fonts.Regular,
     color: colors.neutralBodyText,
   },
   description: {
-    fontSize: normalize(13),
+    fontSize: normalize(12),
     fontFamily: fonts.Regular,
     color: colors.neutralBodyText,
-    lineHeight: 20,
-    marginBottom: vh(4),
+    lineHeight: 18,
+    marginBottom: vh(12),
   },
-  qtyRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: vw(12),
-    marginTop: vh(12),
-  },
-  qtyBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.white,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-  },
-  qtyBtnText: {
-    fontSize: 22,
-    fontFamily: fonts.Bold,
-    color: colors.neutralBlack,
-  },
-  qtyDisplay: {
-    minWidth: 60,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: vh(6),
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.lightGray,
-  },
-  qtyText: {
-    fontSize: normalize(18),
-    fontFamily: fonts.Bold,
-    color: colors.neutralBlack,
-  },
-  totalRow: {
-    marginTop: vh(12),
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: vw(4),
-  },
-  totalLabel: {
-    fontSize: normalize(13),
-    fontFamily: fonts.Regular,
-    color: colors.neutralBodyText,
-  },
-  totalRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: vw(8),
-  },
-  totalVolume: {
-    fontSize: normalize(13),
-    fontFamily: fonts.Regular,
-    color: colors.neutralBodyText,
-  },
-  totalPrice: {
-    fontSize: normalize(15),
-    fontFamily: fonts.Bold,
-    color: colors.neutralBlack,
-  },
-  addButton: {
-    marginTop: vh(14),
-    paddingVertical: vh(14),
-    borderRadius: 14,
+  selectButton: {
+    marginTop: vh(4),
+    paddingVertical: vh(13),
+    borderRadius: 13,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
@@ -397,10 +399,68 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 3 },
   },
-  addButtonText: {
+  selectButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: vw(6),
+  },
+  selectButtonEmoji: {
+    fontSize: 16,
+  },
+  selectButtonText: {
     color: colors.white,
     fontFamily: fonts.Bold,
-    fontSize: normalize(15),
+    fontSize: normalize(14),
     letterSpacing: 0.2,
+  },
+  selectButtonArrow: {
+    color: 'rgba(255, 255, 255, 0.75)',
+    fontFamily: fonts.Bold,
+    fontSize: normalize(14),
+  },
+  indicators: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: vw(6),
+    paddingBottom: vh(4),
+  },
+  indicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#D1D5DB',
+  },
+  indicatorActive: {
+    width: 28,
+    backgroundColor: colors.primary,
+  },
+  // loading 
+  loadingOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  loaderBox: {
+    backgroundColor: colors.white,
+    paddingVertical: vh(24),
+    paddingHorizontal: vw(30),
+    borderRadius: normalize(16),
+    alignItems: 'center',
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+  },
+
+  loaderText: {
+    marginTop: vh(10),
+    fontFamily: fonts.Medium,
+    fontSize: normalize(13),
+    color: colors.neutralBodyText,
   },
 });

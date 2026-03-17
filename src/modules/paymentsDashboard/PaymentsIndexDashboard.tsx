@@ -81,8 +81,8 @@ const PaymentsIndexDashboard = () => {
           </TouchableOpacity>
           <Text style={styles.subHeading}>Purchase additional water packs</Text>
           <PlanSelector
-            defaultSelected="premium"
-            onSelect={(plan) => console.log(plan)}
+            // defaultSelected="premium"
+            // onSelect={(plan) => console.log(plan)}
           />
         </View>
 
