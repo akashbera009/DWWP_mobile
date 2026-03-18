@@ -66,65 +66,6 @@ interface FieldError {
   confirmPassword?: string;
 }
 
-// ─── Step Progress Bar ────────────────────────────────────────────────────────
-
-const TOTAL_STEPS = 3;
-
-const StepBar: React.FC<{ step: number }> = ({ step }) => {
-  const anim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.timing(anim, {
-      toValue: (step - 1) / (TOTAL_STEPS - 1),
-      duration: 380,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: false,
-    }).start();
-  }, [step]);
-
-  return (
-    <View style={sb.wrapper}>
-      <View style={sb.track}>
-        <Animated.View
-          style={[
-            sb.fill,
-            {
-              width: anim.interpolate({
-                inputRange: [0, 1],
-                outputRange: ["0%", "100%"],
-              }),
-            },
-          ]}
-        />
-      </View>
-      <Text style={sb.label}>
-        Step {step} of {TOTAL_STEPS}
-      </Text>
-    </View>
-  );
-};
-
-const sb = StyleSheet.create({
-  wrapper: { marginBottom: 22 },
-  track: {
-    height: 4,
-    backgroundColor: colors.border,
-    borderRadius: 4,
-    overflow: "hidden",
-    marginBottom: 6,
-  },
-  fill: {
-    height: "100%",
-    backgroundColor: colors.primary,
-    borderRadius: 4,
-  },
-  label: {
-    fontSize: 12,
-    color: colors.neutralBodyText,
-    letterSpacing: 0.3,
-  },
-});
-
 // ─── Section Header ───────────────────────────────────────────────────────────
 
 const SectionHeader: React.FC<{ icon: string; title: string; sub: string }> = ({
@@ -230,7 +171,7 @@ export default function SignUpScreen() {
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [cardSlide]);
 
   // Button scale feedback
   const buttonScale = useRef(new Animated.Value(1)).current;

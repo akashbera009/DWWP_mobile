@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text} from 'react-native'
 import React from 'react'
 import LinearGradient from 'react-native-linear-gradient';
 import fonts from '@dwwp/utils/fonts';

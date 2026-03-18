@@ -1,4 +1,4 @@
-import notifee, { AndroidBadgeIconType, AndroidImportance, AndroidStyle } from '@notifee/react-native';
+import notifee, { AndroidBadgeIconType, AndroidImportance } from '@notifee/react-native';
 import colors from './colors';
 
 // type notofication = 

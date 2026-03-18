@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useMemo, useRef } from 'react'
+import React, { useMemo } from 'react'
 import DayBar from './DayBar'
 import fonts from '@dwwp/utils/fonts'
 import { normalize } from '@dwwp/utils/dimensions'
@@ -41,11 +41,7 @@ const DailyBreakDown = () => {
     const monthKey = useMemo(() => getCurrentMonthKey(), [])
     const rawdata = useAppSelector(s => s.usage?.months[monthKey]?.days)
 
-    const {
-        monthKeys,
-        values,
-        monthData,
-        totalConsumed,
+    const { 
         entries,
         maxDay,
         avgDay,

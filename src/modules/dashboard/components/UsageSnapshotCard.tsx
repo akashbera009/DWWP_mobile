@@ -59,7 +59,7 @@ export const UsageSnapshotCard: React.FC = () => {
             duration: 800,
             useNativeDriver: false,
         }).start()
-    }, [usagePct])
+    }, [usagePct , barAnim])
 
     const barWidth = barAnim.interpolate({
         inputRange: [0, 100],

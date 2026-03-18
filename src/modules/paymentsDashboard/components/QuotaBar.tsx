@@ -30,11 +30,11 @@ export const QuotaBar: React.FC<{
                 Animated.timing(labelOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
             ]),
         ]).start()
-    }, [])
+    }, [addedAnim , labelOpacity])
 
     const usedPct = Math.min((currentUsage / newLimit) * 100, 100)
     const addedPct = Math.min((addedLimit / newLimit) * 100, 100)
-    const prevUsedPct = Math.min((currentUsage / previousLimit) * 100, 100)
+    // const prevUsedPct = Math.min((currentUsage / previousLimit) * 100, 100)
 
     const addedBarWidth = addedAnim.interpolate({
         inputRange: [0, 1],

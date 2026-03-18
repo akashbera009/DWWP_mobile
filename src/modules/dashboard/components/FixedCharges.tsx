@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 // import colors from '@dwwp/utils/colors'
-import { normalize, vh } from '@dwwp/utils/dimensions'
+import { normalize} from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
 import { useAppSelector } from '@dwwp/store/hooks'
 const colors = {

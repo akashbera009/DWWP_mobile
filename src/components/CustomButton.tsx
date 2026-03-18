@@ -5,7 +5,7 @@ import {
   ViewStyle,
   TextStyle,
   ActivityIndicator,
-  Vibration,
+  // Vibration,
   Pressable,
 } from 'react-native';
 //Custom Imports

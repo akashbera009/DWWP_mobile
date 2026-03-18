@@ -18,21 +18,20 @@
  *   limitExceeded   – same as quotaExceeded (Firebase field alias)
  */
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import {
     View, Text, StyleSheet, Modal, Pressable,
     TouchableOpacity, Platform, Animated, Easing,
     Image,
 } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
-import { normalize, vh, vw } from '@dwwp/utils/dimensions'
+import { normalize, vh} from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
 import ToggleSwitch from '@dwwp/modules/dashboard/components/ToggleSwitch'
 import { localImages } from '@dwwp/utils/localimages'
 import { useAppSelector } from '@dwwp/store/hooks'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { CustomButton } from '@dwwp/components/CustomButton'
-import { navigationRef } from '@dwwp/utils/navigationService'
 import { ToastContainer } from '@dwwp/components/ToastContainer'
 import { PulseDot } from './PulseDot'
 
@@ -63,104 +62,6 @@ const C = {
     inputBg: '#EFF2F5',
     shadow: 'rgba(43,101,104,0.12)',
 }
-
-// // ─── Big animated valve toggle ────────────────────────────────────────────────
-// interface ValveToggleProps {
-//     value: boolean
-//     disabled?: boolean
-//     onToggle: () => void
-// }
-
-// const ValveToggle: React.FC<ValveToggleProps> = ({ value, disabled, onToggle }) => {
-//     const anim = useRef(new Animated.Value(value ? 1 : 0)).current
-//     const glowAnim = useRef(new Animated.Value(value ? 1 : 0)).current
-//     const ripple = useRef(new Animated.Value(0)).current
-
-//     useEffect(() => {
-//         Animated.spring(anim, { toValue: value ? 1 : 0, friction: 6, tension: 120, useNativeDriver: false }).start()
-//         Animated.timing(glowAnim, { toValue: value ? 1 : 0, duration: 300, useNativeDriver: false }).start()
-//     }, [value])
-
-//     const handlePress = () => {
-//         if (disabled) return
-//         // ripple burst
-//         ripple.setValue(0)
-//         Animated.timing(ripple, { toValue: 1, duration: 400, easing: Easing.out(Easing.ease), useNativeDriver: true }).start()
-//         onToggle()
-//     }
-
-//     const TRACK_W = normalize(88)
-//     const TRACK_H = normalize(46)
-//     const THUMB_D = normalize(36)
-
-//     const thumbX = anim.interpolate({ inputRange: [0, 1], outputRange: [normalize(5), TRACK_W - THUMB_D - normalize(5)] })
-//     const trackBg = anim.interpolate({ inputRange: [0, 1], outputRange: [C.inputBg, C.cyan] })
-//     const glowOp = glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 0.4] })
-//     const rippleS = ripple.interpolate({ inputRange: [0, 1], outputRange: [0.8, 2.2] })
-//     const rippleO = ripple.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0.4, 0.2, 0] })
-
-//     return (
-//         <View style={{ alignItems: 'center', gap: normalize(8) }}>
-//             {/* Glow behind track */}
-//             <Animated.View style={[
-//                 styles.toggleGlow,
-//                 { width: TRACK_W + normalize(20), height: TRACK_H + normalize(20), opacity: glowOp, backgroundColor: C.cyan }
-//             ]} />
-
-//             <Pressable onPress={handlePress} disabled={disabled} style={{ zIndex: 1 }}>
-//                 <Animated.View style={[styles.toggleTrack, { width: TRACK_W, height: TRACK_H, backgroundColor: disabled ? C.disabledBg : trackBg }]}>
-//                     {/* Ripple */}
-//                     <Animated.View style={[
-//                         styles.toggleRipple,
-//                         {
-//                             width: THUMB_D, height: THUMB_D, borderRadius: THUMB_D / 2, transform: [{ scale: rippleS }], opacity: rippleO,
-//                             left: thumbX, backgroundColor: value ? C.white : C.cyan
-//                         }
-//                     ]} />
-
-//                     {/* Thumb */}
-//                     <Animated.View style={[
-//                         styles.toggleThumb,
-//                         {
-//                             width: THUMB_D, height: THUMB_D, borderRadius: THUMB_D / 2, left: thumbX,
-//                             backgroundColor: disabled ? C.disabled : C.white
-//                         }
-//                     ]}>
-//                         {/* Icon inside thumb */}
-//                         <Text style={[styles.thumbIcon, { opacity: disabled ? 0.4 : 1 }]}>
-//                             {value && !disabled ? '💧' : disabled ? '🔒' : '⏸'}
-//                         </Text>
-//                     </Animated.View>
-//                 </Animated.View>
-//             </Pressable>
-
-//             {/* State label under toggle */}
-//             <Text style={[
-//                 styles.toggleLabel,
-//                 { color: disabled ? C.disabled : value ? C.cyan : C.bodyText }
-//             ]}>
-//                 {disabled ? 'LOCKED' : value ? 'SUPPLY ACTIVE' : 'SUPPLY PAUSED'}
-//             </Text>
-//         </View>
-//     )
-// }
-
-// ─── shake hook ──────────────────────────────────────────────────────────────
-function useShake() {
-    const anim = useRef(new Animated.Value(0)).current
-    const shake = () => {
-        Animated.sequence([
-            Animated.timing(anim, { toValue: -10, duration: 60, useNativeDriver: true }),
-            Animated.timing(anim, { toValue: 10, duration: 60, useNativeDriver: true }),
-            Animated.timing(anim, { toValue: -7, duration: 60, useNativeDriver: true }),
-            Animated.timing(anim, { toValue: 7, duration: 60, useNativeDriver: true }),
-            Animated.timing(anim, { toValue: 0, duration: 60, useNativeDriver: true }),
-        ]).start()
-    }
-    const style = { transform: [{ translateX: anim }] }
-    return { shake, style }
-}
-
 // ─── Component ────────────────────────────────────────────────────────────────
 interface Props {
     onClose: () => void
@@ -169,13 +70,8 @@ interface Props {
 const ControlSwitchModal: React.FC<Props> = ({ onClose }) => {
 
     const { servoState } = useAppSelector(s => s.servo)
-    const [localState, setLocalState] = useState(servoState)
     const { lastSeen } = useAppSelector(s => s.servo)
-    const isDirty = localState !== servoState
-
-
     const sheetAnim = useRef(new Animated.Value(600)).current
-    const { shake, style: shakeStyle } = useShake()
 
     // Slide in
     useEffect(() => {

@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, View } from 'react-native'
 import React from 'react'
 import { screenNames } from '@dwwp/utils/screenNames'
 import { CustomHeader } from '@dwwp/components/CustomHeader'

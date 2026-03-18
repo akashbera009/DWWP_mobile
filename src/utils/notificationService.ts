@@ -3,12 +3,8 @@
 // } from '@react-native-firebase/messaging';
 
 import notifee, {
-    AndroidBadgeIconType,
-    AndroidImportance,
-    AndroidStyle,
     EventType,
     Event,
-    Notification,
 } from '@notifee/react-native';
 
 // import { navigate } from './navigationRef';

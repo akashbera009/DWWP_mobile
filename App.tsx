@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet} from "react-native";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -10,7 +10,6 @@ import { PortalProvider, PortalHost } from '@gorhom/portal';
 // import store, { persister } from './src/store/oldindex';
 import { navigationRef } from '@dwwp/utils/navigationService';
 import { ToastContainer } from "@dwwp/components/ToastContainer";
-import SafeAreaContainer from "@dwwp/components/SafeAreaContainer";
 
 import notifee, { EventType } from '@notifee/react-native';
 import { store } from "@dwwp/store";

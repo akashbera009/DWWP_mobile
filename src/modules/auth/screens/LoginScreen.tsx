@@ -2,12 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   Animated,
   Easing,
-  Modal,
   KeyboardAvoidingView,
   Platform,
   StatusBar,
@@ -30,9 +28,6 @@ import fonts from "@dwwp/utils/fonts";
 import { strings } from "@dwwp/utils/strings";
 import { localImages } from "@dwwp/utils/localimages";
 import { vh } from "@dwwp/utils/dimensions";
-
-
-// ─── Loading Popup ────────────────────────────────────────────────────────────
 
 // ─── Login Screen ─────────────────────────────────────────────────────────────
 

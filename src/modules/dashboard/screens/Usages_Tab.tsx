@@ -89,13 +89,6 @@ export interface MonthData {
     dailyUsages: Record<string, number>    // { "2025-01-04": 18.5, ... }
 }
 
-interface Props {
-    // monthData: MonthData
-    // addons?: AddonEntry[]
-    // monthLabel?: string                      // e.g. "January 2025"
-    // onBack?: () => void
-}
-
 // ─── Animated progress bar ────────────────────────────────────────────────────
 interface ProgressBarProps {
     pct: number        // 0–1
@@ -129,7 +122,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
                 })
             ).start()
         }
-    }, [pct])
+    }, [shimAnim,pct])
 
     const barWidth = anim.interpolate({
         inputRange: [0, 1],
@@ -331,7 +324,7 @@ const Usages_Tab = () => {
             filteredAddons
         }
 
-    }, [monthData, todayUse, addons, monthKeyId])
+    }, [monthLimit, monthData, todayUse, addons, monthKeyId])
 
     const [baseQuotaCollapse, setBaseQuotaCollapse] = useState<boolean>(false)
     const [addonSectionCollapse, setAddonSectionCollapse] = useState<boolean>(true)
@@ -351,21 +344,21 @@ const Usages_Tab = () => {
     })
 
     // Status
-    const statusColor =
-        monthData.limitExceeded
-            ? C.error
-            : overallPct > 0.85
-                ? C.warning
-                : C.success
+    // const statusColor =
+    //     monthData.limitExceeded
+    //         ? C.error
+    //         : overallPct > 0.85
+    //             ? C.warning
+    //             : C.success
 
     // Header scroll for parallax feel
     const scrollY = useRef(new Animated.Value(0)).current
 
-    const headerH = scrollY.interpolate({
-        inputRange: [0, 80],
-        outputRange: [normalize(160), normalize(100)],
-        extrapolate: 'clamp'
-    })
+    // const headerH = scrollY.interpolate({
+    //     inputRange: [0, 80],
+    //     outputRange: [normalize(160), normalize(100)],
+    //     extrapolate: 'clamp'
+    // })
     return (
         <View style={styles.screen}>
 

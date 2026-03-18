@@ -34,7 +34,7 @@ const Mini_Monthly_Usage_Chart = () => {
         temp = temp.reverse().slice(0, 6).reverse()
         temp.push({ month: currenMonthKey, value: thisMonthUsages })
         setFinalObjectArray(temp);
-    }, [])
+    }, [currenMonthKey , thisMonthUsages , usedInLitres , monthKeys])
     useEffect(() => {
         if (finalObjectArray.length === 0) return
         setActiveBar(finalObjectArray.length - 1)

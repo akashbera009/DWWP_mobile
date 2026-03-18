@@ -15,7 +15,7 @@ import {
     View, Text, StyleSheet, Animated, Pressable, Easing,
 } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
-import { normalize, vh, vw } from '@dwwp/utils/dimensions'
+import { normalize} from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
 import { useAppSelector } from '@dwwp/store/hooks'
 
@@ -127,7 +127,7 @@ type OnlineStatusPropType = {
 export const OnlineStatus = ({ handleSetActivetab }: OnlineStatusPropType) => {
     const lastSeen = useAppSelector(state => state?.servo?.lastSeen)
 
-    const [tick, setTick] = useState(0)
+    const [_, setTick] = useState(0)
 
     // trigger re-render every 5 seconds
     useEffect(() => {
@@ -139,7 +139,7 @@ export const OnlineStatus = ({ handleSetActivetab }: OnlineStatusPropType) => {
 
     const level = calcLevel(Number(lastSeen))
     const label = calcLabel(Number(lastSeen))
-    const isOnline = level == 'online'
+    const isOnline = level === 'online'
     const dot = levelColor[level]
 
     const arcAnims = useWifiAnims(isOnline)

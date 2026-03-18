@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react'
 import {
-    View, Text, StyleSheet, Animated, Platform, Image
+    View, Text, StyleSheet, Animated, Image
 } from 'react-native'
 import ToggleSwitch from './ToggleSwitch'
 import { useAppSelector } from '@dwwp/store/hooks'
@@ -48,7 +48,7 @@ const C = {
  *   3. Locked   — quota exceeded, toggle hidden, recharge CTA shown
  */
 export const WaterControlCard: React.FC = () => {
-    const { servoState, lastSeen } = useAppSelector(s => s.servo)
+    const { servoState} = useAppSelector(s => s.servo)
 
     // ── derive contextual flags ────────────────────────────────────────────────
     // Replace these with your real selectors once wired up
@@ -63,7 +63,7 @@ export const WaterControlCard: React.FC = () => {
         Animated.spring(entryAnim, {
             toValue: 1, friction: 9, tension: 50, useNativeDriver: true,
         }).start()
-    }, [])
+    }, [entryAnim])
 
     const cardStyle = {
         opacity: entryAnim,

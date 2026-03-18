@@ -8,7 +8,7 @@ import {
 import { Portal } from '@gorhom/portal'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 // utils 
-import { screenWidth, vh, vw } from '@dwwp/utils/dimensions'
+import { screenWidth,vw } from '@dwwp/utils/dimensions'
 import colors from '@dwwp/utils/colors'
 
 // components
@@ -16,9 +16,8 @@ import Header from '../components/Header'
 import ProfilePanel from '../components/ProfilePanel'
 import NotificationPanel from '../components/NotificationPanel'
 import ControlSwitchModal from '../components/ControlSwitchModal'
-import DeviceSection from '../components/DeviceSection'
 import DashBoardPage from './DashBoardPage'
-import Usages_Tab, { MOCK_ADDONS, MOCK_MONTH_DATA } from './Usages_Tab'
+import Usages_Tab from './Usages_Tab'
 
 // redux
 import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks'

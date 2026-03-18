@@ -1,5 +1,3 @@
-import { Transaction } from "@react-native-firebase/app/dist/module/internal/web/firebaseFirestore";
-
 export const strings = {
     dwwp: 'DWWP',
     userDashboard: 'User Dashboard',

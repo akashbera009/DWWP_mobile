@@ -63,7 +63,7 @@ export const LoadingPopup: React.FC<LoadingPopupProps> = ({
       dot2.setValue(0);
       dot3.setValue(0);
     }
-  }, [visible]);
+  }, [visible , dot1 , dot2 , dot3 , opacityAnim]);
 
   const dotStyle = (anim: Animated.Value) => ({
     transform: [

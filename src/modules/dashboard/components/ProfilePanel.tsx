@@ -1,5 +1,5 @@
-import { Image, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { cache, useEffect, useState } from 'react'
+import { Image,  StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import colors from '@dwwp/utils/colors'
 import fonts from '@dwwp/utils/fonts'

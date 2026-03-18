@@ -52,7 +52,7 @@ const DayBar: React.FC<DayBarProps> = ({ day, value, max, isToday, avg }) => {
             easing: Easing.out(Easing.quad),
             useNativeDriver: false,
         }).start()
-    }, [value, max])
+    }, [anim, day, value, max])
 
     const barH = anim.interpolate({ inputRange: [0, 1], outputRange: [normalize(3), BAR_MAX_H] })
     const barColor = value > avg * 1.3 ? C.error : value > avg * 1.1 ? C.warning : C.cyan

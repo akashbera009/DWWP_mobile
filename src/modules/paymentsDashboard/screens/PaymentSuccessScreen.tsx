@@ -72,7 +72,7 @@ const PaymentSuccessScreen = ({ navigation, route }: Props) => {
     addon
   } = route?.params
   // ── Redux ──────────────────────────────────────────────────────────────────
-  const { currentMonthId, months, todayUsage } = useAppSelector(s => s.usage)
+  const { currentMonthId, months } = useAppSelector(s => s.usage)
   if (currentMonthId === null) return
   const currentMonth = months?.[currentMonthId]
   const currentUsage = currentMonth?.total ?? 0

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useMemo } from 'react'
 import fonts from '@dwwp/utils/fonts'
-import { normalize, vh, vw } from '@dwwp/utils/dimensions'
+import { normalize, vh} from '@dwwp/utils/dimensions'
 import { getCurrentMonthKey } from '@dwwp/utils/commonFunctions'
 import { useAppSelector } from '@dwwp/store/hooks'
 
@@ -46,7 +46,6 @@ const EffectiveTotal = () => {
         totalConsumed,
         totalAddonLiters,
         effectiveLimit,
-        baseConsumed,
         addonConsumed,
         remaining,
         overUsed,

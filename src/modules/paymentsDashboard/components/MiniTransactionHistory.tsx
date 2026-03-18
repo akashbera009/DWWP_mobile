@@ -11,7 +11,6 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
-import TransactionItem from './TransactionItem';
 import { normalize, vh, vw } from '@dwwp/utils/dimensions';
 import colors from '@dwwp/utils/colors';
 import fonts from '@dwwp/utils/fonts';
@@ -120,7 +119,6 @@ const TransactionHistory = ({ scrollToBottom }: TransactionHistoryScreenProps) =
             {!isTransactionLoading ?
               <>
                 {latestTransactions.map((txn, index) => (
-                  // <TransactionItem index={index} key={index.toString()} item={txn as any} />
                   <View
                     key={index}>
                     {txn?.type === 'addon' ?

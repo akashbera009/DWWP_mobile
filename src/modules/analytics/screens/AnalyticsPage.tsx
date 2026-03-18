@@ -17,7 +17,6 @@ const SCREEN_WIDTH = screenWidth;
 const MARGIN_BOTH_SIDE = vw(16)
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const fmt = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(2)}kL` : `${Math.round(n)}L`
-const fmtD = (n: number) => `${n.toFixed(1)}L`
 
 // ─── Theme ────────────────────────────────────────────────────────────────────
 const C = {
@@ -98,9 +97,7 @@ const AnalyticsPage = () => {
       <View style={styles.homeHeaderContainer}>
         <Text style={styles.homeHeaderText}>{strings.analytics}</Text>
       </View>
-      <View style={styles.stickeyHeader}>
-
-      </View>
+      <View style={styles.stickeyHeader} />
       <ScrollView style={styles.scrollview}>
         <ScrollView
           ref={innerScrollRef}

@@ -24,6 +24,7 @@ import Avatar from '../dashboard/components/Avatar';
 import { logout } from '../auth/authAction';
 import { LoadingPopup } from '../auth/components/LoadingPopup';
 import Pill from '../dashboard/components/Pill';
+import { useSelector } from 'react-redux';
 
 const ViewProfileScreen = () => {
   const { top } = useSafeAreaInsets()
@@ -42,7 +43,7 @@ const ViewProfileScreen = () => {
       meterNumber: userSelector?.meterNumber,
       supplyZone: userSelector?.supplyZone,
     })
-  }, []);
+  }, [userSelector?.emailId]);
 
   const [logouLoading, setLogOutLoading] = useState<boolean>(false)
   const handleLogOut = async () => {
@@ -54,7 +55,7 @@ const ViewProfileScreen = () => {
         routes: [{ name: screenNames.AuthStack }],
       })
     } catch (error) {
-      console.error('logout error')
+      console.error('logout error' , error)
     } finally {
       setLogOutLoading(true)
     }

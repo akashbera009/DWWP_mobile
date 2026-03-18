@@ -50,3 +50,6 @@ online status needs listner
 check if we can remove the redundant today usage in the redux state 
 
 bill calculations are wrong in respect to the penalty 
+
+
+add vibtration to the buttons 

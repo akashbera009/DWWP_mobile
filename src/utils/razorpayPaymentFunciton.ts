@@ -1,13 +1,9 @@
-import RazorpayCheckout, { CheckoutOptions } from 'react-native-razorpay';
+import RazorpayCheckout from 'react-native-razorpay';
 import Config from 'react-native-config';
 import colors from './colors';
 import { strings } from './strings';
 import { useAppSelector } from '@dwwp/store/hooks';
 
-type requestPayloadType = {
-    amount?: number,
-    type?: string
-}
 export const useRazorpayPayment = () => {
     let userData = {
         name: '',

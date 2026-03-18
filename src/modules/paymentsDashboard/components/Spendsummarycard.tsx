@@ -19,7 +19,7 @@ const SpendSummaryCard: React.FC<Props> = ({ totalSpent, totalUsage, pendingAmou
       Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, damping: 14, stiffness: 100 }),
       Animated.timing(glowAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
     ]).start();
-  }, []);
+  }, [scaleAnim,glowAnim]);
 
   return (
     <Animated.View style={[styles.card, { transform: [{ scale: scaleAnim }], opacity: glowAnim }]}>

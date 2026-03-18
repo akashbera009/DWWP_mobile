@@ -1,7 +1,6 @@
 import React, { useRef, useState, useMemo, useCallback } from 'react'
 import {
-  View, Text, StyleSheet, FlatList, Pressable,
-  Animated, Dimensions, TextInput, Image,
+  View, Text, StyleSheet, FlatList, Pressable,TextInput, Image,
   TouchableOpacity, Modal, ScrollView,
 } from 'react-native'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
@@ -14,8 +13,6 @@ import { CustomHeader } from '@dwwp/components/CustomHeader'
 import { AddonCard, PaymentCard } from '../components/AddonAndRechargeCardComponent'
 import { Portal } from '@gorhom/portal'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-
-const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window')
 
 // ─── Color palette ────────────────────────────────────────────────────────────
 const C = {
@@ -301,7 +298,7 @@ const FilterPanel: React.FC<{
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-const SimplifiedPaymentHistory: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
+const SimplifiedPaymentHistory=() => {
   const { paymentsHistory, addonsHistory } = useAppSelector(
     s => s.payment.transactionHistory
   ) as { paymentsHistory: PaymentRecord[]; addonsHistory: AddonRecord[] }

@@ -112,12 +112,6 @@ const QuickLinks: React.FC = () => {
             }
         },
         {
-            label: 'Do a Quick Recharge',
-            onPress: () => {
-                navigation.navigate(screenNames.AddonRechargesScreen)
-            }
-        },
-        {
             label: 'Pay Dues',
             onPress: () => {
                 bottomNavigation.navigate(screenNames.PaymentDashBoard)
@@ -127,7 +121,7 @@ const QuickLinks: React.FC = () => {
 
     useEffect(() => {
         Animated.timing(headerAnim, { toValue: 1, duration: 250, useNativeDriver: true }).start();
-    }, []);
+    }, [headerAnim]);
 
     return (
         <View style={styles.wrapper}>

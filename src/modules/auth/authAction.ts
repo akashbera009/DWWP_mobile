@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
 
-import { createUserWithEmailAndPassword, FirebaseAuthTypes, getAuth, signInWithEmailAndPassword } from "@react-native-firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from "@react-native-firebase/auth";
 
 import firestore from "@react-native-firebase/firestore"
 
@@ -9,26 +9,6 @@ import { persistor } from "@dwwp/store"
 import { AuthUser, RegisterPayload } from '@dwwp/modals'
 import { clearAll } from "@dwwp/utils/mmkvStorage"
 import { showInfoSnackbar } from "@dwwp/utils/showSnackBar";
-
-const ADMIN_DOC = "adminConfig"
-
-// async function checkIsAdmin(email: string): Promise<boolean> {
-//     try {
-//         const snap = await firestore()
-//             .collection("admin")
-//             .doc(ADMIN_DOC)
-//             .get()
-
-//         const list: string[] = snap.data()?.["01ListOfAdmin"] ?? []
-
-//         return list
-//             .map((e: string) => e.toLowerCase())
-//             .includes(email.toLowerCase())
-
-//     } catch {
-//         return false
-//     }
-// }
 
 export const loginWithEmail = createAsyncThunk<
     AuthUser,

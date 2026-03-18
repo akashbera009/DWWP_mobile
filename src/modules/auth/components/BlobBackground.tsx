@@ -1,9 +1,8 @@
-import { StyleSheet, Text, View, Animated, Easing } from 'react-native'
+import { StyleSheet, View, Animated, Easing } from 'react-native'
 import React, { useEffect, useRef } from 'react'
-import { screenHeight, screenWidth } from '@dwwp/utils/dimensions';
+import { screenWidth } from '@dwwp/utils/dimensions';
 import colors from '@dwwp/utils/colors';
 
-const height = screenHeight
 const width = screenWidth
 const BlobBackground: React.FC = () => {
     const blob1 = useRef(new Animated.Value(0)).current;

@@ -76,7 +76,7 @@ const usageSlice = createSlice({
 
     // ── stopCurrentMonthListener ────────────────
     builder
-      .addCase(stopCurrentMonthListener.fulfilled, (state) => {
+      .addCase(stopCurrentMonthListener.fulfilled, () => {
         // Nothing to update in state; listener is stopped
       })
 

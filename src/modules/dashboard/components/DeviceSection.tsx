@@ -1,7 +1,6 @@
 import {
     StyleSheet, Text,
     View,
-    Animated,
     TouchableOpacity
 } from 'react-native'
 import React from 'react'

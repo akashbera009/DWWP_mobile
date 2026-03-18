@@ -169,7 +169,7 @@ const SuccessModal: React.FC<{
       cardScale.setValue(0.82)
       checkScale.setValue(0)
     }
-  }, [visible])
+  }, [cardScale,checkScale,opacity,visible])
 
   if (!visible) return null
 
@@ -350,7 +350,7 @@ const RaiseComplaintScreen: React.FC<{ onBack?: () => void }> = ({ onBack }) => 
       <CustomHeader screenName="Raise Complaint" />
 
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        style={styles.keyboardView}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView
@@ -493,13 +493,10 @@ export default RaiseComplaintScreen
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const CAT_CARD_W = (SCREEN_W - vw(32) - normalize(10) * 4) / 3
-
-const C_purple = '#7C5CBF'
-
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: C.bg },
   scroll: { paddingHorizontal: vw(16), paddingBottom: vh(40), gap: normalize(4) },
-
+  keyboardView :{ flex: 1 },
   // Sections
   section: { marginTop: vh(20) },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: normalize(6), marginBottom: vh(4) },

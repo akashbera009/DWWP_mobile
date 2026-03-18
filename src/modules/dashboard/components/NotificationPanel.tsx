@@ -6,7 +6,6 @@ import fonts from '@dwwp/utils/fonts'
 import colors from '@dwwp/utils/colors'
 import { useAppSelector } from '@dwwp/store/hooks'
 import { BroadcastMsg } from '@dwwp/modals'
-import { TouchableWithoutFeedback } from '@gorhom/bottom-sheet'
 
 const NotificationPanel = ({ onClose }: { onClose: () => void }) => {
     const [notifications, setNoticications] = useState<BroadcastMsg[] | null>([])

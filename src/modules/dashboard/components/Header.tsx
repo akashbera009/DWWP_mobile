@@ -3,7 +3,6 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withSpring,
-    withTiming
 } from 'react-native-reanimated'
 import React, { useEffect, useState } from 'react'
 import LinearGradient from 'react-native-linear-gradient';

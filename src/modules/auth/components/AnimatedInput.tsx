@@ -53,7 +53,7 @@ const AnimatedInput: React.FC<AnimatedInputProps> = ({
             duration: 220,
             useNativeDriver: false,
         }).start();
-    }, [focused]);
+    }, [focused , focusAnim]);
 
     const borderColor = focusAnim.interpolate({
         inputRange: [0, 1],

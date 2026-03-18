@@ -9,9 +9,7 @@ type Props = {
   ignoreTop?: boolean; // optional override
 };
 
-const SafeAreaContainer = ({ children, ignoreTop: ignoreTopProp }: Props) => {
-//   const { color, ignoreTop: ignoreTopFromCtx } = useSafeAreaColor();
-
+const SafeAreaContainer = ({ children}: Props) => {
   const ignoreTop = false
     // typeof ignoreTopProp === 'boolean' ? ignoreTopProp : ignoreTopFromCtx;
 //    ignoreTopProp
