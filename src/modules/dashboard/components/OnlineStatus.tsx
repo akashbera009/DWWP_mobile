@@ -78,7 +78,7 @@ function useWifiAnims(isOnline: boolean) {
             const sequence = Animated.loop(
                 Animated.stagger(
                     180,
-                    anims.map(a =>
+                    anims?.map(a =>
                         Animated.sequence([
                             Animated.timing(a, { toValue: 1, duration: 420, easing: Easing.out(Easing.quad), useNativeDriver: true }),
                             Animated.timing(a, { toValue: 0.35, duration: 420, easing: Easing.in(Easing.quad), useNativeDriver: true }),
@@ -122,14 +122,8 @@ function usePulse(active: boolean) {
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
-interface Props {
-
-}
-
-export const OnlineStatus: React.FC<Props> = () => {
-    // Refresh label every 5 s
-
-    const lastSeen = useAppSelector(state => state.servo.lastSeen)
+export const OnlineStatus= () => {
+    const lastSeen = useAppSelector(state => state?.servo?.lastSeen)
 
     const [tick, setTick] = useState(0)
 
@@ -140,7 +134,7 @@ export const OnlineStatus: React.FC<Props> = () => {
         }, 1000)
         return () => clearInterval(id)
     }, [])
-
+ 
     const level = calcLevel(Number(lastSeen))
     const label = calcLabel(Number(lastSeen))
     const isOnline = level == 'online'
@@ -186,7 +180,7 @@ export const OnlineStatus: React.FC<Props> = () => {
 
                         {/* Arcs – rendered bottom-up: arc[0]=inner, arc[2]=outer */}
                         <View style={styles.arcStack}>
-                            {arcAnims.map((anim, i) => {
+                            {arcAnims?.map((anim, i) => {
                                 const SIZE = normalize(22 + i * 20)   // 22 / 42 / 62
                                 const THICK = normalize(3.5 - i * 0.5) // 3.5 / 3 / 2.5
                                 return (

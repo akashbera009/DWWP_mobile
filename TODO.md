@@ -44,15 +44,19 @@ need a listner for the recharge section if it is done , it trigger and calculate
 circlegauge is having double arcs in the usage_tab.tsx 
 
 
-crash in first install=> HeroSummaryCard.tsx:90 React has detected a change in the order of Hooks called by HeroSummaryCard. 
+crash in first install=> (HeroSummaryCard.tsx:90[resolved ]) new in usagesSnapshotcard React has detected a change in the order of Hooks called by HeroSummaryCard. 
  undefined           =>      useRef
 
 
 payment modal header text be modified professionally 
 
-notification sound is not working 
 date and time of the payment receipt be added from props , not now()
 we will reuse paymentsuccessscreen , as part of view details of payments screen 
 
 
 usage_tab view all button is not working 
+
+online status needs listner 
+check if we can remove the redundant today usage in the redux state 
+
+bill calculations are wrong in respect to the penalty 

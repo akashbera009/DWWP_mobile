@@ -21,9 +21,11 @@ import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks';
 import { confirmAddonPayment } from '../paymentAction';
 import { addBroadcast } from '@dwwp/modules/dashboard/dashboardSlice';
 import { useNavigation } from '@react-navigation/native';
-import { MainStackParamList, payCurrentBillType, successPayload } from '@dwwp/utils/types';
+import { billObjectType, MainStackParamList, payCurrentBillType, successPayload } from '@dwwp/utils/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { screenNames } from '@dwwp/utils/screenNames';
+import { selectCurrentMonthLimit, selectCurrentMonthTotal } from '@dwwp/modules/dashboard/usageSelectors';
+import { getCurrentMonthKey } from '@dwwp/utils/commonFunctions';
 
 export interface BillingCardProps {
     amount: number;
@@ -33,31 +35,63 @@ export interface BillingCardProps {
     onPayPress: () => void;
 }
 
-const isLastDayOfMonth = () => {
-    // const today = new Date();
-    // const tomorrow = new Date(today);
-    // tomorrow.setDate(today.getDate() + 1);
-    // return tomorrow.getDate() === 1;
-    return true;
-};
 type MainStackNavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
 const CurrentBillComponent = () => {
     const navigation = useNavigation<MainStackNavigationProp>();
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-    const dummyBillObject = {
-        amount: 250.75,
-        usage: 120,
-        dueDate: '2026-03-04',
-        isPaid: false,
+
+    const todayUsage = useAppSelector(s => s?.usage?.todayUsage)
+    const price = useAppSelector(state => state?.dashboard?.priceConfig?.regularPrice)
+    const monthTotal = useAppSelector(selectCurrentMonthTotal)
+    const monthLimit = useAppSelector(selectCurrentMonthLimit)
+    const billAmount = React.useMemo(() => {
+        if (!price) return 0
+        return (price * todayUsage).toFixed(0)
+    }, [price, todayUsage])
+
+    const monthBillAmount = React.useMemo(() => {
+        if (!price) return 0
+        return (price * monthTotal).toFixed(0)
+    }, [price, monthTotal])
+
+    const [nextBillRemainingDays, setNextBillRemainingDays] = useState<number>(0);
+
+    useEffect(() => {
+        const now = new Date();
+
+        const daysInMonth = (year: number, month: number) =>
+            new Date(year, month, 0).getDate();
+
+        const billingCycle = daysInMonth(now.getFullYear(), now.getMonth() + 1);
+        const remainingDays = billingCycle - now.getDate();
+
+        setNextBillRemainingDays(remainingDays);
+    }, []);
+    // get paymentstatus
+    const transactions = useAppSelector(s => s?.payment?.payments)
+    const monthKey = getCurrentMonthKey()
+    const [isPaid, setIsPaid] = useState(false)
+    useEffect(() => {
+        const res = transactions.find(entry =>
+            (entry?.forMonth === monthKey) && (entry?.status === 'Completed')
+        )
+        if (res) setIsPaid(true)
+        else setIsPaid(false)
+    }, [])
+
+    const billObject: billObjectType = {
+        amount: String(monthBillAmount),
+        usage: monthTotal,
+        dueDate: nextBillRemainingDays,
+        isPaid: isPaid,
     };
 
     const scaleAnim = useRef(new Animated.Value(1)).current;
     const pulseAnim = useRef(new Animated.Value(1)).current;
 
-    const isMonthEnd = isLastDayOfMonth();
-    const isDisabled = dummyBillObject.isPaid || !isMonthEnd;
-    const isPaid = dummyBillObject.isPaid;
+    const isMonthEnd = nextBillRemainingDays >=0 && nextBillRemainingDays < 2 ;
+    const isDisabled = billObject.isPaid || !isMonthEnd;
     const [loading, setLoading] = useState(false)
     const dispatch = useAppDispatch()
     const emailId = useAppSelector(s => s.dashboard?.userDetails?.emailId)
@@ -158,10 +192,10 @@ const CurrentBillComponent = () => {
             // navigate to success screen 
             navigation.navigate(screenNames.PaymentSuccessScreen, {
                 payment_id,
-                amount : amount* 100,
+                amount: amount * 100,
                 qty,
                 refill,
-                addon : 'addon'
+                addon: 'addon'
             })
         } catch (error) {
             console.log(error);
@@ -208,7 +242,7 @@ const CurrentBillComponent = () => {
                 {/* Amount display */}
                 <View style={styles.amountRow}>
                     <Text style={styles.currencySymbol}>₹</Text>
-                    <Text style={styles.amountText}>{dummyBillObject.amount.toFixed(2)}</Text>
+                    <Text style={styles.amountText}>{billObject.amount}</Text>
                 </View>
 
                 {/* Stats row */}
@@ -217,8 +251,8 @@ const CurrentBillComponent = () => {
                         <Image source={localImages.usages}
                             style={styles.Stateicon} />
                         <View>
-                            <Text style={styles.statValue}>{dummyBillObject.usage} L</Text>
-                            <Text style={styles.statLabel}>Usage</Text>
+                            <Text style={styles.statValue}>{billObject.usage} L</Text>
+                            <Text style={styles.statLabel}>Used</Text>
                         </View>
                     </View>
                     <View style={styles.statDivider} />
@@ -226,8 +260,8 @@ const CurrentBillComponent = () => {
                         <Image source={localImages.calendar}
                             style={styles.Stateicon} />
                         <View>
-                            <Text style={styles.statValue}>{dummyBillObject.dueDate}</Text>
-                            <Text style={styles.statLabel}>Due Date</Text>
+                            <Text style={styles.statValue}>{billObject.dueDate}</Text>
+                            <Text style={styles.statLabel}>Days left</Text>
                         </View>
                     </View>
                 </View>
@@ -255,7 +289,7 @@ const CurrentBillComponent = () => {
                 onProceedPayment={onProceedPayment}
                 onCancelProceed={onCancelProceed}
                 amount={10}
-                type ={'recharge'}
+                type={'recharge'}
                 refill='10'
             />
 

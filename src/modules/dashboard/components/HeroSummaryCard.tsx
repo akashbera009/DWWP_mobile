@@ -13,7 +13,7 @@ import Animated, {
     withSpring,
 } from 'react-native-reanimated'
 import { useAppSelector } from '@dwwp/store/hooks'
-import { selectCurrentMonthLimit, selectCurrentMonthTotal, selectLimitExceeded, selectTodayUsage } from '../usageSelectors'
+import { selectCurrentMonthLimit, selectCurrentMonthTotal, selectTodayUsage } from '../usageSelectors'
 
 // ─── Tuning constants ─────────────────────────────────────────────────────────
 //
@@ -44,11 +44,8 @@ const clamp = (v: number, lo: number, hi: number) => {
 }
 
 const HeroSummaryCard: React.FC = () => {
-    const price = useAppSelector(state => state.dashboard.priceConfig?.regularPrice)
 
-    // const todayKey = getTodayKey()
-    // const monthKey = getCurrentMonthKey()
-
+    const price = useAppSelector(state => state?.dashboard?.priceConfig?.regularPrice)
     const todayUsage = useAppSelector(selectTodayUsage)
     const monthTotal = useAppSelector(selectCurrentMonthTotal)
     const monthLimit = useAppSelector(selectCurrentMonthLimit)

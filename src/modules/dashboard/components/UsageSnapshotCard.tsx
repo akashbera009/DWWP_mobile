@@ -38,10 +38,10 @@ const C = {
  * All data from Redux usage slice.
  */
 export const UsageSnapshotCard: React.FC = () => {
-    const { todayUsage, allTimeDaysTotal, currentMonthId, months } = useAppSelector(s => s.usage)
+    const { todayUsage, allTimeDaysTotal, currentMonthId, months } = useAppSelector(s => s?.usage)
 
     // ── derive values ──────────────────────────────────────────────────────────
-    const MONTHLY_LIMIT = useAppSelector(s => s.dashboard.limitConfig?.regular)
+    const MONTHLY_LIMIT = useAppSelector(s => s?.dashboard?.limitConfig?.regular)
     if (currentMonthId === null) return
     const currentMonthUsage = months?.[currentMonthId]?.total ?? 0
     const lastMonthKeys = Object.keys(months ?? {}).sort()

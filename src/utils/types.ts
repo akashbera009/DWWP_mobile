@@ -67,6 +67,12 @@ export interface payCurrentBillType {
     refill: number
     qty: number
 }
+export type billObjectType = {
+    amount: string,
+    usage: number,
+    dueDate: number,
+    isPaid: boolean
+}
 export interface successPayload {
     payment_id: string,
     amount: number,
