@@ -142,6 +142,7 @@ const CurrentBillComponent = () => {
                         amount,
                         refill,
                         qty,
+                         addon:'regular'
                     })
             } else {
                 showWarningSnackbar('Payment Cancelled by User')
@@ -431,11 +432,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: vw(8),
+        marginLeft : vw(4)
     },
     Stateicon: {
         height: vh(22),
         width: vh(22),
-        marginRight: vw(6),
+        marginRight: vw(2),
         tintColor: colors.black
     },
     statIcon: {
@@ -483,7 +485,7 @@ const styles = StyleSheet.create({
     buttonText: {
         fontFamily: fonts.Bold,
         fontSize: normalize(15),
-        color: colors.white,
+        color: colors.grayScaleColor,
         letterSpacing: 0.2,
     },
 

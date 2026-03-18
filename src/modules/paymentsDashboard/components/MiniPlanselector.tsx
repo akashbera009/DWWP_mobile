@@ -182,7 +182,7 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
     if (!selectedPlan) return;
     payCurrentBill({
       amount: totalPrice,
-      refill: 1000,
+      refill:  totalVolume,
       qty: qty
     })
   };
@@ -202,6 +202,7 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
             amount,
             refill,
             qty,
+            addon:"addon"
           })
       } else {
         showWarningSnackbar('Payment Cancelled by User')
@@ -212,11 +213,14 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
       showErrorSnackbar('Payment failed ')
     } finally {
       setIsLoading(false);
-    } 
+    }
   };
 
   const onSuccess = async ({ payment_id, amount, qty = 1, refill, addon }: successPayload) => {
     try {
+      //close qtyModal
+      setIsModalVisible(false)
+
       displayNotification({
         title: '⚡ Recharge Successful',
         body: `Your recharge of ₹${amount} was for refill ${refill}L processed successfully
@@ -233,7 +237,7 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
           email: emailId,
           razorPayId: payment_id,
           amount: amount,
-          quantityDone: 0,
+          quantityDone: qty,
           refill: refill,
         })).then(res => {
           console.log('firebase writing response is ', res);

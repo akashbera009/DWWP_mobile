@@ -30,11 +30,12 @@ import QuickLinks from '../components/Quicklinks'
 type DashBoardPagePropsType = {
     setIsSwitchModalOpen: () => void
     refreshDashboard: () => void
+    handleSetActivetab: (idx: number) => void
 }
 
 type BottomStackNavigation = NativeStackNavigationProp<BottomTabParamList>;
 
-const DashBoardPage = ({ setIsSwitchModalOpen, refreshDashboard }: DashBoardPagePropsType) => {
+const DashBoardPage = ({ setIsSwitchModalOpen, refreshDashboard, handleSetActivetab }: DashBoardPagePropsType) => {
     const [refreshing, setRefreshing] = React.useState(false);
     const bottomStackNavigation = useNavigation<BottomStackNavigation>()
 
@@ -49,7 +50,7 @@ const DashBoardPage = ({ setIsSwitchModalOpen, refreshDashboard }: DashBoardPage
 
     const handleViewMonthlyUsagesPress = () => {
         bottomStackNavigation.navigate(screenNames.AnalyticsPage)
-    } 
+    }
     return (
         <View
             style={styles.container}
@@ -67,7 +68,7 @@ const DashBoardPage = ({ setIsSwitchModalOpen, refreshDashboard }: DashBoardPage
                 }
             >
                 {/* Welcome Row */}
-                <WelcomeBanner/>
+                <WelcomeBanner />
 
                 {/* Hero Summary Card */}
                 <HeroSummaryCard />
@@ -78,6 +79,7 @@ const DashBoardPage = ({ setIsSwitchModalOpen, refreshDashboard }: DashBoardPage
                 {/* Device Control */}
                 <DeviceSection
                     setIsSwitchModalOpen={() => setIsSwitchModalOpen()}
+                    handleSetActivetab={handleSetActivetab}
                 />
 
                 {/* Usage Chart */}
@@ -94,7 +96,7 @@ const DashBoardPage = ({ setIsSwitchModalOpen, refreshDashboard }: DashBoardPage
                 {/* Fixed Charges */}
                 <FixedCharges />
 
-             <QuickLinks/>
+                <QuickLinks />
 
             </ScrollView >
         </View >

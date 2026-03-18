@@ -156,13 +156,11 @@ const Dash_Index_Screen = () => {
                         <DashBoardPage
                             setIsSwitchModalOpen={() => setIsSwitchModalOpen(true)}
                             refreshDashboard={fetchDashboardData}
+                            handleSetActivetab={handleSetActivetab}
                         />
                     </View>
 
                     <View style={styles.page2}>
-                        {/* <DeviceSection
-                            setIsSwitchModalOpen={() => setIsSwitchModalOpen(true)}
-                        /> */}
                         <Device_Info_Tab />
                     </View>
 

@@ -14,9 +14,10 @@ import { useAppSelector } from '@dwwp/store/hooks'
 
 type DeviceSectionProp = {
     setIsSwitchModalOpen: () => void
+    handleSetActivetab: (idx : number) => void
 }
-const DeviceSection = ({setIsSwitchModalOpen }: DeviceSectionProp) => {
-    const servoState = useAppSelector(s=> s.servo.servoState)
+const DeviceSection = ({ setIsSwitchModalOpen , handleSetActivetab }: DeviceSectionProp) => {
+    const servoState = useAppSelector(s => s.servo.servoState)
     return (
         <View style={[styles.deviceStatusSection]}>
             {/* Section label */}
@@ -26,7 +27,9 @@ const DeviceSection = ({setIsSwitchModalOpen }: DeviceSectionProp) => {
             <View style={styles.statusRow}>
 
                 {/* Left – animated WiFi / online status */}
-                <OnlineStatus/>
+                <OnlineStatus
+                    handleSetActivetab={handleSetActivetab}
+                />
 
                 {/* Right – valve state + open sheet button */}
                 <TouchableOpacity
@@ -104,7 +107,7 @@ const styles = StyleSheet.create({
         fontFamily: fonts.Bold,
         fontSize: normalize(16),
         color: colors.neutralBlack,
-        marginBottom : vh(14)
+        marginBottom: vh(14)
     },
 
 
@@ -118,7 +121,7 @@ const styles = StyleSheet.create({
     // Valve card (right side, same height as OnlineStatus)
     valveCard: {
         borderTopColor: colors.border,
-        borderTopWidth : normalize(5), 
+        borderTopWidth: normalize(5),
         flex: 1,
         borderRadius: normalize(22),
         overflow: 'hid\den',

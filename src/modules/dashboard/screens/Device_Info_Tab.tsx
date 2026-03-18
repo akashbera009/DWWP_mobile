@@ -12,6 +12,7 @@ import fonts from '@dwwp/utils/fonts'
 import { normalize, vh } from '@dwwp/utils/dimensions'
 import colors from '@dwwp/utils/colors'
 import { localImages } from '@dwwp/utils/localimages'
+import { PulseDot } from '../components/PulseDot'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ConnLevel = 'online' | 'recent' | 'stale' | 'offline' | 'loading'
@@ -79,35 +80,6 @@ function formatMonthId(id: string): string {
     const [year, month] = id.split('-')
     return new Date(Number(year), Number(month) - 1)
         .toLocaleString('default', { month: 'long', year: 'numeric' })
-}
-
-// ─── Pulsing dot ──────────────────────────────────────────────────────────────
-const PulseDot: React.FC<{ color: string; active: boolean }> = ({ color, active }) => {
-    const pulse = useRef(new Animated.Value(1)).current
-    useEffect(() => {
-        if (!active) return
-        const loop = Animated.loop(Animated.sequence([
-            Animated.timing(pulse, { toValue: 1.9, duration: 800, useNativeDriver: true }),
-            Animated.timing(pulse, { toValue: 1, duration: 800, useNativeDriver: true }),
-        ]))
-        loop.start()
-        return () => loop.stop()
-    }, [active])
-    return (
-        <View style={{ width: normalize(8), height: normalize(8), alignItems: 'center', justifyContent: 'center' }}>
-            {active && (
-                <Animated.View style={{
-                    position: 'absolute',
-                    width: normalize(8), height: normalize(8),
-                    borderRadius: normalize(4),
-                    backgroundColor: color,
-                    opacity: 0.35,
-                    transform: [{ scale: pulse }],
-                }} />
-            )}
-            <View style={{ width: normalize(6), height: normalize(6), borderRadius: normalize(3), backgroundColor: color }} />
-        </View>
-    )
 }
 
 // ─── Section label ────────────────────────────────────────────────────────────

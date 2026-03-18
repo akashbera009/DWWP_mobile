@@ -12,19 +12,12 @@ import PlanSelector from './components/MiniPlanselector'
 import { showSnackbar } from '@dwwp/utils/showSnackBar'
 import { RefreshControl } from 'react-native-gesture-handler'
 import { localImages } from '@dwwp/utils/localimages'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useNavigation } from '@react-navigation/native'
-import { MainStackParamList } from '@dwwp/utils/types'
-import { screenNames } from '@dwwp/utils/screenNames'
 import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks'
 import { fetchAllPaymentsAndAddons } from './paymentAction'
 
-type MainStackNavigation = NativeStackNavigationProp<MainStackParamList>;
 const PaymentsIndexDashboard = () => {
   const { top } = useSafeAreaInsets()
   const [refreshing, setRefreshing] = React.useState(false);
-  const mainStackNavigation = useNavigation<MainStackNavigation>()
-
   const scrollViewRef = useRef<ScrollView | null>(null)
 
   const dispatch = useAppDispatch();
@@ -44,9 +37,6 @@ const PaymentsIndexDashboard = () => {
     }, 1000);
   }, []);
 
-  const handleOpenChoosePlan = () => {
-    mainStackNavigation.navigate(screenNames.AddonRechargesScreen)
-  }
   const scrollToBottom = useCallback(() => {
     scrollViewRef.current?.scrollToEnd({
       animated: true,
@@ -74,7 +64,6 @@ const PaymentsIndexDashboard = () => {
         <View style={styles.planSelectorView}>
           <TouchableOpacity
             style={styles.planSelectorHeader}
-            onPress={handleOpenChoosePlan}
           >
             <Text style={styles.heading}>{strings.planSelectorHeading}</Text>
             <Image source={localImages.back} style={styles.backArrow} />

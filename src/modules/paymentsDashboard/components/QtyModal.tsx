@@ -214,7 +214,7 @@ const QtyModal: React.FC<QtyModalProps> = ({
             activeOpacity={0.7}
           >
             <Text style={styles.confirmBtnText}>
-              {isLoading ? 'Processing...' : `Add to Cart • ₹${totalPrice}`}
+              {isLoading ? 'Processing...' : `Purchase • ₹${totalPrice}`}
             </Text>
           </TouchableOpacity>
         </View>

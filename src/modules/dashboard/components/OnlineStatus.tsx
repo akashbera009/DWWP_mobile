@@ -120,9 +120,11 @@ function usePulse(active: boolean) {
 
     return anim
 }
-
+type OnlineStatusPropType = {
+    handleSetActivetab: (idx: number) => void
+}
 // ─── Component ────────────────────────────────────────────────────────────────
-export const OnlineStatus= () => {
+export const OnlineStatus = ({ handleSetActivetab }: OnlineStatusPropType) => {
     const lastSeen = useAppSelector(state => state?.servo?.lastSeen)
 
     const [tick, setTick] = useState(0)
@@ -134,7 +136,7 @@ export const OnlineStatus= () => {
         }, 1000)
         return () => clearInterval(id)
     }, [])
- 
+
     const level = calcLevel(Number(lastSeen))
     const label = calcLabel(Number(lastSeen))
     const isOnline = level == 'online'
@@ -162,7 +164,11 @@ export const OnlineStatus= () => {
 
     return (
         <Animated.View style={[styles.shadow, { transform: [{ scale: Animated.multiply(entryScale, pressScale) }] }]}>
-            <Pressable onPressIn={onPressIn} onPressOut={onPressOut} onPress={() => { }}>
+            <Pressable onPressIn={onPressIn} onPressOut={onPressOut} onPress={
+                () => {
+                    handleSetActivetab(1)
+                }
+            }>
                 <LinearGradient colors={bgColors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.card}>
 
                     {/* Glass border overlay */}

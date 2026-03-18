@@ -33,7 +33,6 @@ export type MainStackParamList = {
 
     PaymentsIndexDashboard: undefined
     FullPaymantHistory: undefined
-    AddonRechargesScreen: undefined
     IndividualPaymentHistory: undefined // be a transaction data 
 
     ViewProfileScreen: undefined;
