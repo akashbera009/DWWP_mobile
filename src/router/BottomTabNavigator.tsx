@@ -49,7 +49,7 @@ const TabIcon = ({ routeName, focused }: TabIconProps) => {
         return (
           <Image
             source={
-              focused ? localImages.analytics_fill : localImages.analytics_blank
+              focused ? localImages.analysis_fill : localImages.analysis_blank
             }
             style={[styles.iconImage]}
           />
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     fontSize: normalize(12),
   },
   inactiveLabel: {
-    fontFamily: fonts.Regular,
+    fontFamily: fonts.Medium,
     color: colors.primaryBlack,
     fontSize: normalize(11),
   },

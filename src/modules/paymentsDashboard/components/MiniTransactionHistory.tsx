@@ -22,6 +22,8 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '@dwwp/utils/types';
 import { useAppSelector } from '@dwwp/store/hooks';
+import { AddonCard, PaymentCard } from './AddonAndRechargeCardComponent';
+import { AddonRecord, PaymentRecord } from '@dwwp/modals';
 
 if (Platform.OS === 'android') {
   if (UIManager.setLayoutAnimationEnabledExperimental) {
@@ -79,7 +81,7 @@ const TransactionHistory = ({ scrollToBottom }: TransactionHistoryScreenProps) =
 
     const combined = [...addons, ...payments];
     setRecentTransactions(combined.length)
-    return combined 
+    return combined
       .sort((a, b) => {
         const dateA = a.date ? new Date(a.date).getTime() : 0;
         const dateB = b.date ? new Date(b.date).getTime() : 0;
@@ -118,7 +120,22 @@ const TransactionHistory = ({ scrollToBottom }: TransactionHistoryScreenProps) =
             {!isTransactionLoading ?
               <>
                 {latestTransactions.map((txn, index) => (
-                  <TransactionItem index={index} key={index.toString()} item={txn as any} />
+                  // <TransactionItem index={index} key={index.toString()} item={txn as any} />
+                  <View
+                    key={index}>
+                    {txn?.type === 'addon' ?
+                      <AddonCard
+                        index={index}
+                        item={txn as AddonRecord}
+
+                      />
+                      :
+                      <PaymentCard
+                        index={index}
+                        item={txn as PaymentRecord}
+                      />
+                    }
+                  </View>
                 ))}
               </>
               :

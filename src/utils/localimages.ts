@@ -2,6 +2,8 @@ export const localImages = {
     dwwp_logo : require('../assets/images/DWWP LOGO.png'),
     analytics_blank : require('../assets/images/analytics_blank.png'),
     analytics_fill : require('../assets/images/analytics_fill.png'),
+    analysis_blank : require('../assets/images/analysis.png'),
+    analysis_fill: require('../assets/images/analysis_fill.png'),
     
     eyeSlash: require('../assets/images/eye-slash.png'),
     eye: require('../assets/images/eye.png'),
@@ -32,6 +34,7 @@ export const localImages = {
     close: require('../assets/images/close.png'),
     angle: require('../assets/images/angle.png'),
     filter: require('../assets/images/filter.png'),
+    search: require('../assets/images/search.png'),
     chip: require('../assets/images/chip.png'),
 
     hide: require('../assets/images/hide.png'),

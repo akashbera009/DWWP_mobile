@@ -1,3 +1,4 @@
+import { AddonRecord, PaymentRecord } from '@dwwp/modals';
 import { NavigatorScreenParams } from '@react-navigation/native';
 
 // export type RootStackParamList = {
@@ -45,6 +46,9 @@ export type MainStackParamList = {
         qty: number,
         refill: number,
         addon: string,
+    };
+    ViewPaymentDetailsScreen: {
+        transaction: TransactionForNav
     }
 };
 export type RootStackParamList = {
@@ -79,3 +83,12 @@ export interface successPayload {
     qty: number,
     addon?: 'regular' | 'addon'
 }
+export interface PaymentRecordNav extends PaymentRecord {
+    type: 'payment'
+}
+
+export interface AddonRecordNav extends AddonRecord {
+    type: 'addon'
+}
+
+export type TransactionForNav = PaymentRecordNav | AddonRecordNav

@@ -182,7 +182,7 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
     if (!selectedPlan) return;
     payCurrentBill({
       amount: totalPrice,
-      refill:  totalVolume,
+      refill: totalVolume,
       qty: qty
     })
   };
@@ -202,7 +202,7 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
             amount,
             refill,
             qty,
-            addon:"addon"
+            addon: "addon"
           })
       } else {
         showWarningSnackbar('Payment Cancelled by User')
@@ -338,11 +338,9 @@ export default PlanSelector;
 
 const styles = StyleSheet.create({
   root: {
-    gap: vw(16),
     marginBottom: vh(8),
   },
   scrollContent: {
-    paddingHorizontal: vw(16),
     gap: vw(12),
   },
   cardWrapper: {

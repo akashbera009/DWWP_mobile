@@ -1,8 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react'
 import {
-  View, Text, StyleSheet, ScrollView,
-  TouchableOpacity, Animated, Platform,
-  ActivityIndicator,
+  View, Text, StyleSheet, ScrollView, Animated, Platform,
 } from 'react-native'
 
 import LinearGradient from 'react-native-linear-gradient'

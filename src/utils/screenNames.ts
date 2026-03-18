@@ -20,7 +20,8 @@ export const screenNames = {
 
     FullPaymantHistory : 'FullPaymantHistory',
     AddonRechargesScreen : 'AddonRechargesScreen',
-    PaymentSuccessScreen : 'PaymentSuccessScreen'
+    PaymentSuccessScreen : 'PaymentSuccessScreen',
+    ViewPaymentDetailsScreen:'ViewPaymentDetailsScreen',
 } as const;
 
 export type ScreenNames = keyof typeof screenNames;

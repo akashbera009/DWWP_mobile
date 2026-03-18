@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
         marginHorizontal: vw(16)
     },
     titleBox:{
-        marginVertical: vh(6),
+        marginVertical: vh(8),
     },
     homeHeaderText: {
         fontFamily: fonts.Bold,

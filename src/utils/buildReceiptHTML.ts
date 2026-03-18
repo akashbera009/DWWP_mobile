@@ -1,6 +1,6 @@
 export function buildReceiptHTML(p: {
-  payment_id: string; amount: string; qty: number
-  refill: number; addon?: string; date: string
+  payment_id: string; amount?: string; qty?: number
+  refill?: number; addon?: string; date: string
   previousLimit: number; newLimit: number; currentUsage: number
 }) {
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/>
@@ -33,7 +33,7 @@ export function buildReceiptHTML(p: {
         <tr><td>Payment Type</td><td>Water Quota Refill</td></tr>
         <tr><td>Plan / Addon</td><td>${p.addon ?? '—'}</td></tr>
         <tr><td>Quantity</td><td>${p.qty} unit${p.qty !== 1 ? 's' : ''}</td></tr>
-        <tr><td>Quota Added</td><td>${p.refill.toLocaleString()} L</td></tr>
+        <tr><td>Quota Added</td><td>${p.refill?.toLocaleString()} L</td></tr>
         <tr><td>Transaction ID</td><td style="word-break:break-all">${p.payment_id}</td></tr>
         <tr><td>Date & Time</td><td>${p.date}</td></tr>
       </table>
@@ -41,11 +41,11 @@ export function buildReceiptHTML(p: {
         <div class="quota-title">Quota Updated · ${p.previousLimit.toLocaleString()} L → ${p.newLimit.toLocaleString()} L</div>
         <div class="bar-bg">
           <div class="bar-used" style="width:${Math.min((p.currentUsage / p.newLimit) * 100, 100).toFixed(1)}%"></div>
-          <div class="bar-add"  style="width:${Math.min((p.refill / p.newLimit) * 100, 100).toFixed(1)}%"></div>
+          <div class="bar-add"  style="width:${Math.min((p?.refill || 0 / p.newLimit) * 100, 100).toFixed(1)}%"></div>
         </div>
         <div style="font-size:11px;color:#6b7280;margin-top:8px">
           Used: ${p.currentUsage.toLocaleString()} L &nbsp;|&nbsp;
-          Added: ${p.refill.toLocaleString()} L &nbsp;|&nbsp;
+          Added: ${p.refill?.toLocaleString()} L &nbsp;|&nbsp;
           New limit: ${p.newLimit.toLocaleString()} L
         </div>
       </div>
