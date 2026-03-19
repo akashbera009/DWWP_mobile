@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   Modal,
-  ActivityIndicator
+  ActivityIndicator,
+  Image
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -30,6 +31,8 @@ import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks';
 import { confirmAddonPayment } from '../paymentAction';
 import { screenNames } from '@dwwp/utils/screenNames';
 import { addBroadcast } from '@dwwp/modules/dashboard/dashboardSlice';
+import { CustomButton } from '@dwwp/components/CustomButton';
+import { localImages } from '@dwwp/utils/localimages';
 
 export interface Plan {
   id: string;
@@ -76,7 +79,7 @@ const PlanCard: React.FC<{
     borderWidth: withTiming(progress.value > 0.5 ? 2 : 1, { duration: 200 }),
     transform: [
       // { translateY: withSpring(progress.value > 0.5 ? -8 : 0, { damping: 14, stiffness: 100 }) },
-      { scale: scaleAnim.value },
+      // { scale: scaleAnim.value },
     ],
     shadowOpacity: withTiming(progress.value > 0.5 ? 0.22 : 0.06, { duration: 200 }),
   }));
@@ -133,23 +136,30 @@ const PlanCard: React.FC<{
 
           <Text style={styles.description}>{plan.description}</Text>
 
-          {selected && (
+          {selected ? (
             <Animated.View>
               {/* Add to Cart Button */}
               <TouchableOpacity
                 style={styles.selectButton}
                 activeOpacity={0.8}
-                // onPress={onAddToCart}
-                onPress={()=>{
-                  displayNotification({title: 'hi', body : 'body ', data:{type : 'Addon'}})
-                }}
+                onPress={onAddToCart}
               >
                 <View style={styles.selectButtonContent}>
-                  <Text style={styles.selectButtonEmoji}>🛒</Text>
-                  <Text style={styles.selectButtonText}>Add to Cart</Text>
-                  <Text style={styles.selectButtonArrow}>→</Text>
+                  <Text style={styles.selectButtonText}>Proceed to Pay</Text>
+                  <Image
+                    source={localImages.angle}
+                    style={styles.angle}
+                  />
                 </View>
               </TouchableOpacity>
+            </Animated.View>
+          ) : (
+            <Animated.View>
+              <CustomButton
+                title='Select'
+                onPress={handlePress}
+                variant='outline'
+              />
             </Animated.View>
           )}
         </View>
@@ -342,7 +352,7 @@ export default PlanSelector;
 const styles = StyleSheet.create({
   root: {
     marginBottom: vh(8),
-    marginTop : vh(8)
+    marginTop: vh(8)
   },
   scrollContent: {
     gap: vw(12),
@@ -351,7 +361,9 @@ const styles = StyleSheet.create({
     width: vw(280),
   },
   card: {
+    marginVertical:normalize(6),
     borderRadius: 20,
+    minHeight: vh(270),
     borderWidth: 1,
     borderColor: '#E5E7EB',
     backgroundColor: '#FFFFFF',
@@ -474,8 +486,8 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginBottom: vh(12),
   },
-  selectButton: {
-    marginTop: vh(4),
+  selectButton: { 
+    marginTop:vh(6),
     paddingVertical: vh(13),
     borderRadius: 13,
     backgroundColor: colors.primary,
@@ -501,6 +513,11 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Bold,
     fontSize: normalize(14),
     letterSpacing: 0.2,
+  },
+  angle: {
+    height: vh(14),
+    width: vh(14),
+    tintColor: colors.white
   },
   selectButtonArrow: {
     color: 'rgba(255, 255, 255, 0.75)',

@@ -36,7 +36,7 @@ export const PLANS: Plan[] = [
     name: 'Festive',
     price: 150,
     volume: 300,
-    description: 'Ideal for big gatherings and festivals.',
+    description: 'Ideal for big gatherings and festivals. Lets Enjoy without worry!',
     icon: '🥳',
     badge: 'Festive Offer',
     badgeColor: '#10b981',

@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.2,
   },
   headerSub: {
-    fontFamily: fonts.Regular,
+    fontFamily: fonts.Medium,
     fontSize: normalize(11),
     color: colors.neutralBodyText,
     marginTop: 2,

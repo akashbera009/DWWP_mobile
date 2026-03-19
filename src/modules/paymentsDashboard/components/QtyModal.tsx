@@ -9,6 +9,7 @@ import {
 import { normalize, vh, vw } from '@dwwp/utils/dimensions';
 import colors from '@dwwp/utils/colors';
 import fonts from '@dwwp/utils/fonts';
+import Pill from '@dwwp/modules/dashboard/components/Pill';
 
 export interface Plan {
   id: string;
@@ -35,9 +36,9 @@ const QtyModal: React.FC<QtyModalProps> = ({
   onConfirm,
   onCancel,
   isLoading = false,
-}) => { 
+}) => {
   const [qty, setQty] = useState<number>(1);
-  
+
   useEffect(() => {
     if (visible) {
       setQty(1);
@@ -88,7 +89,7 @@ const QtyModal: React.FC<QtyModalProps> = ({
           <View style={styles.planIconBox}>
             <Text style={styles.planIcon}>{plan.icon}</Text>
           </View>
-          
+
           <View style={styles.planDetails}>
             <View style={styles.planNameRow}>
               <Text style={styles.planName}>{plan.name}</Text>
@@ -113,18 +114,7 @@ const QtyModal: React.FC<QtyModalProps> = ({
           <Text style={styles.label}>Select quantity</Text>
 
           {/* Qty Display - Modern Card */}
-          <View style={styles.qtyDisplayCard}>
-            <View style={styles.qtyDisplayInner}>
-              <Text style={styles.qtyValue}>{qty}</Text>
-              <Text style={styles.qtyUnit}>packs</Text>
-            </View>
-            <View style={styles.priceDisplay}>
-              <Text style={styles.priceLarge}>₹{totalPrice}</Text>
-            </View>
-          </View>
-
-          {/* Stepper Controls */}
-          <View style={styles.stepperContainer}>
+          <View style={styles.qtySelectorCard}>
             <TouchableOpacity
               style={[styles.stepperBtn, qty === 1 && styles.stepperBtnDisabled]}
               onPress={handleDecrement}
@@ -136,8 +126,14 @@ const QtyModal: React.FC<QtyModalProps> = ({
               </Text>
             </TouchableOpacity>
 
-            <View style={styles.stepperDisplay}>
-              <Text style={styles.stepperDisplayText}>{qty}</Text>
+            <View style={styles.qtyDisplayCard}>
+              <View style={styles.qtyDisplayInner}>
+                <Text style={styles.qtyValue}>{qty}</Text>
+                <Text style={styles.qtyUnit}>{qty === 1 ? 'pack' : 'packs'}</Text>
+              </View>
+              <View style={styles.priceDisplay}>
+                <Text style={styles.priceLarge}>₹{totalPrice}</Text>
+              </View>
             </View>
 
             <TouchableOpacity
@@ -175,26 +171,10 @@ const QtyModal: React.FC<QtyModalProps> = ({
             ))}
           </View>
 
-          {/* Info Grid */}
-          <View style={styles.infoGrid}>
-            <View style={styles.infoCard}>
-              <Text style={styles.infoLabel}>Price</Text>
-              <Text style={styles.infoValue}>₹{plan.price}</Text>
-              <Text style={styles.infoUnit}>per pack</Text>
-            </View>
-            
-            <View style={styles.infoCard}>
-              <Text style={styles.infoLabel}>Volume</Text>
-              <Text style={styles.infoValue}>{plan.volume}L</Text>
-              <Text style={styles.infoUnit}>per pack</Text>
-            </View>
-            
-            <View style={styles.infoCard}>
               <Text style={styles.infoLabel}>Total</Text>
+            <View style={styles.infoCard}>
               <Text style={styles.infoValue}>{totalVolume}L</Text>
-              <Text style={styles.infoUnit}>{qty} packs</Text>
             </View>
-          </View>
         </View>
 
         {/* Actions */}
@@ -252,7 +232,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginVertical: vh(12),
   },
-  
+
   // Plan Header
   planHeader: {
     flexDirection: 'row',
@@ -327,48 +307,51 @@ const styles = StyleSheet.create({
 
   // Qty Display Card
   qtyDisplayCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flex: 1,
     alignItems: 'center',
     backgroundColor: colors.primaryLight,
     borderRadius: 16,
     paddingHorizontal: vw(20),
-    paddingVertical: vh(20),
+    marginHorizontal: vw(16),
     marginBottom: vh(20),
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: colors.primary,
   },
   qtyDisplayInner: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: vw(8),
+    marginBottom : vh(-16)
   },
   qtyValue: {
     fontSize: normalize(44),
-    fontFamily: fonts.Bold,
+    fontFamily: fonts.SemiBold,
     color: colors.primary,
   },
   qtyUnit: {
+    position :'absolute',
+    right : vw(-36) , 
+    bottom: vh(22) , 
     fontSize: normalize(13),
     fontFamily: fonts.Regular,
     color: colors.neutralBodyText,
   },
   priceDisplay: {
     alignItems: 'flex-end',
+    backgroundColor : colors.primaryLight,
+    paddingHorizontal : normalize(16),
+    paddingVertical:vh(2),
+    margin: normalize(8),
+    borderRadius : normalize(16),
+    borderWidth : 2 , 
+    borderColor : colors.border
   },
   priceLarge: {
     fontSize: normalize(26),
     fontFamily: fonts.Bold,
     color: colors.primary,
   },
-
-  // Stepper Controls
-  stepperContainer: {
+  qtySelectorCard: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: vw(16),
-    marginBottom: vh(20),
+    flex: 1,
+    alignItems: 'center'
   },
   stepperBtn: {
     width: 50,
@@ -450,22 +433,25 @@ const styles = StyleSheet.create({
   },
   infoCard: {
     flex: 1,
+    flexDirection : 'row',
     backgroundColor: '#F8F8F8',
     borderRadius: 12,
     paddingHorizontal: vw(12),
     paddingVertical: vh(12),
-    alignItems: 'center',
+    // alignItems: 'center',
+    justifyContent :'center'
   },
   infoLabel: {
     fontSize: normalize(11),
-    fontFamily: fonts.Regular,
+    fontFamily: fonts.SemiBold,
     color: colors.neutralBodyText,
     marginBottom: vh(4),
+    marginHorizontal : normalize(8)
   },
   infoValue: {
-    fontSize: normalize(15),
+    fontSize: normalize(22),
     fontFamily: fonts.Bold,
-    color: colors.primary,
+    color: colors.activeDot,
     marginBottom: vh(2),
   },
   infoUnit: {
