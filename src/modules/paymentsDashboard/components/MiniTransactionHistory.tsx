@@ -81,12 +81,12 @@ const TransactionHistory = ({ scrollToBottom }: TransactionHistoryScreenProps) =
     const combined = [...addons, ...payments];
     setRecentTransactions(combined.length)
     return combined
-      .sort((a, b) => {
+      ?.sort((a, b) => {
         const dateA = a.date ? new Date(a.date).getTime() : 0;
         const dateB = b.date ? new Date(b.date).getTime() : 0;
         return dateB - dateA;
       })
-      .slice(0, 3);
+      ?.slice(0, 3);
 
   }, [addonsHistory, paymentsHistory]);
 

@@ -26,6 +26,7 @@ import { fetchServoState } from '../servoActions'
 import DashboardSkeleton from '@dwwp/components/DashboardSkeleton'
 import { fetchAllTimeDays, fetchAllTimeMonths, fetchTodayUsage, listenCurrentMonth, stopCurrentMonthListener } from '../usageActions'
 import Device_Info_Tab from './Device_Info_Tab'
+import { fetchAllPaymentsAndAddons } from '@dwwp/modules/paymentsDashboard/paymentAction'
 
 const SCREEN_WIDTH = screenWidth
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
@@ -51,8 +52,10 @@ const Dash_Index_Screen = () => {
     }, [email])
     //refresh data
     const refreshData = useCallback(() => {
+        if (!email) return
         fetchDashboardData();
         fetchAdditionalData()
+        fetchAllPaymentsAndAddons({ email })
     }, [email])
 
     useEffect(() => {
@@ -76,7 +79,7 @@ const Dash_Index_Screen = () => {
         if (!email) return
         const timer = setTimeout(() => {
             fetchAdditionalData()
-        }, 1500);
+        }, 1000);
         return () => clearTimeout(timer)
     }, [email, fetchAdditionalData])
 

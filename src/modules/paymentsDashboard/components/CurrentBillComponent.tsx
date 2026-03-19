@@ -12,14 +12,12 @@ import {
 import colors from '@dwwp/utils/colors';
 import { normalize, vh, vw } from '@dwwp/utils/dimensions';
 import fonts from '@dwwp/utils/fonts';
-import { displayNotification } from '@dwwp/utils/displayNotification';
 import { localImages } from '@dwwp/utils/localimages';
 import ConfirmationPayModal from './ConfirmationPayMpdal';
 import { useRazorpayPayment } from '@dwwp/utils/razorpayPaymentFunciton';
 import { showErrorSnackbar, showWarningSnackbar } from '@dwwp/utils/showSnackBar';
 import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks';
 import { confirmAddonPayment } from '../paymentAction';
-import { addBroadcast } from '@dwwp/modules/dashboard/dashboardSlice';
 import { useNavigation } from '@react-navigation/native';
 import { billObjectType, MainStackParamList, payCurrentBillType, successPayload } from '@dwwp/utils/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -90,7 +88,7 @@ const CurrentBillComponent = () => {
     const scaleAnim = useRef(new Animated.Value(1)).current;
     const pulseAnim = useRef(new Animated.Value(1)).current;
 
-    const isMonthEnd = nextBillRemainingDays >=0 && nextBillRemainingDays < 2 ;
+    const isMonthEnd = nextBillRemainingDays >= 0 && nextBillRemainingDays < 2;
     const isDisabled = billObject.isPaid || !isMonthEnd;
     const [loading, setLoading] = useState(false)
     const dispatch = useAppDispatch()
@@ -114,11 +112,12 @@ const CurrentBillComponent = () => {
         Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, damping: 10 }).start();
 
 
+    const { handlePayment } = useRazorpayPayment();
     const onProceedPayment = useCallback(() => {
         payCurrentBill({
-            amount: 40,
-            refill: 100,
-            qty: 1
+            amount: Number(monthBillAmount),
+            usage: monthTotal,
+            type: 'regular'
         })
     }, [])
     const onCancelProceed = useCallback(() => {
@@ -126,10 +125,8 @@ const CurrentBillComponent = () => {
         setLoading(false)
     }, [loading])
 
-    const { handlePayment } = useRazorpayPayment();
-
-    const payCurrentBill = async ({ amount, refill, qty }: payCurrentBillType): Promise<void> => {
-        console.log('initiating payment... ');
+    const payCurrentBill = async ({ amount, usage, type }: payCurrentBillType): Promise<void> => {
+        console.log('initiating Recharge payment... ');
         try {
             setLoading(true)
             setIsModalOpen(true)
@@ -140,9 +137,8 @@ const CurrentBillComponent = () => {
                     onSuccess({
                         payment_id,
                         amount,
-                        refill,
-                        qty,
-                         addon:'regular'
+                        usage,
+                        type
                     })
             } else {
                 showWarningSnackbar('Payment Cancelled by User')
@@ -157,46 +153,25 @@ const CurrentBillComponent = () => {
         }
     };
 
-    const onSuccess = async ({ payment_id, amount, qty = 1, refill, addon }: successPayload) => {
+    const onSuccess = async ({ payment_id, amount, usage, type }: successPayload) => {
+        if (!emailId) return
         try {
             setLoading(true)
-            displayNotification({
-                title: '⚡ Recharge Successful',
-                body:
-                    `Your recharge of ₹${amount} was for refill ${refill}L processed successfully
-                        Transaction ID:${payment_id}
-                        Thank you for helping prevent water wastage 🌍`,
-                data: {
-                    subtitle: '<p style="color:#7B68EE;">Water Service Activated</p>',
-                    type: 'recharge',
-                }
-            });
-
-            if (addon === 'addon' && emailId) {
-                dispatch(confirmAddonPayment({
-                    email: emailId,
-                    razorPayId: payment_id,
-                    amount: amount,
-                    quantityDone: 0,
-                    refill: refill,
-                })).then(res => {
-                    console.log('firebase writing response is ', res);
-                })
-                dispatch(addBroadcast({
-                    icon: '⚡️',
-                    message: `Recharge of ₹${amount} for ${refill}L was done. Payment ID: ${payment_id}`,
-                    timestamp: new Date().toISOString(),
-                }))
-            } else {
-                console.log('need to write regular payment logic ');
-            }
+            dispatch(confirmAddonPayment({
+                email: emailId,
+                razorPayId: payment_id,
+                amount: amount,
+                usage,
+                type
+            })).then(res => {
+                console.log('firebase writing response is ', res);
+            })
             // navigate to success screen 
             navigation.navigate(screenNames.PaymentSuccessScreen, {
                 payment_id,
                 amount: amount * 100,
-                qty,
-                refill,
-                addon: 'addon'
+                usage: String(usage),
+                type: 'addon'
             })
         } catch (error) {
             console.log(error);
@@ -271,7 +246,7 @@ const CurrentBillComponent = () => {
                 <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
                     <TouchableOpacity
                         style={[styles.button, isDisabled && styles.disabledButton]}
-                        disabled={isDisabled}
+                        // disabled={isDisabled}
                         onPress={() => setIsModalOpen(true)}
                         onPressIn={handlePressIn}
                         onPressOut={handlePressOut}
@@ -432,7 +407,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: vw(8),
-        marginLeft : vw(4)
+        marginLeft: vw(4)
     },
     Stateicon: {
         height: vh(22),

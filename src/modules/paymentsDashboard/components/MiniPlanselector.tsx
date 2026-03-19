@@ -23,7 +23,7 @@ import fonts from '@dwwp/utils/fonts';
 import { PLANS } from '../mocks/planData';
 import QtyModal from './QtyModal';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { MainStackParamList, payCurrentBillType, successPayload } from '@dwwp/utils/types';
+import { MainStackParamList, payAddonBillType, payCurrentBillType, successPayload } from '@dwwp/utils/types';
 import { showErrorSnackbar, showWarningSnackbar } from '@dwwp/utils/showSnackBar';
 import { useRazorpayPayment } from '@dwwp/utils/razorpayPaymentFunciton';
 import { displayNotification } from '@dwwp/utils/displayNotification';
@@ -196,14 +196,15 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
     payCurrentBill({
       amount: totalPrice,
       refill: totalVolume,
-      qty: qty
+      qty: qty,
+      type: 'addon'
     })
   };
   const { handlePayment } = useRazorpayPayment();
   const emailId = useAppSelector(s => s.dashboard?.userDetails?.emailId)
 
-  const payCurrentBill = async ({ amount, refill, qty }: payCurrentBillType): Promise<void> => {
-    console.log('initiating payment... ');
+  const payCurrentBill = async ({ amount, refill, qty , type }: payAddonBillType): Promise<void> => {
+    console.log('initiating addon payment... ');
     try {
       setIsLoading(true);
       const res = await handlePayment(amount)
@@ -215,7 +216,7 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
             amount,
             refill,
             qty,
-            addon: "addon"
+            type
           })
       } else {
         showWarningSnackbar('Payment Cancelled by User')
@@ -229,47 +230,29 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
     }
   };
 
-  const onSuccess = async ({ payment_id, amount, qty = 1, refill, addon }: successPayload) => {
+  const onSuccess = async ({ payment_id, amount, qty = 1, refill, type }: successPayload) => {
+    if (!emailId) return
     try {
       //close qtyModal
       setIsModalVisible(false)
+      dispatch(confirmAddonPayment({
+        email: emailId,
+        razorPayId: payment_id,
+        amount: amount,
+        qty: qty,
+        refill: refill,
+        type
+      })).then(res => {
+        console.log('firebase writing response is ', res);
+      })
 
-      displayNotification({
-        title: '⚡ Recharge Successful',
-        body: `Your recharge of ₹${amount} was for refill ${refill}L processed successfully
-                          Transaction ID:${payment_id}
-                          Thank you for helping prevent water wastage 🌍`,
-        data: {
-          subtitle: '<p style="color:#7B68EE;">Water Service Activated</p>',
-          type: 'recharge',
-        }
-      });
-
-      if (addon === 'addon' && emailId) {
-        dispatch(confirmAddonPayment({
-          email: emailId,
-          razorPayId: payment_id,
-          amount: amount,
-          quantityDone: qty,
-          refill: refill,
-        })).then(res => {
-          console.log('firebase writing response is ', res);
-        })
-        dispatch(addBroadcast({
-          icon: '⚡️',
-          message: `Recharge of ₹${amount} for ${refill}L was done. Payment ID: ${payment_id}`,
-          timestamp: new Date().toISOString(),
-        }))
-      } else {
-        console.log('need to write regular payment logic ');
-      }
       // navigate to success screen 
       navigation.navigate(screenNames.PaymentSuccessScreen, {
         payment_id,
         amount: amount * 100,
         qty,
         refill,
-        addon: 'addon'
+        type: 'addon'
       })
     } catch (error) {
       console.log(error);
@@ -361,7 +344,7 @@ const styles = StyleSheet.create({
     width: vw(280),
   },
   card: {
-    marginVertical:normalize(6),
+    marginVertical: normalize(6),
     borderRadius: 20,
     minHeight: vh(270),
     borderWidth: 1,
@@ -486,8 +469,8 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginBottom: vh(12),
   },
-  selectButton: { 
-    marginTop:vh(6),
+  selectButton: {
+    marginTop: vh(6),
     paddingVertical: vh(13),
     borderRadius: 13,
     backgroundColor: colors.primary,

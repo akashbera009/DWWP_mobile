@@ -13,7 +13,7 @@
  *     └── timeStamp:    string (ISO)
  *
  *   users/{email}/monthlyUsages/{YYYY-MM}/addon/{id}
- *     ├── quantityDone: number   (liters purchased)
+ *     ├── qty: number   (liters purchased)
  *     ├── amount:       number   (₹)
  *     ├── addon_date:   string   (ISO)
  *     ├── razor_pay_id: string
@@ -130,7 +130,7 @@ export default paymentSlice.reducer
 
 // Total addon liters purchased this month
 // export const selectTotalAddonLiters = (s: RootState) =>
-//     s.payment.addons.reduce((sum, a) => sum + a.quantityDone, 0)
+//     s.payment.addons.reduce((sum, a) => sum + a.qty, 0)
 
 // // Total ₹ spent on addons this month
 // export const selectTotalAddonSpend = (s: RootState) =>

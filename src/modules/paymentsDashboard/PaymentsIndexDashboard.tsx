@@ -93,7 +93,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.overlayBackground
   },
   homeHeaderContainer: {
-    backgroundColor: colors.primary
+    backgroundColor: colors.primary,
+    minHeight : vh(80),
+    justifyContent :'center'
   },
   homeHeaderText: {
     fontFamily: fonts.Bold,

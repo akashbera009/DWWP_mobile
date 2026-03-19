@@ -64,11 +64,9 @@ const EffectiveTotal = () => {
         const currentMonthAddons = addons.filter(
             (addon: any) => addon?.forMonth === monthKeyId
         )
-        console.log(currentMonthAddons);
-
         // addon liters
         const totalAddonLiters = currentMonthAddons.reduce(
-            (sum, addon) => sum + (addon.quantityDone ?? 0) * (addon.refill ?? 0),
+            (sum, addon) => sum + (addon.qty ?? 0) * (addon.refill ?? 0),
             0
         )
 

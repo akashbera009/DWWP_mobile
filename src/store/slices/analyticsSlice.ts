@@ -26,7 +26,7 @@
 
 // export interface AddonEntry {
 //     id: string
-//     quantityDone: number    // liters added
+//     qty: number    // liters added
 //     amount: number    // ₹ paid
 //     addon_date: string    // ISO
 //     razor_pay_id: string

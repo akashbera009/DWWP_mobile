@@ -2,8 +2,10 @@ import { createAsyncThunk } from '@reduxjs/toolkit'
 import firestore from '@react-native-firebase/firestore'
 import type { RootState } from '../../store/index'
 import { fetchCurrentMonth } from '@dwwp/modules/dashboard/dashboardActions'
-import { AddonRecord,FetchAllMonthsPayload,PaymentRecord } from '@dwwp/modals'
+import { AddonRecord, FetchAllMonthsPayload, PaymentRecord } from '@dwwp/modals'
 import { getCurrentMonthKey, normalizeTimestamp, toNumber } from '@dwwp/utils/commonFunctions'
+import { NotificationService } from '../../utils/FirebaseNotificationUpdate'
+import { displayNotification } from '@dwwp/utils/displayNotification'
 
 /**
  * fetchPaymentHistory
@@ -62,7 +64,7 @@ export const fetchAllPaymentsAndAddons = createAsyncThunk<
                 const docData: any = d.data() ?? {}
                 addonRecords.push({
                     id: d.id,
-                    quantityDone: Number(docData.quantityDone ?? 0),
+                    qty: Number(docData.qty ?? 0),
                     amount: toNumber(docData.amount, 0),
                     addon_date: normalizeTimestamp(docData.addon_date),
                     razor_pay_id: docData.razor_pay_id ?? docData.razorPayId ?? '',
@@ -141,35 +143,96 @@ export const confirmAddonPayment = createAsyncThunk<
         email: string
         razorPayId: string
         amount: number
-        quantityDone: number    // liters purchased
-        refill: number
+        usage?: number,
+        qty?: number
+        refill?: number,
+        type: 'regular' | 'addon'
     },
     { rejectValue: string; state: RootState }
 >('payment/confirmAddon', async (
-    { email, razorPayId, amount, quantityDone, refill },
+    { email, razorPayId, amount, qty, refill, type },
     { rejectWithValue, dispatch }
 ) => {
     try {
+
+        displayNotification({
+            title: `${type === 'addon' ? '⚡' : '🪙'} ${type === 'addon' ? type.slice(0, 1).toUpperCase() + type?.slice(1): 'Recharge'} Successful`,
+            body:
+                `Your ${type === 'addon' ? type.slice(0, 1).toUpperCase() + type?.slice(1): 'Recharge'} of ₹${amount} ${type === 'addon' ? `'for refill' ${(refill ?? 0) * (qty ?? 0)}L 'processed successfully'` : 'was successful'} 
+                                Transaction ID:${razorPayId}
+                                <br> Thank you for helping prevent water wastage 🌍`,
+            data: {
+                subtitle: '<p style="color:#7B68EE;">Water Service Activated</p>',
+                type: 'recharge',
+            }
+        });
+
         const monthKey = getCurrentMonthKey()
-        const addonData = {
-            quantityDone,
-            amount,
-            addon_date: new Date().toISOString(),
-            razor_pay_id: razorPayId,
-            refill,
-            status: 'Completed',
+        const addonData = {}
+        if (type === 'addon') {
+            const addonData = {
+                qty,
+                amount,
+                addon_date: new Date().toISOString(),
+                razor_pay_id: razorPayId,
+                refill,
+                status: 'Completed',
+            }
+
+            // Write addon record
+            await firestore()
+                .collection('users').doc(email)
+                .collection('monthlyUsages').doc(monthKey)
+                .collection('addon').doc(razorPayId)
+                .set(addonData)
+        } else {
+            // reglar recharges 
+            const paymentData = {
+                amount: String(amount),
+                forMonth: monthKey,
+                razor_pay_id: razorPayId,
+                status: 'Completed',
+                timeStamp: new Date(),
+            }
+
+            const paymentDocRef = firestore()
+                .collection('users')
+                .doc(email)
+                .collection('monthlyUsages')
+                .doc(monthKey)
+                .collection('payment')
+                .doc('payment_details')
+
+            const paymentDoc = await paymentDocRef.get()
+
+            if (paymentDoc.exists()) {
+                await paymentDocRef.update(paymentData)
+                console.log('Payment updated for month:', monthKey)
+            } else {
+                await paymentDocRef.set(paymentData)
+                console.log('Payment created for month:', monthKey)
+            }
         }
-
-        // Write addon record
-        await firestore()
-            .collection('users').doc(email)
-            .collection('monthlyUsages').doc(monthKey)
-            .collection('addon').doc(razorPayId)
-            .set(addonData)
-
+        try {
+            await NotificationService.createUserNotification(email, {
+                type: 'payment',
+                title: 'Payment Successful ✅',
+                message: `Your addon payment of ₹${amount} for ${qty}L has been completed.`,
+                data: {
+                    amount,
+                    qty,
+                    razorPayId,
+                    refill,
+                    status: 'Completed',
+                },
+            })
+        } catch (notifError) {
+            console.warn('Notification creation failed, but payment succeeded:', notifError)
+            // Don't reject the payment if notification fails
+        }
         // Refresh dashboard month data to reflect new limit
         dispatch(fetchCurrentMonth({ email, force: true }))
-
+        dispatch(fetchAllPaymentsAndAddons({ email }))
         return { id: razorPayId, ...addonData } as AddonRecord
     } catch (e: any) {
         return rejectWithValue(e.message ?? 'Failed to confirm payment.')

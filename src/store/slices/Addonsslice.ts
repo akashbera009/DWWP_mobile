@@ -29,7 +29,7 @@
 //   id: string;
 //   addon_date: string;
 //   amount: number;
-//   quantityDone: number; // litres purchased
+//   qty: number; // litres purchased
 //   refill: number;       // how many pack units
 //   razor_pay_id: string;
 //   status: 'Completed';
@@ -66,12 +66,12 @@
 //   {
 //     razorPayId: string;
 //     amount: number;
-//     quantityDone: number; // litres = plan.volume * qty
+//     qty: number; // litres = plan.volume * qty
 //     refill: number;       // qty (number of packs)
 //   },
 //   { rejectValue: string }
 // >('addons/purchaseAddon', async (
-//   { razorPayId, amount, quantityDone, refill },
+//   { razorPayId, amount, qty, refill },
 //   { rejectWithValue }
 // ) => {
 //   try {
@@ -90,7 +90,7 @@
 //       id: razorPayId,
 //       addon_date: now,
 //       amount,
-//       quantityDone,
+//       qty,
 //       refill,
 //       razor_pay_id: razorPayId,
 //       status: 'Completed',
@@ -157,7 +157,7 @@
 //       .addCase(purchaseAddon.fulfilled, (state, action) => {
 //         state.purchaseStatus = 'succeeded';
 //         state.items.unshift(action.payload); // prepend — newest first
-//         state.totalAddonLitres += action.payload.quantityDone;
+//         state.totalAddonLitres += action.payload.qty;
 //       })
 //       .addCase(purchaseAddon.rejected, (state, action) => {
 //         state.purchaseStatus = 'failed';
@@ -174,7 +174,7 @@
 //         state.fetchStatus = 'succeeded';
 //         state.items = action.payload;
 //         state.totalAddonLitres = action.payload.reduce(
-//           (sum, a) => sum + a.quantityDone, 0
+//           (sum, a) => sum + a.qty, 0
 //         );
 //       })
 //       .addCase(fetchAddons.rejected, (state, action) => {

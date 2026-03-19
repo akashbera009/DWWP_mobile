@@ -11,7 +11,7 @@
  *     {YYYY-MM-DD}     – number (daily liters)
  *
  *   monthlyUsages/{YYYY-MM}/addon/{id}/
- *     quantityDone     – liters added
+ *     qty     – liters added
  *     amount           – ₹ paid
  *     addon_date       – ISO timestamp
  *     razor_pay_id     – string
@@ -75,7 +75,7 @@ const C = {
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface AddonEntry {
     id: string
-    quantityDone: number   // liters added
+    qty: number   // liters added
     amount: number   // ₹ paid
     addon_date: string   // ISO
     razor_pay_id: string
@@ -212,8 +212,8 @@ interface AddonCardProps {
 }
 
 const AddonCard: React.FC<AddonCardProps> = ({ addon, consumedFromAddon, index }) => {
-    const usedPct = Math.min(consumedFromAddon / Math.max(addon.quantityDone, 1), 1)
-    const left = Math.max(addon.quantityDone - consumedFromAddon, 0)
+    const usedPct = Math.min(consumedFromAddon / Math.max(addon.qty, 1), 1)
+    const left = Math.max(addon.qty - consumedFromAddon, 0)
     const date = new Date(addon.addon_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
 
     return (
@@ -231,8 +231,8 @@ const AddonCard: React.FC<AddonCardProps> = ({ addon, consumedFromAddon, index }
                         <Text style={{ fontSize: normalize(16) }}>💳</Text>
                     </View>
                     <View style={{ flex: 1 }}>
-                        <Text style={styles.addonTitle}>Addon #{index + 1}  ·  +{fmt(addon.quantityDone)}</Text>
-                        <Text style={styles.addonMeta}>{date}  ·  ₹{addon.amount}  ·  {addon.razor_pay_id.slice(-8)}</Text>
+                        <Text style={styles.addonTitle}>Addon #{index + 1}  ·  +{fmt(addon.qty)}</Text>
+                        <Text style={styles.addonMeta}>{date}  ·  ₹{addon.amount}  ·  {addon.razor_pay_id?.slice(-8)}</Text>
                     </View>
                     <View style={[styles.addonStatusPill, {
                         backgroundColor: addon.status === 'Completed' ? C.successBg : C.warningBg,
@@ -293,7 +293,7 @@ const Usages_Tab = () => {
 
         // addon liters
         const totalAddonLiters = filteredAddons.reduce(
-            (s, a) => s + (a.quantityDone ?? 0) * (a.refill ?? 0),
+            (s, a) => s + (a.qty ?? 0) * (a.refill ?? 0),
             0
         )
 
@@ -334,7 +334,7 @@ const Usages_Tab = () => {
 
     const addonConsumedArr = filteredAddons.map(a => {
 
-        const addonLiters = (a.quantityDone ?? 0) * (a.refill ?? 0)
+        const addonLiters = (a.qty ?? 0) * (a.refill ?? 0)
 
         const consumed = Math.min(remaining_to_assign, addonLiters)
 
@@ -544,7 +544,7 @@ const Usages_Tab = () => {
                                 </View>
 
                                 {/* Individual addon cards */}
-                                {addons.slice(0, 5).map((addon, i) => (
+                                {addons?.slice(0, 5)?.map((addon, i) => (
                                     <AddonCard
                                         key={addon.id}
                                         addon={addon as any}
@@ -667,12 +667,12 @@ export const monthData = [
 ];
 export const MOCK_ADDONS: AddonEntry[] = [
     {
-        id: 'addon_1', quantityDone: 200, amount: 120,
+        id: 'addon_1', qty: 200, amount: 120,
         addon_date: '2025-01-10T14:30:00.000Z',
         razor_pay_id: 'pay_Rdck9DTiXfX5vm', status: 'Completed',
     },
     {
-        id: 'addon_2', quantityDone: 100, amount: 60,
+        id: 'addon_2', qty: 100, amount: 60,
         addon_date: '2025-01-13T09:15:00.000Z',
         razor_pay_id: 'pay_Xmrt4ABcYz2wqP', status: 'Completed',
     },

@@ -4,23 +4,112 @@ import React, { useEffect, useState } from 'react'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
 import colors from '@dwwp/utils/colors'
-import { useAppSelector } from '@dwwp/store/hooks'
-import { BroadcastMsg } from '@dwwp/modals'
+import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks'
+import { BroadcastMsg, UserNotification } from '@dwwp/modals'
+import { fetchUserNotifications } from '../Notificationslice'
 
 const NotificationPanel = ({ onClose }: { onClose: () => void }) => {
-    const [notifications, setNoticications] = useState<BroadcastMsg[] | null>([])
-    const notificationSelector = useAppSelector(state => state?.dashboard.broadcasts)
+  const dispatch = useAppDispatch()
+
+    // Admin broadcasts
+    const [broadcasts, setBroadcasts] = useState<BroadcastMsg[] | null>([])
+    const broadcastSelector = useAppSelector(state => state?.dashboard.broadcasts)
+
+    // User notifications
+    const [userNotifications, setUserNotifications] = useState<UserNotification[] | null>([])
+    const userNotificationsSelector = useAppSelector(state => state?.notification.userNotifications)
+    const userEmail = useAppSelector(state => state?.dashboard.userDetails?.emailId)
+
+    // Combined view
+    const [activeTab, setActiveTab] = useState<'all' | 'broadcasts' | 'notifications'>('all')
+
     useEffect(() => {
-        if (notificationSelector?.length !== 0) {
-            setNoticications(notificationSelector)
-        } else return
-    }, [notificationSelector])
+        if (broadcastSelector?.length !== 0) {
+            setBroadcasts(broadcastSelector)
+        }
+    }, [broadcastSelector])
+
+    useEffect(() => {
+        if (userNotificationsSelector?.length !== 0) {
+            setUserNotifications(userNotificationsSelector)
+        }
+    }, [userNotificationsSelector])
+
+    // Fetch user notifications on mount
+    useEffect(() => {
+        if (userEmail) {
+            dispatch(fetchUserNotifications(userEmail))
+        }
+    }, [userEmail, dispatch])
+
+    const allNotifications = [
+        ...(broadcasts || []).map(b => ({
+            ...b,
+            notificationType: 'broadcast' as const,
+        })),
+        ...(userNotifications || []).map(n => ({
+            ...n,
+            notificationType: 'user' as const,
+        })),
+    ].sort((a, b) => {
+        const timeA = new Date(a.timestamp).getTime()
+        const timeB = new Date(b.timestamp).getTime()
+        return timeB - timeA
+    })
+
+    const totalCount = allNotifications.length
+    const unreadCount = (userNotifications || []).filter(n => !n.read).length
+
+    const getFilteredNotifications = () => {
+        switch (activeTab) {
+            case 'broadcasts':
+                return allNotifications.filter(n => n.notificationType === 'broadcast')
+            case 'notifications':
+                return allNotifications.filter(n => n.notificationType === 'user')
+            default:
+                return allNotifications
+        }
+    }
+
+    const filteredNotifications = getFilteredNotifications()
+
+    const getNotificationColor = (notification: any) => {
+        if (notification.notificationType === 'broadcast') {
+            return colors.activeDot
+        }
+
+        // Color based on user notification type
+        const typeColors: Record<string, string> = {
+            payment: colors.success || '#4CAF50',
+            refill: colors.info || '#2196F3',
+            limit_exceeded: colors.warning || '#FF9800',
+            addon_completed: colors.success || '#4CAF50',
+            system: colors.activeDot,
+        }
+        return typeColors[notification.type] || colors.activeDot
+    }
+
+    const formatTimestamp = (timestamp: string) => {
+        const date = new Date(timestamp)
+        const now = new Date()
+        const diffMs = now.getTime() - date.getTime()
+        const diffMins = Math.floor(diffMs / 60000)
+        const diffHours = Math.floor(diffMs / 3600000)
+        const diffDays = Math.floor(diffMs / 86400000)
+
+        if (diffMins < 1) return 'Just now'
+        if (diffMins < 60) return `${diffMins}m ago`
+        if (diffHours < 24) return `${diffHours}h ago`
+        if (diffDays < 7) return `${diffDays}d ago`
+
+        return date.toLocaleDateString()
+    }
     return (
         <View style={styles.dropdownPanel}>
             <View style={styles.dropdownHeader}>
                 <Text style={styles.dropdownTitle}>Notifications</Text>
                 <View style={styles.notifBadge}>
-                    <Text style={styles.notifBadgeText}>{notifications?.length}</Text>
+                    <Text style={styles.notifBadgeText}>{filteredNotifications?.length}</Text>
                 </View>
             </View>
 
@@ -29,7 +118,7 @@ const NotificationPanel = ({ onClose }: { onClose: () => void }) => {
                     nestedScrollEnabled
                     showsVerticalScrollIndicator={false}
                 >
-                    {notifications?.map((n: BroadcastMsg, id: number) => (
+                    {filteredNotifications?.map((n: BroadcastMsg, id: number) => (
                         <View key={id} style={styles.notifRow}>
                             <View
                                 style={[

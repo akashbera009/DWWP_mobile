@@ -19,6 +19,7 @@ import dashboardReducer from '@dwwp/modules/dashboard/dashboardSlice'
 import paymentReducer from '@dwwp/modules/paymentsDashboard/paymentSlice'
 import servoReducer from '@dwwp/modules/dashboard/servoSlice'
 import usageReducer from '@dwwp/modules/dashboard/usageSlice'
+import  notificationReducer from '@dwwp/modules/dashboard/Notificationslice'
 
 import {
     FLUSH,
@@ -33,7 +34,7 @@ import {
 const persistConfig = {
     key: 'root',
     storage: mmkvStorage,
-    whitelist: ['auth', 'payment', 'usage' ,'dashboard'],
+    whitelist: ['auth', 'usage' ,'dashboard'],
 }
 
 const rootReducer = combineReducers({
@@ -42,6 +43,7 @@ const rootReducer = combineReducers({
     payment: paymentReducer,
     servo: servoReducer,
     usage: usageReducer,
+    notification : notificationReducer
 })
 // payment: paymentReducer,
 const persistedReducer = persistReducer(persistConfig, rootReducer);

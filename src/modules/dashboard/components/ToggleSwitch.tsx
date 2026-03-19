@@ -37,8 +37,8 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
     const dispatch = useDispatch<AppDispatch>();
 
     // ── Redux state ────────────────────────────────────────────────────────────
-    const { servoState, isLoading } = useSelector((state: RootState) => state.servo);
-    const email = useSelector((state: RootState) => state.dashboard?.userDetails?.emailId);
+    const { servoState, isLoading } = useSelector((state: RootState) => state?.servo);
+    const email = useSelector((state: RootState) => state?.dashboard?.userDetails?.emailId);
 
     // ── Animation ──────────────────────────────────────────────────────────────
     const progress = useSharedValue(servoState ? 1 : 0);

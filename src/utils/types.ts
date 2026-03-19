@@ -24,9 +24,10 @@ export type MainStackParamList = {
     PaymentSuccessScreen: {
         payment_id: string,
         amount: number,
-        qty: number,
-        refill: number,
-        addon: string,
+        qty?: number,
+        refill?: number,
+        type: string,
+        usage?:string 
     };
     ViewPaymentDetailsScreen: {
         transaction: TransactionForNav
@@ -46,10 +47,16 @@ export type StoredUser = {
 
 
 // paymenst 
-export interface payCurrentBillType {
+export interface payAddonBillType {
     amount: number,
     refill: number
     qty: number
+    type: 'regular' | 'addon'
+}
+export interface payCurrentBillType {
+    amount: number,
+    usage: number,
+    type: 'regular'
 }
 export type billObjectType = {
     amount: string,
@@ -60,9 +67,10 @@ export type billObjectType = {
 export interface successPayload {
     payment_id: string,
     amount: number,
-    refill: number,
-    qty: number,
-    addon?: 'regular' | 'addon'
+    refill?: number,
+    usage?: number,
+    qty?: number,
+    type: 'regular' | 'addon'
 }
 export interface PaymentRecordNav extends PaymentRecord {
     type: 'payment'

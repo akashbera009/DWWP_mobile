@@ -269,11 +269,11 @@ const ViewPaymentDetailsScreen = ({ navigation, route }: Props) => {
                 payment_id: transactionId,
                 amount: String(amount),
                 date: formatFullDate(date),
-                qty: isPayment ? undefined : (transaction as AddonRecord).quantityDone,
+                qty: isPayment ? undefined : (transaction as AddonRecord).qty,
                 refill: isPayment ? undefined : (transaction as AddonRecord).refill,
                 addon: isPayment ? undefined : `Addon Recharge`,
                 previousLimit: limit ?? 0,
-                newLimit: (limit ?? 0) + (transaction as AddonRecord).refill * (transaction as AddonRecord).quantityDone,
+                newLimit: (limit ?? 0) + (transaction as AddonRecord).refill * (transaction as AddonRecord).qty,
                 currentUsage: totalConsumed ?? 0
             })
             showSuccessSnackbar('PDF Saved in phone')
@@ -343,9 +343,9 @@ const ViewPaymentDetailsScreen = ({ navigation, route }: Props) => {
                             {!isPayment && (
                                 <>
                                     <Text style={S.sectionTitle}>Addon Details</Text>
-                                    <Row label="Quantity" value={`${(transaction as AddonRecord).quantityDone ?? 0} unit(s)`} />
+                                    <Row label="Quantity" value={`${(transaction as AddonRecord).qty ?? 0} unit(s)`} />
                                     <Row label="Refill Per Unit" value={`${(transaction as AddonRecord).refill ?? 0}L`} />
-                                    <Row label="Total Refill" value={`${((transaction as AddonRecord).quantityDone ?? 0) * ((transaction as AddonRecord).refill ?? 0)}L`} accent />
+                                    <Row label="Total Refill" value={`${((transaction as AddonRecord).qty ?? 0) * ((transaction as AddonRecord).refill ?? 0)}L`} accent />
                                     <Row label="Razor Pay ID" value={truncateId((transaction as AddonRecord).razor_pay_id)} />
                                     <Dashes />
                                 </>

@@ -22,6 +22,18 @@ type Props = {
   route: RouteProp<MainStackParamList, 'PaymentSuccessScreen'>;
   navigation: NativeStackNavigationProp<MainStackParamList, 'PaymentSuccessScreen'>;
 }
+
+type PaymentParams = {
+  payment_id: string
+  amount: number
+  type: 'addon' | 'regular'
+  // Addon specific
+  qty?: number
+  refill?: number
+  // Regular specific
+  usage?: string
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatINR(paise: number) {
   return `₹${(paise / 100).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`
@@ -35,7 +47,7 @@ function formatDate() {
 }
 
 function truncateId(id: string) {
-  return id.length > 26 ? `${id.slice(0, 12)}…${id.slice(-6)}` : id
+  return id.length > 26 ? `${id?.slice(0, 12)}…${id?.slice(-6)}` : id
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -45,6 +57,7 @@ const Row: React.FC<{ label: string; value: string; accent?: boolean }> = ({ lab
     <Text style={[rowS.value, accent && rowS.accentValue]}>{value}</Text>
   </View>
 )
+
 const rowS = StyleSheet.create({
   wrap: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: normalize(8) },
   label: { fontFamily: fonts.Regular, fontSize: normalize(13), color: colors.black },
@@ -64,22 +77,32 @@ const Dashes = () => (
 // MAIN SCREEN
 // ═══════════════════════════════════════════════════════════════════════════════
 const PaymentSuccessScreen = ({ navigation, route }: Props) => {
+  const params = route?.params as PaymentParams
+
   const {
     payment_id,
     amount,
+    type,
     qty,
     refill,
-    addon
-  } = route?.params
+    usage,
+  } = params
+
   // ── Redux ──────────────────────────────────────────────────────────────────
   const { currentMonthId, months } = useAppSelector(s => s.usage)
-  if (currentMonthId === null) return
+  if (currentMonthId === null) return null
+
   const currentMonth = months?.[currentMonthId]
   const currentUsage = currentMonth?.total ?? 0
   const previousLimit = currentMonth?.limit ?? 2000
-  const addedQuota = (refill ?? 0) * (qty ?? 1)
-  const newLimit = previousLimit + addedQuota
-  const isAddon = !!addon
+
+  // ── Determine payment type and calculate values ──────────────────────────
+  const isAddon = type === 'addon'
+  const addedQuota = isAddon ? (refill ?? 0) * (qty ?? 1) : 0
+  const newLimit = isAddon ? previousLimit + addedQuota : previousLimit
+
+  // For regular recharge display
+  const usageValue = usage ? parseInt(usage, 10) : 0
 
   // ── Entrance animations ────────────────────────────────────────────────────
   const iconScale = useRef(new Animated.Value(0)).current
@@ -112,18 +135,19 @@ const PaymentSuccessScreen = ({ navigation, route }: Props) => {
   const limit = useAppSelector(S => S?.dashboard?.currentMonth?.limit)
   const totalConsumed = useAppSelector(S => S?.dashboard?.currentMonth?.totalConsumed)
   const [isDownloadLoading, setIsDownloadLoading] = useState(false)
+
   const handleDownloadPDF = async () => {
     setIsDownloadLoading(true)
     try {
       const html = buildReceiptHTML({
         payment_id: payment_id,
         amount: String(amount / 100),
-        qty: qty,
-        refill: refill,
-        addon: addon,
+        qty: isAddon ? qty : undefined,
+        refill: isAddon ? refill : undefined,
+        addon: isAddon ? type : undefined,
         date: '',
         previousLimit: limit ?? 0,
-        newLimit: (limit ?? 0) + refill * qty,
+        newLimit: isAddon ? (limit ?? 0) + (refill ?? 0) * (qty ?? 0) : (limit ?? 0),
         currentUsage: totalConsumed ?? 0
       })
       await generateAndShareReceiptPDF(html, `DWWP_Receipt_${payment_id}`)
@@ -154,7 +178,11 @@ const PaymentSuccessScreen = ({ navigation, route }: Props) => {
         {/* ── Heading ── */}
         <Animated.View style={{ opacity: iconOpacity, alignItems: 'center' }}>
           <Text style={S.heading}>Payment Successful</Text>
-          <Text style={S.subheading}>Your water quota has been recharged</Text>
+          <Text style={S.subheading}>
+            {isAddon
+              ? 'Your water quota has been recharged'
+              : 'Your account has been credited'}
+          </Text>
         </Animated.View>
 
         {/* ── Amount pill ── */}
@@ -175,6 +203,7 @@ const PaymentSuccessScreen = ({ navigation, route }: Props) => {
             />
           </>
         )}
+
         {/* ── Receipt card ── */}
         <Animated.View style={[S.receipt, { opacity: cardOpacity, transform: [{ translateY: cardSlide }] }]}>
           {/* Notch top */}
@@ -186,17 +215,28 @@ const PaymentSuccessScreen = ({ navigation, route }: Props) => {
 
           {/* Receipt rows */}
           <View style={S.receiptBody}>
-            <Row label="Payment Type" value="Water Quota Refill" />
+            {/* ── ADDON SECTION ── */}
             {isAddon && (
               <>
-                <Row label="Plan / Addon" value={addon!} />
-                <Row label="Qty" value={`${qty ?? 1} unit${(qty ?? 1) !== 1 ? 's' : ''}`} />
+                <Row label="Payment Type" value="Water Quota Addon" />
+                <Row label="Duration" value={`${refill ?? 1} Month${(refill ?? 1) !== 1 ? 's' : ''}`} />
+                <Row label="Quantity" value={`${qty ?? 1} unit${(qty ?? 1) !== 1 ? 's' : ''}`} />
+                <Row label="Quota Added" value={`${addedQuota.toLocaleString()} L`} accent />
               </>
             )}
-            <Row label="Quota Added" value={`${addedQuota.toLocaleString()} L`} accent />
+
+            {/* ── REGULAR RECHARGE SECTION ── */}
+            {!isAddon && (
+              <>
+                <Row label="Payment Type" value="Water Quota Recharge" />
+                <Row label="Amount Credited" value={`₹${(amount / 100).toLocaleString('en-IN')}`} accent />
+                <Row label="Account Status" value="Active ✓" accent />
+              </>
+            )}
 
             <Dashes />
 
+            {/* ── COMMON SECTION ── */}
             <Row label="Transaction ID" value={shortId} />
             <Row label="Date & Time" value={formattedDate} />
             <Row label="Status" value="Successful ✓" accent />
@@ -210,7 +250,9 @@ const PaymentSuccessScreen = ({ navigation, route }: Props) => {
           </View>
 
           <Text style={S.receiptFooter}>
-            {strings.paymentFooterText}
+            {isAddon
+              ? strings.paymentFooterText
+              : 'Thank you for your payment. Your water service is now active.'}
           </Text>
         </Animated.View>
 

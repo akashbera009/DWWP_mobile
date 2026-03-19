@@ -58,7 +58,7 @@ const AnalyticsPage = () => {
   const dayOfMonth = new Date().getDate()
 
   const totalConsumed = Object.values(monthData.dailyUsages).reduce((s, v) => s + v, 0)
-  const totalAddonLiters = addons.reduce((s, a) => s + a.quantityDone, 0)
+  const totalAddonLiters = addons.reduce((s, a) => s + a.qty, 0)
   const effectiveLimit = monthData.limit + totalAddonLiters
 
   const trend = getTrend(totalConsumed, effectiveLimit, dayOfMonth, daysInMonth)
@@ -191,7 +191,9 @@ const styles = StyleSheet.create({
     paddingRight: vw(16),
   },
   homeHeaderContainer: {
-    backgroundColor: colors.primary
+    backgroundColor: colors.primary,
+    minHeight: vh(80),
+    justifyContent: 'center'
   },
   homeHeaderText: {
     fontFamily: fonts.Bold,

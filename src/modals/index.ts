@@ -153,11 +153,12 @@ export interface PaymentRecord {
 
 export interface AddonRecord {
   id: string
-  quantityDone: number
+  qty: number
   amount: number
   addon_date: string | null
   razor_pay_id: string
   refill: number
+  forMonth?:string 
   status: string | null
 }
 
@@ -194,5 +195,34 @@ export type FetchAllMonthsPayload = {
   transactionHistory: {
     paymentsHistory: PaymentRecord[]
     addonsHistory: AddonRecord[]
+  }
+}
+
+
+// User Notification Types
+export interface UserNotification {
+  id: string
+  type: 'payment' | 'refill' | 'limit_exceeded' | 'addon_completed' | 'system'| string
+  title: string
+  message: string
+  amount?: number
+  qty?: number
+  razorPayId?: string
+  status: 'Completed' | 'Pending' | 'Failed' | string
+  icon: string
+  timestamp: string
+  createdAt: string
+  read: boolean
+}
+export interface NotificationPayload {
+  type: UserNotification['type']
+  title: string
+  message: string
+  data?: {
+    qty?: number
+    amount?: number
+    razorPayId?: string
+    refill?: number
+    status?: string
   }
 }

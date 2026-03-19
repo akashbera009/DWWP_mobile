@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { StyleSheet} from "react-native";
+import { PermissionsAndroid, Platform, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -17,7 +17,24 @@ import { persistor } from "@dwwp/store/index";
 import { RootNavigator } from "@dwwp/router";
 
 function App() {
+  async function requestNotifeePermission() {
+    await notifee.requestPermission();
+  }
   useEffect(() => {
+    async function initNotifications() {
+      // Request permission (Notifee)
+      await requestNotifeePermission();
+
+      // (Optional but recommended) Android 13+
+      if (Platform.OS === 'android' && Platform.Version >= 33) {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+        );
+        console.log('Android permission:', granted);
+      }
+    }
+
+    initNotifications();
     const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
       switch (type) {
         case EventType.DISMISSED:

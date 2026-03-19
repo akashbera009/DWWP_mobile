@@ -14,7 +14,8 @@ check if the the back arrow with the subheading is correct alignment
 3 transactions styling is needed 
   
 
-notification panel . lets check this with a largenotifcaiton if it is scrollable or just full enrtire screen , also need real time listner for notification
+notification panel . lets check this with a largenotifcaiton if it is scrollable or just full enrtire screen
+notoficaiton panel is not scrollable , 
 
 
 in splash screen background bubble need zindex increment 

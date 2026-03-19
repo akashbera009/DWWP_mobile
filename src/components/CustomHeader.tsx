@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     homeHeaderContainer: {
         backgroundColor: colors.primary,
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     backArrow: {
         height: vh(16),

@@ -89,7 +89,7 @@ export async function seedDummyMonthlyData(
             const addonPayload = {
                 addon_date: firestore.FieldValue.serverTimestamp(),
                 amount: generateAddonAmount(idx),
-                quantityDone: randInt(1, 4),
+                qty: randInt(1, 4),
                 razor_pay_id: addonRazorId,
                 refill: randInt(20, 200),
                 forMonth: month,

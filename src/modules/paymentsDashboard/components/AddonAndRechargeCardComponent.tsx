@@ -64,7 +64,7 @@ function fmtMonth(key: string | null | undefined): string {
 
 function shortId(id: string | null | undefined): string {
   if (!id || typeof id !== 'string') return '—'
-  return id.slice(-10).toUpperCase()
+  return id?.slice(-10).toUpperCase()
 }
 
 
@@ -117,7 +117,7 @@ export const AddonCard: React.FC<{ item: AddonRecord; index: number }> = ({ item
               <Text style={styles.cardTitle}>Water Recharge</Text>
               <View style={styles.addonPillRow}>
                 <View style={[styles.addonPill, { backgroundColor: C.cyanBg, borderColor: C.cyanBorder }]}>
-                  <Text style={[styles.addonPillText, { color: C.cyan }]}>Qty: {item.quantityDone}</Text>
+                  <Text style={[styles.addonPillText, { color: C.cyan }]}>Qty: {item.qty}</Text>
                 </View>
                 <View style={[styles.addonPill, { backgroundColor: C.purpleBg, borderColor: C.purpleBorder }]}>
                   <Text style={[styles.addonPillText, { color: C.purple }]}>refill: {item.refill}L </Text>

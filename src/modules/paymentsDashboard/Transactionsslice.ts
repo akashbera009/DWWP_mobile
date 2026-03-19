@@ -117,7 +117,7 @@ export const fetchTransactions = createAsyncThunk<
       return {
         id: `addon_${d.id}`,
         type: 'addon' as TransactionType,
-        title: `Water Pack +${data.quantityDone ?? 0}L`,
+        title: `Water Pack +${data.qty ?? 0}L`,
         subtitle: `Refilled ${data.refill ?? 1}x  •  ${data.razor_pay_id ?? ''}`,
         amount: data.amount ?? 0,
         date: formatDate(data.addon_date),
@@ -160,7 +160,7 @@ export const fetchAddonTransactions = createAsyncThunk<
       return {
         id: `addon_${d.id}`,
         type: 'addon' as TransactionType,
-        title: `Water Pack +${data.quantityDone ?? 0}L`,
+        title: `Water Pack +${data.qty ?? 0}L`,
         subtitle: `Refilled ${data.refill ?? 1}x`,
         amount: data.amount ?? 0,
         date: formatDate(data.addon_date),

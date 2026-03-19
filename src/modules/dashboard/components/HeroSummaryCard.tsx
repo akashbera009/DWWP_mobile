@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import LinearGradient from 'react-native-linear-gradient'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
@@ -14,6 +14,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { useAppSelector } from '@dwwp/store/hooks'
 import { selectCurrentMonthLimit, selectCurrentMonthTotal, selectTodayUsage } from '../usageSelectors'
+import { getCurrentMonthKey } from '@dwwp/utils/commonFunctions'
 
 // ─── Tuning constants ─────────────────────────────────────────────────────────
 //
@@ -49,6 +50,20 @@ const HeroSummaryCard: React.FC = () => {
     const todayUsage = useAppSelector(selectTodayUsage)
     const monthTotal = useAppSelector(selectCurrentMonthTotal)
     const monthLimit = useAppSelector(selectCurrentMonthLimit)
+    const addons = useAppSelector(s => s.payment?.addons)
+    const thisMonthKey = getCurrentMonthKey()
+
+    const [addedLimit, setAddedLimit] = useState(1)
+    const [effectiveLimit, setEffectiveLimit] = useState(monthLimit)
+    useEffect(() => {
+        const totalAddons = addons
+            .filter(txn => txn?.forMonth === thisMonthKey)
+            .reduce((reducer, item) => reducer + (item?.qty * item?.refill), 0)
+        setAddedLimit(totalAddons)
+        const total = (monthLimit || 0 ) + totalAddons
+        setEffectiveLimit(total)
+
+    }, [addedLimit, monthLimit , addedLimit]) 
     // const limitExceeded = useAppSelector(selectLimitExceeded)
 
     // const allTimeDaysTotal = useAppSelector(selectAllTimeDaysTotal)
@@ -77,10 +92,8 @@ const HeroSummaryCard: React.FC = () => {
     //     state.usage.allTimeDaysTotal
     // ).toFixed(0)
 
-    if(monthLimit === null) return 
-    const usagePct = monthTotal / monthLimit;
-    const onlineCount = 2;
-    const total = 4;
+    if (effectiveLimit === null) return
+    const usagePct = monthTotal  / effectiveLimit;
 
     // const sensor = useAnimatedSensor(SensorType.GYROSCOPE, { interval: 16 })
     const sensor = useAnimatedSensor(SensorType.GRAVITY, { interval: 16 })
@@ -192,8 +205,8 @@ const HeroSummaryCard: React.FC = () => {
                         </View>
                         <View style={styles.heroStatDivider} />
                         <View style={styles.heroStatItem}>
-                            <Text style={styles.heroStatValue}>{onlineCount}/{total}</Text>
-                            <Text style={styles.heroStatUnit}>Devices</Text>
+                            <Text style={styles.heroStatValue}>{effectiveLimit}</Text>
+                            <Text style={styles.heroStatUnit}>Total Limit</Text>
                         </View>
                     </View>
                 </View>
