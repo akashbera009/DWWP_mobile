@@ -25,31 +25,18 @@ export const displayNotification = async ({ title, body, data }: notificationTyp
         await notifee.displayNotification({
 
             title: `${title}`,
-            subtitle: '&#127881;',
+            subtitle: `${data?.type}`,
             body:
                 `${body}` +
                 `${data?.type}!`,
             android: {
                 channelId,
                 sound: 'ring_drop',
-                color: colors.primary,
-                smallIcon: 'ic_launcher',
+                color: colors.black,
+                smallIcon: 'ic_launcher_foreground',
                 largeIcon: 'https://github.com/akashbera009/DWWP_2.0/blob/main/DWWP%20LOGO.png?raw=true',
                 badgeIconType: AndroidBadgeIconType.SMALL,  // badge 
                 importance: AndroidImportance.HIGH,// importance
-                // style: {
-                //   type: AndroidStyle.BIGPICTURE,
-                //   picture: 'https://imgs.search.brave.com/sIT_rkJ_HDXYstSOy2NQ99Wa_Y1LOuuaouxUEoAuBLA/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9ibG9n/Z2VyLmdvb2dsZXVz/ZXJjb250ZW50LmNv/bS9pbWcvYi9SMjl2/WjJ4bC9BVnZYc0Vn/VDlld3p4Yi1tSEpu/STNsQWVGVjVzclgz/NTIwZlVqeFBVZ0FB/VXlZUWZSekNfcTY2/Ukk0TWpfbjBRSkdL/RVlhRFBRZldjbnFy/cjdxQmp0S1FERDFk/d2doUE9OcXdqdGQ4/WGhCczlCdWN5dGpB/ckI5b3hYcWhueG1V/TFNURXRwMEdaZ0hY/bzh3RzFaYXcvczY0/MC1ydy9hbGwtYWJv/dXQtZG9ncy5qcGc',
-                // },
-                // style: {
-                //     type: AndroidStyle.BIGTEXT,
-                //     text: 'Ypur recharge has been done .'
-                // },
-                // style: {
-                //   type: AndroidStyle.INBOX,
-                //   lines: ['First Message', 'Second Message', 'Third Message', 'Forth Message'],
-                // },
-
                 pressAction: {
                     id: 'default',
                 },
@@ -64,7 +51,6 @@ export const displayNotification = async ({ title, body, data }: notificationTyp
             ios: {
                 attachments: [
                     {
-                        // Local file path.
                         url: 'https://player.cloudinary.com/embed/?cloud_name=dilxiy8fa&public_id=steak_video_qng8ej',
                         thumbnailTime: 3, // optional
                     },

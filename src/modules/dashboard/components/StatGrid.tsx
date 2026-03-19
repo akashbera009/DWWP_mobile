@@ -19,20 +19,20 @@ type StatItem = {
 const StatGrid = () => {
     let billingCycle
     let nextBillRemainingdays
-    const [statGrid , setStatGrid ] = useState<StatItem[]>([
-            { icon: '⚡', label: 'Today', value: '0', subScript: 'litres', sub: '+0% vs last mo', accent: colors.activeDot, trend: 12, bg: 'rgba(50,194,202,0.08)' },
-            { icon: '🚨', label: 'Penalty', value: '₹0', sub: '2 need attention', accent: colors.warning, trend: undefined, bg: 'rgba(243,156,18,0.08)' },
-            { icon: '📡', label: 'Regular Price', value: '₹0', sub: 'All zones active', accent: colors.success, trend: undefined, bg: 'rgba(39,174,96,0.08)' },
-            { icon: '📅', label: 'Billing Cycle', value: `0`, subScript: 'days', sub: `0 days Until next bill`, accent: colors.secondary, trend: undefined, bg: colors.primaryLight },
-        ]
-    ) 
+    const [statGrid, setStatGrid] = useState<StatItem[]>([
+        { icon: '⚡', label: 'Today', value: '0', subScript: 'litres', sub: '+0% vs last mo', accent: colors.activeDot, trend: 12, bg: 'rgba(50,194,202,0.08)' },
+        { icon: '🚨', label: 'Penalty', value: '₹0', sub: '2 need attention', accent: colors.warning, trend: undefined, bg: 'rgba(243,156,18,0.08)' },
+        { icon: '📡', label: 'Regular Price', value: '₹0', sub: 'All zones active', accent: colors.success, trend: undefined, bg: 'rgba(39,174,96,0.08)' },
+        { icon: '📅', label: 'Billing Cycle', value: `0`, subScript: 'days', sub: `0 days Until next bill`, accent: colors.secondary, trend: undefined, bg: colors.primaryLight },
+    ]
+    )
     const now = new Date()
     const todayUse = useAppSelector(s => s.usage.todayUsage)
     useEffect(() => {
         const daysInMonth = (year: number, month: number) => new Date(year, month, 0).getDate();
         billingCycle = daysInMonth(now.getFullYear(), now.getMonth() + 1)
         nextBillRemainingdays = billingCycle - now.getDate()
-        setStatGrid ([
+        setStatGrid([
             { icon: '⚡', label: 'Today', value: todayUse.toString(), subScript: 'litres', sub: '+12% vs last mo', accent: colors.activeDot, trend: 12, bg: 'rgba(50,194,202,0.08)' },
             { icon: '🚨', label: 'Penalty', value: '₹0', sub: '2 need attention', accent: colors.warning, trend: undefined, bg: 'rgba(243,156,18,0.08)' },
             { icon: '📡', label: 'Regular Price', value: '₹-', sub: 'All zones active', accent: colors.success, trend: undefined, bg: 'rgba(39,174,96,0.08)' },
@@ -109,14 +109,13 @@ const styles = StyleSheet.create({
     statGridValueRow: {
         flexDirection: 'row',
         alignItems: 'flex-end',
-        overflow : 'hidden'
+        overflow: 'hidden'
     },
     statGridValue: {
         fontFamily: fonts.Bold,
         fontSize: normalize(22),
         color: colors.neutralBlack,
         lineHeight: normalize(26),
-        // maxWidth : vw(70)
     },
     statGridValueSubScript: {
         marginLeft: vw(6),

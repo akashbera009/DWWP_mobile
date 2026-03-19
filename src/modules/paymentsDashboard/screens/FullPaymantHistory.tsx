@@ -1,6 +1,6 @@
 import React, { useRef, useState, useMemo, useCallback } from 'react'
 import {
-  View, Text, StyleSheet, FlatList, Pressable,TextInput, Image,
+  View, Text, StyleSheet, FlatList, Pressable, TextInput, Image,
   TouchableOpacity, Modal, ScrollView,
 } from 'react-native'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
@@ -13,26 +13,9 @@ import { CustomHeader } from '@dwwp/components/CustomHeader'
 import { AddonCard, PaymentCard } from '../components/AddonAndRechargeCardComponent'
 import { Portal } from '@gorhom/portal'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { CustomButton } from '@dwwp/components/CustomButton'
 
 // ─── Color palette ────────────────────────────────────────────────────────────
-const C = {
-  primary: '#2B6568',
-  primaryDark: '#1e4a4d',
-  cyan: '#32C2CA',
-  white: '#FFFFFF',
-  black: '#041617',
-  text: '#1A1A1A',
-  textLight: '#6A7C92',
-  border: '#E1E8ED',
-  bg: '#F8FAFB',
-  card: '#FFFFFF',
-  divider: '#E8ECEF',
-  success: '#27AE60',
-  warning: '#F39C12',
-  error: '#E74C3C',
-  overlay: 'rgba(0,0,0,0.5)',
-  shadow: 'rgba(43,101,104,0.08)',
-}
 
 // ─── Type definitions ─────────────────────────────────────────────────────────
 type TransactionWithType =
@@ -278,18 +261,17 @@ const FilterPanel: React.FC<{
 
           {/* Footer */}
           <View style={[styles.filterFooter, { marginBottom: bottom }]}>
-            <Pressable
-              style={styles.filterResetBtn}
+            <CustomButton
+              title='Reset'
               onPress={() => onFilterChange(DEFAULT_FILTERS)}
-            >
-              <Text style={styles.filterResetBtnText}>Reset</Text>
-            </Pressable>
-            <Pressable
-              style={styles.filterApplyBtn}
+              variant='outline'
+              style={styles.filterResetBtn}
+              />
+            <CustomButton
+              title='Apply'
               onPress={onClose}
-            >
-              <Text style={styles.filterApplyBtnText}>Apply</Text>
-            </Pressable>
+              style={styles.filterResetBtn}
+            />
           </View>
         </View>
       </View>
@@ -298,7 +280,7 @@ const FilterPanel: React.FC<{
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
-const SimplifiedPaymentHistory=() => {
+const SimplifiedPaymentHistory = () => {
   const { paymentsHistory, addonsHistory } = useAppSelector(
     s => s.payment.transactionHistory
   ) as { paymentsHistory: PaymentRecord[]; addonsHistory: AddonRecord[] }
@@ -352,7 +334,7 @@ const SimplifiedPaymentHistory=() => {
     <View style={styles.screen}>
       <CustomHeader
         screenName="Transaction History"
-        subTitle="All payments and recharges"
+        subTitle={`All (${(allTransactions || [])?.length}) payments and recharges`}
       />
 
       {/* Search bar with filter button */}
@@ -362,7 +344,7 @@ const SimplifiedPaymentHistory=() => {
           <TextInput
             style={styles.searchInput}
             placeholder="Search transactions..."
-            placeholderTextColor={C.textLight}
+            placeholderTextColor={colors.neutralBodyText}
             value={filters.search}
             onChangeText={handleSearchChange}
           />
@@ -412,7 +394,7 @@ export default SimplifiedPaymentHistory
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: C.bg,
+    backgroundColor: colors.background,
   },
 
   // Search bar
@@ -423,17 +405,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: normalize(16),
     paddingVertical: normalize(0),
     backgroundColor: 'transparent',
-    borderBottomWidth: 1,
-    borderBottomColor: C.divider,
   },
   searchInputWrap: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.inputBackground,
-    borderWidth: 1,
+    borderWidth: 2,
     marginTop: vh(6),
-    borderColor: colors.border,
+    borderColor: colors.lightBlack1,
     borderRadius: normalize(12),
     paddingHorizontal: normalize(12),
     paddingVertical: normalize(6),
@@ -446,7 +426,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: normalize(14),
-    color: C.text,
+    color: colors.black70,
     fontFamily: fonts.Regular,
   },
   filterBtn: {
@@ -473,17 +453,17 @@ const styles = StyleSheet.create({
     width: normalize(8),
     height: normalize(8),
     borderRadius: normalize(4),
-    backgroundColor: C.primary,
+    backgroundColor: colors.primary,
   },
 
   // Filter Panel
   filterOverlay: {
     flex: 1,
-    backgroundColor: C.overlay,
+    backgroundColor: colors.black70,
     justifyContent: 'flex-end',
   },
   filterPanel: {
-    backgroundColor: C.card,
+    backgroundColor: colors.background,
     borderTopLeftRadius: normalize(20),
     borderTopRightRadius: normalize(20),
     maxHeight: '85%',
@@ -494,30 +474,30 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: normalize(20),
-    paddingBottom: normalize(14),
+    paddingBottom: normalize(8),
     borderBottomWidth: 1,
-    borderBottomColor: C.divider,
+    borderBottomColor: colors.border,
   },
   filterTitle: {
     fontSize: normalize(18),
     fontFamily: fonts.Bold,
-    color: C.text,
+    color: colors.black,
   },
   filterClose: {
     fontSize: normalize(24),
-    color: C.textLight,
+    color: colors.placeholderText,
   },
   filterContent: {
     paddingHorizontal: normalize(20),
     paddingVertical: normalize(16),
   },
   filterSection: {
-    marginBottom: normalize(28),
+    marginBottom: normalize(8),
   },
   filterSectionTitle: {
     fontSize: normalize(14),
     fontFamily: fonts.SemiBold,
-    color: C.text,
+    color: colors.neutralBlack,
     marginBottom: normalize(12),
   },
   filterOptions: {
@@ -526,10 +506,10 @@ const styles = StyleSheet.create({
   filterOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: normalize(12),
+    paddingVertical: normalize(6),
     paddingHorizontal: normalize(12),
     borderRadius: normalize(10),
-    backgroundColor: C.bg,
+    backgroundColor: colors.background,
   },
   filterOptionActive: {
     backgroundColor: 'rgba(43,101,104,0.08)',
@@ -539,27 +519,27 @@ const styles = StyleSheet.create({
     height: normalize(20),
     borderRadius: normalize(6),
     borderWidth: 2,
-    borderColor: C.border,
+    borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: normalize(12),
   },
   filterCheckboxActive: {
-    borderColor: C.primary,
-    backgroundColor: C.primary,
+    borderColor: colors.primary,
+    backgroundColor: colors.primary,
   },
   filterCheckmark: {
-    color: C.white,
+    color: colors.white,
     fontSize: normalize(12),
     fontFamily: fonts.Bold,
   },
   filterOptionLabel: {
     fontSize: normalize(14),
     fontFamily: fonts.Regular,
-    color: C.textLight,
+    color: colors.neutralBodyText,
   },
   filterOptionLabelActive: {
-    color: C.primary,
+    color: colors.primary,
     fontFamily: fonts.SemiBold,
   },
   filterFooter: {
@@ -568,48 +548,40 @@ const styles = StyleSheet.create({
     paddingHorizontal: normalize(20),
     paddingVertical: normalize(14),
     borderTopWidth: 1,
-    borderTopColor: C.divider,
+    borderTopColor: colors.border,
   },
   filterResetBtn: {
     flex: 1,
-    paddingVertical: normalize(12),
-    borderRadius: normalize(12),
-    borderWidth: 1.5,
-    borderColor: C.border,
-    alignItems: 'center',
   },
   filterResetBtnText: {
     fontSize: normalize(14),
     fontFamily: fonts.SemiBold,
-    color: C.text,
+    color: colors.neutralBlack,
   },
   filterApplyBtn: {
     flex: 1,
     paddingVertical: normalize(12),
     borderRadius: normalize(12),
-    backgroundColor: C.primary,
+    backgroundColor: colors.primary,
     alignItems: 'center',
   },
   filterApplyBtnText: {
     fontSize: normalize(14),
     fontFamily: fonts.SemiBold,
-    color: C.white,
+    color: colors.white,
   },
 
   // Month separator
   monthSeparator: {
     paddingHorizontal: normalize(16),
     paddingVertical: normalize(16),
-    backgroundColor: C.bg,
+    backgroundColor: colors.background,
   },
   monthLabel: {
     fontSize: normalize(16),
     fontFamily: fonts.Bold,
-    color: C.text,
+    color: colors.neutralBlack,
   },
-
-  // Transaction item (handled by PaymentCard/AddonCard)
-  // Styles removed - using existing card components
 
   // Empty state
   emptyState: {
@@ -626,18 +598,18 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: normalize(18),
     fontFamily: fonts.Bold,
-    color: C.text,
+    color: colors.neutralBlack,
   },
   emptySub: {
     fontSize: normalize(14),
     fontFamily: fonts.Regular,
-    color: C.textLight,
+    color: colors.neutralBodyText,
     textAlign: 'center',
   },
 
   // List
   listContent: {
     paddingBottom: normalize(24),
-    backgroundColor: C.bg,
+    backgroundColor: colors.background,
   },
 })

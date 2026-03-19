@@ -109,7 +109,8 @@ const PaymentSuccessScreen = ({ navigation, route }: Props) => {
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   const handleDone = () => navigation?.goBack()
-
+  const limit = useAppSelector(S => S?.dashboard?.currentMonth?.limit)
+  const totalConsumed = useAppSelector(S => S?.dashboard?.currentMonth?.totalConsumed)
   const [isDownloadLoading, setIsDownloadLoading] = useState(false)
   const handleDownloadPDF = async () => {
     setIsDownloadLoading(true)
@@ -121,9 +122,9 @@ const PaymentSuccessScreen = ({ navigation, route }: Props) => {
         refill: refill,
         addon: addon,
         date: '',
-        previousLimit: 100,
-        newLimit: 200,
-        currentUsage: 10
+        previousLimit: limit ?? 0,
+        newLimit: (limit ?? 0) + refill * qty,
+        currentUsage: totalConsumed ?? 0
       })
       await generateAndShareReceiptPDF(html, `DWWP_Receipt_${payment_id}`)
     } catch (err) {
@@ -227,7 +228,7 @@ const PaymentSuccessScreen = ({ navigation, route }: Props) => {
         />
         <CustomButton
           title='Done'
-          style={{flexGrow:1}}
+          style={{ flexGrow: 1 }}
           onPress={handleDone}
           variant='primary'
         />

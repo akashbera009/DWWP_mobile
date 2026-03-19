@@ -18,6 +18,7 @@ import { CustomHeader } from '@dwwp/components/CustomHeader'
 import { showSuccessSnackbar } from '@dwwp/utils/showSnackBar'
 import { localImages } from '@dwwp/utils/localimages'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useAppSelector } from '@dwwp/store/hooks'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Transaction =
@@ -127,23 +128,23 @@ const TransactionHeader: React.FC<{
 
     return (
         <View style={headerS.container}>
-           
-                <View style={headerS.iconWrap}>
-                    <View style={[
-                        headerS.icon,
-                        { backgroundColor: type === 'payment' ? 'rgba(43,101,104,0.1)' : 'rgba(124,92,191,0.1)' }
-                    ]}>
-                        {/* <Text style={headerS.iconText}>{txIcon}</Text> */}
-                         <Text style={headerS.amountValue}>{formatINR(amount)}</Text>
-                    </View>
-                    <View>
-                        <Text style={headerS.title}>{txTitle}</Text>
-                        <Text style={headerS.date}>{formatFullDate(date)}</Text>
-                    </View>
+
+            <View style={headerS.iconWrap}>
+                <View style={[
+                    headerS.icon,
+                    { backgroundColor: type === 'payment' ? 'rgba(43,101,104,0.1)' : 'rgba(124,92,191,0.1)' }
+                ]}>
+                    {/* <Text style={headerS.iconText}>{txIcon}</Text> */}
+                    <Text style={headerS.amountValue}>{formatINR(amount)}</Text>
                 </View>
-                <View style={[headerS.statusBadge, { borderColor: statusColor }]}>
-                    <Text style={[headerS.statusIcon, { color: statusColor }]}>{statusIcon}</Text>
+                <View>
+                    <Text style={headerS.title}>{txTitle}</Text>
+                    <Text style={headerS.date}>{formatFullDate(date)}</Text>
                 </View>
+            </View>
+            <View style={[headerS.statusBadge, { borderColor: statusColor }]}>
+                <Text style={[headerS.statusIcon, { color: statusColor }]}>{statusIcon}</Text>
+            </View>
         </View>
     )
 }
@@ -161,7 +162,7 @@ const headerS = StyleSheet.create({
         shadowOpacity: 0.05,
         shadowRadius: 8,
         elevation: 2,
-               flexDirection: 'row',
+        flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
     },
@@ -174,7 +175,7 @@ const headerS = StyleSheet.create({
     icon: {
         // width: normalize(48),
         // height: normalize(48),
-        padding : normalize(8),
+        padding: normalize(8),
         borderRadius: normalize(12),
         alignItems: 'center',
         justifyContent: 'center',
@@ -239,7 +240,7 @@ const ViewPaymentDetailsScreen = ({ navigation, route }: Props) => {
             </View>
         )
     }
- 
+
     const isPayment = transaction.type === 'payment'
     const amount = transaction.amount ?? 0
     const status = transaction.status
@@ -259,7 +260,8 @@ const ViewPaymentDetailsScreen = ({ navigation, route }: Props) => {
 
     // ── PDF Download ──────────────────────────────────────────────────────────
     const [isDownloadLoading, setIsDownloadLoading] = useState(false)
-
+    const limit = useAppSelector(S => S?.dashboard?.currentMonth?.limit)
+    const totalConsumed = useAppSelector(S => S?.dashboard?.currentMonth?.totalConsumed)
     const handleDownloadPDF = async () => {
         setIsDownloadLoading(true)
         try {
@@ -270,9 +272,9 @@ const ViewPaymentDetailsScreen = ({ navigation, route }: Props) => {
                 qty: isPayment ? undefined : (transaction as AddonRecord).quantityDone,
                 refill: isPayment ? undefined : (transaction as AddonRecord).refill,
                 addon: isPayment ? undefined : `Addon Recharge`,
-                previousLimit: 0,
-                newLimit: 0,
-                currentUsage: 0
+                previousLimit: limit ?? 0,
+                newLimit: (limit ?? 0) + (transaction as AddonRecord).refill * (transaction as AddonRecord).quantityDone,
+                currentUsage: totalConsumed ?? 0
             })
             showSuccessSnackbar('PDF Saved in phone')
             await generateAndShareReceiptPDF(html, `DWWP_Receipt_${transactionId}`)

@@ -139,7 +139,10 @@ const PlanCard: React.FC<{
               <TouchableOpacity
                 style={styles.selectButton}
                 activeOpacity={0.8}
-                onPress={onAddToCart}
+                // onPress={onAddToCart}
+                onPress={()=>{
+                  displayNotification({title: 'hi', body : 'body ', data:{type : 'Addon'}})
+                }}
               >
                 <View style={styles.selectButtonContent}>
                   <Text style={styles.selectButtonEmoji}>🛒</Text>
@@ -294,7 +297,7 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
         </ScrollView>
 
         {/* Carousel indicators */}
-        <View style={styles.indicators}>
+        {/* <View style={styles.indicators}>
           {PLANS.map((plan) => (
             <TouchableOpacity
               key={plan.id}
@@ -305,7 +308,7 @@ const PlanSelector: React.FC<PlanSelectorProps> = ({
               onPress={() => handleSelect(plan)}
             />
           ))}
-        </View>
+        </View> */}
       </View>
 
       {/* Quantity Modal - Bottom Sheet */}
@@ -339,6 +342,7 @@ export default PlanSelector;
 const styles = StyleSheet.create({
   root: {
     marginBottom: vh(8),
+    marginTop : vh(8)
   },
   scrollContent: {
     gap: vw(12),

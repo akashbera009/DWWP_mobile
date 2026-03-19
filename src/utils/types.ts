@@ -1,24 +1,6 @@
 import { AddonRecord, PaymentRecord } from '@dwwp/modals';
 import { NavigatorScreenParams } from '@react-navigation/native';
 
-// export type RootStackParamList = {
-//     BottomTabNavigator: undefined;
-
-//     // Global screens (outside tabs)
-//     LoginScreen: undefined;
-//     ViewProfileScreen: undefined;
-
-// };
-
-// export type BottomTabParamList = {
-//     DashBoard: undefined;
-//     ServoControl: undefined;
-//     PaymentDashBoard: undefined;
-//     Analytics: undefined;
-//     Profile: undefined
-// };
-
-
 export type AuthStackParamList = {
     LoginScreen: undefined;
     SignUpScreen: undefined;
@@ -34,7 +16,6 @@ export type MainStackParamList = {
 
     PaymentsIndexDashboard: undefined
     FullPaymantHistory: undefined
-    IndividualPaymentHistory: undefined // be a transaction data 
 
     ViewProfileScreen: undefined;
     SettingsScreen: undefined;

@@ -2,8 +2,7 @@
 daily usages in analytics component is not vertically scrollable 
 
 plan selector in payment dashboard need to be horizontla , or be changed with other design 
-
-plan selctor page a horizontal scrolview hoye ache 
+ 
 
 need round logo for DWWP initial screen
 
@@ -12,7 +11,6 @@ in payment hostory show subtitle (total129 transactions )
 
 add a subheading for all the bottomtab screens 
 check if the the back arrow with the subheading is correct alignment 
-
 3 transactions styling is needed 
   
 
@@ -53,3 +51,5 @@ bill calculations are wrong in respect to the penalty
 
 
 add vibtration to the buttons 
+
+analytics component prediction work needed 

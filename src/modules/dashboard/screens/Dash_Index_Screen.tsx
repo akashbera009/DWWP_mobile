@@ -8,7 +8,7 @@ import {
 import { Portal } from '@gorhom/portal'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 // utils 
-import { screenWidth,vw } from '@dwwp/utils/dimensions'
+import { screenWidth, vw } from '@dwwp/utils/dimensions'
 import colors from '@dwwp/utils/colors'
 
 // components
@@ -41,7 +41,6 @@ const Dash_Index_Screen = () => {
         state => state.dashboard
     )
 
-
     // fetching the important data first 
     const fetchDashboardData = useCallback(() => {
         if (!email) return
@@ -49,6 +48,11 @@ const Dash_Index_Screen = () => {
         dispatch(fetchCurrentMonth({ email }))
         dispatch(fetchAdminConfig())
 
+    }, [email])
+    //refresh data
+    const refreshData = useCallback(() => {
+        fetchDashboardData();
+        fetchAdditionalData()
     }, [email])
 
     useEffect(() => {
@@ -154,7 +158,7 @@ const Dash_Index_Screen = () => {
                     <View style={styles.page}>
                         <DashBoardPage
                             setIsSwitchModalOpen={() => setIsSwitchModalOpen(true)}
-                            refreshDashboard={fetchDashboardData}
+                            refreshDashboard={refreshData}
                             handleSetActivetab={handleSetActivetab}
                         />
                     </View>

@@ -117,10 +117,10 @@ const AnalyticsPage = () => {
           <View style={styles.page}>
             <MonthlyBreakDown />
           </View>
-          <Image source={localImages.downarrow}
+          <View
             style={{
-              height: vh(22),
-              width: vh(22),
+              height: vh(24),
+              width: vh(24),
               borderRadius: normalize(20),
               padding: normalize(12),
               position: 'relative',
@@ -128,9 +128,17 @@ const AnalyticsPage = () => {
               top: '50%',
               backgroundColor: colors.activeDotLight,
               transform: [{ rotate: '-90deg' }],
-              objectFit: 'contain'
-            }} />
+            }}>
 
+            {/* <Image source={localImages.downarrow}
+            style={{
+              height: vh(22),
+              width: vh(22),
+              objectFit: 'contain',
+              
+            }} /> */}
+
+          </View>
           <View style={styles.page}>
             <DailyBreakDown />
           </View>
@@ -172,7 +180,7 @@ const styles = StyleSheet.create({
   scrollview: {
     backgroundColor: colors.overlayBackground,
     paddingTop: vh(16),
-    paddingBottom : vh(16)
+    paddingBottom: vh(16)
   },
   horizontalScrollView: {
     paddingHorizontal: vw(16),

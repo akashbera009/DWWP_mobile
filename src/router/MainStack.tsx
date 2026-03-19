@@ -8,7 +8,6 @@ import ViewProfileScreen from '@dwwp/modules/userProfile/ViewProfileScreen';
 import SettingsScreen from '@dwwp/modules/userProfile/SettingsScreen';
 import RaiseComplaintScreen from '@dwwp/modules/userProfile/RaiseComplaintScreen';
 import PaymentsIndexDashboard from '@dwwp/modules/paymentsDashboard/PaymentsIndexDashboard';
-import IndividualPaymentHistory from '@dwwp/modules/paymentsDashboard/screens/IndividualPaymentHistory';
 import FullPaymantHistory from '@dwwp/modules/paymentsDashboard/screens/FullPaymantHistory';
 import PaymentSuccessScreen from '@dwwp/modules/paymentsDashboard/screens/PaymentSuccessScreen';
 import ViewPaymentDetailsScreen from '@dwwp/modules/paymentsDashboard/screens/ViewPaymentDetailsScreen';
@@ -25,7 +24,6 @@ export default function MainStackNavigator() {
       />
       <Stack.Screen name="PaymentsIndexDashboard" component={PaymentsIndexDashboard} options={{ headerShown: false }} />
       <Stack.Screen name="FullPaymantHistory" component={FullPaymantHistory} options={{ headerShown: false }} />
-      <Stack.Screen name="IndividualPaymentHistory" component={IndividualPaymentHistory} options={{ headerShown: false }} />
 
       <Stack.Screen name="ViewProfileScreen" component={ViewProfileScreen} options={{ headerShown: false }} />
       <Stack.Screen name="SettingsScreen" component={SettingsScreen} />

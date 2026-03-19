@@ -203,8 +203,8 @@ export const PaymentCard: React.FC<{ item: PaymentRecord; index: number }> = ({ 
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row', backgroundColor: C.card, borderRadius: normalize(18),
-    overflow: 'hidden', shadowColor: C.shadow, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 10, elevation: 3,
-    borderWidth: 1, borderColor: C.border, marginHorizontal: vw(16), marginVertical: vh(4)
+    overflow: 'hidden', shadowColor: C.shadow, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 1, shadowRadius: 10, elevation: 10,
+    borderWidth: 1, borderColor: C.border, marginHorizontal: vw(16), marginVertical: vh(4),
   },
   cardAccent: { width: normalize(4) },
   cardBody: { flex: 1, padding: normalize(14), gap: normalize(10) },

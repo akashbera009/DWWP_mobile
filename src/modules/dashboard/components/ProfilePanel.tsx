@@ -40,8 +40,15 @@ const ProfilePanel = ({ onClose }: { onClose: () => void }) => {
                     onClose?.()
             }
         },
-        { title: strings.settings, imageUrl: localImages.settings },
-        { title: strings.raiseComplaint, imageUrl: localImages.report },
+        // { title: strings.settings, imageUrl: localImages.settings },
+        { 
+            title: strings.raiseComplaint,
+             imageUrl: localImages.report,
+              onClickEvent:()=>{
+                 navigation.navigate(screenNames.RaiseComplaintScreen)
+                 onClose?.()
+              }
+             },
         {
             title: strings.logout,
             imageUrl: localImages.logout,

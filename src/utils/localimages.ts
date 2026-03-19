@@ -11,6 +11,7 @@ export const localImages = {
     back: require('../assets/images/back.png'),
     downarrow: require('../assets/images/downarrow.png'),
     tick: require('../assets/images/tick.png'),
+    report_docs: require('../assets/images/report_docs.png'),
     verified: require('../assets/images/verified.png'),
 
     homeTab: require('../assets/images/homeTab.png'),
