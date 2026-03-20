@@ -20,6 +20,7 @@ export type MainStackParamList = {
     ViewProfileScreen: undefined;
     SettingsScreen: undefined;
     RaiseComplaintScreen: undefined;
+    AllNotifications:undefined ; 
 
     PaymentSuccessScreen: {
         payment_id: string,

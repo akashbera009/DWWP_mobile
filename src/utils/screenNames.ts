@@ -17,6 +17,7 @@ export const screenNames = {
     ViewProfileScreen:'ViewProfileScreen',
     SelectAddress : 'SelectAddress',
     RaiseComplaintScreen : 'RaiseComplaintScreen',
+    AllNotifications:'AllNotifications',
 
     FullPaymantHistory : 'FullPaymantHistory',
     AddonRechargesScreen : 'AddonRechargesScreen',

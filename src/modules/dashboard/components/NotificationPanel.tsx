@@ -7,9 +7,15 @@ import colors from '@dwwp/utils/colors'
 import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks'
 import { BroadcastMsg, UserNotification } from '@dwwp/modals'
 import { fetchUserNotifications } from '../Notificationslice'
+import { MainStackParamList } from '@dwwp/utils/types'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { useNavigation } from '@react-navigation/native'
+import { screenNames } from '@dwwp/utils/screenNames'
+type MainStackNavigationProp =NativeStackNavigationProp<MainStackParamList>;
 
 const NotificationPanel = ({ onClose }: { onClose: () => void }) => {
   const dispatch = useAppDispatch()
+  const navigation = useNavigation<MainStackNavigationProp>();
 
     // Admin broadcasts
     const [broadcasts, setBroadcasts] = useState<BroadcastMsg[] | null>([])
@@ -138,7 +144,10 @@ const NotificationPanel = ({ onClose }: { onClose: () => void }) => {
                 </ScrollView>
             </View>
 
-            <TouchableOpacity onPress={onClose} style={styles.dropdownFooter}>
+            <TouchableOpacity onPress={()=>{
+                onClose?.()
+                navigation.navigate(screenNames.AllNotifications)
+            }} style={styles.dropdownFooter}>
                 <Text style={styles.dropdownFooterText}>View All</Text>
             </TouchableOpacity>
         </View>
