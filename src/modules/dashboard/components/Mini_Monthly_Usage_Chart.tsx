@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
 import LinearGradient from 'react-native-linear-gradient'
@@ -10,44 +10,60 @@ import { getCurrentMonthKey, getShortMonthNameByMonthKey } from '@dwwp/utils/com
 
 
 const Mini_Monthly_Usage_Chart = () => {
-    const usedHistoryObject = useAppSelector(s => s.usage.allTimeMonths)
-    const monthKeys: string[] = Object.keys(usedHistoryObject).map((e) => {
-        return getShortMonthNameByMonthKey(e)
-    })
-    const usedInLitres: number[] = Object.values(usedHistoryObject).map((e) => {
-        return Number(e.toFixed(0))
-    })
+    const usedHistoryObject = useAppSelector(s => s.usage?.allTimeMonths)
+    console.log('ALL TIME MONTHS →', usedHistoryObject)
 
-    const [finalObjectArray, setFinalObjectArray] = useState<{ month: string, value: number }[]>([{ month: '', value: 0 }])
     let currenMonthKey = getCurrentMonthKey()
-    const thisMonthUsages = useAppSelector(s => s.usage.months[currenMonthKey]?.total)
+    const thisMonthUsages = useAppSelector(s => s.usage?.months[currenMonthKey]?.total)
     currenMonthKey = getShortMonthNameByMonthKey(currenMonthKey)
 
-    const [activeBar, setActiveBar] = useState(finalObjectArray.length - 1)
-    useEffect(() => {
-        let temp = monthKeys.map((month, i) => {
-            return {
-                month: month,
-                value: usedInLitres[i]
-            }
+    const finalObjectArray = useMemo(() => {
+        if (!usedHistoryObject || Object.keys(usedHistoryObject).length === 0) {
+            return []
+        }
+
+        let temp = Object.entries(usedHistoryObject)
+            .sort(([a], [b]) => a.localeCompare(b)) // VERY IMPORTANT
+            .map(([key, value]) => ({
+                month: getShortMonthNameByMonthKey(key),
+                value: Math.round(value)
+            }))
+
+        temp = temp.slice(-6)
+
+        temp.push({
+            month: getShortMonthNameByMonthKey(getCurrentMonthKey()),
+            value: thisMonthUsages ?? 0
         })
-        temp = temp.reverse().slice(0, 6).reverse()
-        temp.push({ month: currenMonthKey, value: thisMonthUsages })
-        setFinalObjectArray(temp);
-    }, [])
+
+        return temp
+    }, [usedHistoryObject, thisMonthUsages])
+
+    const [activeBar, setActiveBar] = useState(0)
+
     useEffect(() => {
-        if (finalObjectArray.length === 0) return
-        setActiveBar(finalObjectArray.length - 1)
+        if (finalObjectArray.length > 0) {
+            setActiveBar(finalObjectArray.length - 1)
+        }
     }, [finalObjectArray.length])
 
-    const MAX_VAL = Math.floor(Math.max(...finalObjectArray.map((d) => d.value)))
-    const AVG_VAL = Math.floor(finalObjectArray.reduce((prev, d, _) => (d.value + prev), 0) / finalObjectArray.length)
+    // const MAX_VAL = Math.floor(Math.max(...finalObjectArray?.map((d) => d.value)))
+    const MAX_VAL = finalObjectArray.length
+        ? Math.max(...finalObjectArray.map(d => d.value))
+        : 1
+    // const AVG_VAL = Math.floor(finalObjectArray?.reduce((prev, d, _) => (d.value + prev), 0) / finalObjectArray?.length)
+    const AVG_VAL = finalObjectArray.length
+        ? Math.floor(
+            finalObjectArray.reduce((sum, d) => sum + d.value, 0) /
+            finalObjectArray.length
+        )
+        : 0
     return (
         <View style={styles.card}>
             {/* Header */}
             <View style={styles.cardHeaderRow}>
                 <View>
-                    <Text style={styles.cardTitle}>Monthly Usage{activeBar}</Text>
+                    <Text style={styles.cardTitle}>Monthly Usage {activeBar}</Text>
                     <Text style={styles.cardSubtitle}>Kilowatt hours · Jan 2025</Text>
                 </View>
                 <Pill label="This Year" color={colors.primary} bg={colors.primaryLight} />
@@ -57,7 +73,9 @@ const Mini_Monthly_Usage_Chart = () => {
             <View style={styles.chartContainer}>
                 {finalObjectArray.map((d, i) => {
                     const isActive = i === activeBar
-                    const barH = Math.round((d.value / MAX_VAL) * 100)
+                    const barH = MAX_VAL > 0
+                        ? Math.round((d.value / MAX_VAL) * 100)
+                        : 0
                     return (
                         <TouchableOpacity
                             key={d.month}

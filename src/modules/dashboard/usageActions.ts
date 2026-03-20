@@ -71,9 +71,7 @@ export const listenCurrentMonth = createAsyncThunk(
             .onSnapshot(
                 (snapshot) => {
                     if (!snapshot.exists) return
-                    console.log('snapshot exists:', snapshot.exists)
-                    console.log('snapshot data:', JSON.stringify(snapshot.data()))  // ← add this
-
+                    console.log('snapshot exists:', snapshot.exists())
                     const data = snapshot.data() as Record<string, unknown>
                     const month = parseMonthDoc(monthId, data)
 

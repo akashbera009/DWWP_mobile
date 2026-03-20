@@ -39,39 +39,39 @@ const C = {
 }
 
 const MonthlyBreakDown = () => {
- const usedHistoryObject = useAppSelector(s => s.usage.allTimeMonths)
-     const monthKeys: string[] = Object.keys(usedHistoryObject).map((e) => {
-         return getShortMonthNameByMonthKey(e)
-     })
-     const usedInLitres: number[] = Object.values(usedHistoryObject).map((e) => {
-         return Number(e.toFixed(0))
-     })
- 
-     const [finalObjectArray, setFinalObjectArray] = useState<{ month: string, value: number }[]>([{ month: '', value: 0 }])
-     let currenMonthKey = getCurrentMonthKey()
-     const thisMonthUsages = useAppSelector(s => s.usage.months[currenMonthKey]?.total)
-     currenMonthKey = getShortMonthNameByMonthKey(currenMonthKey)
- 
-     const [activeBar, setActiveBar] = useState(finalObjectArray.length - 1)
-     useEffect(() => {
-         let temp = monthKeys.map((month, i) => {
-             return {
-                 month: month,
-                 value: usedInLitres[i]
-             }
-         })
-         temp = temp.reverse().slice(0, 6).reverse()
-         temp.push({ month: currenMonthKey, value: thisMonthUsages })
-         setFinalObjectArray(temp);
-     }, [])
-     useEffect(() => {
-         if (finalObjectArray.length === 0) return
-         setActiveBar(finalObjectArray.length - 1)
-     }, [finalObjectArray.length])
- 
-     const MAX_VAL = Math.floor(Math.max(...finalObjectArray.map((d) => d.value)))
-     const AVG_VAL = Math.floor(finalObjectArray.reduce((prev, d, _) => (d.value + prev), 0) / finalObjectArray.length)
-     
+  const usedHistoryObject = useAppSelector(s => s.usage.allTimeMonths)
+  const monthKeys: string[] = Object.keys(usedHistoryObject).map((e) => {
+    return getShortMonthNameByMonthKey(e)
+  })
+  const usedInLitres: number[] = Object.values(usedHistoryObject).map((e) => {
+    return Number(e.toFixed(0))
+  })
+
+  const [finalObjectArray, setFinalObjectArray] = useState<{ month: string, value: number }[]>([{ month: '', value: 0 }])
+  let currenMonthKey = getCurrentMonthKey()
+  const thisMonthUsages = useAppSelector(s => s.usage.months[currenMonthKey]?.total)
+  currenMonthKey = getShortMonthNameByMonthKey(currenMonthKey)
+
+  const [activeBar, setActiveBar] = useState(finalObjectArray.length - 1)
+  useEffect(() => {
+    let temp = monthKeys.map((month, i) => {
+      return {
+        month: month,
+        value: usedInLitres[i]
+      }
+    })
+    temp = temp.reverse().slice(0, 6).reverse()
+    temp.push({ month: currenMonthKey, value: thisMonthUsages })
+    setFinalObjectArray(temp);
+  }, [])
+  useEffect(() => {
+    if (finalObjectArray.length === 0) return
+    setActiveBar(finalObjectArray.length - 1)
+  }, [finalObjectArray.length])
+
+  const MAX_VAL = Math.floor(Math.max(...finalObjectArray.map((d) => d.value)))
+  const AVG_VAL = Math.floor(finalObjectArray.reduce((prev, d, _) => (d.value + prev), 0) / finalObjectArray.length)
+
   return (
     <>
       <View style={styles.sectionLabel}>

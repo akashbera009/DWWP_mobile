@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   },
   homeHeaderContainer: {
     backgroundColor: colors.primary,
-    minHeight : vh(80),
+    minHeight : vh(70),
     justifyContent :'center'
   },
   homeHeaderText: {

@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from 'react'
 import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks'
-import { NotificationService} from '../../utils/FirebaseNotificationUpdate'
+import { NotificationService } from '@dwwp/utils/firebaseNotificationUpdate'
 import { addNotification, setUnreadCount } from './Notificationslice'
 
 /**

@@ -2,6 +2,7 @@ import React, { useRef, useState, useMemo, useCallback } from 'react'
 import {
   View, Text, StyleSheet, FlatList, Pressable, TextInput, Image,
   TouchableOpacity, Modal, ScrollView,
+  ActivityIndicator,
 } from 'react-native'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
@@ -266,7 +267,7 @@ const FilterPanel: React.FC<{
               onPress={() => onFilterChange(DEFAULT_FILTERS)}
               variant='outline'
               style={styles.filterResetBtn}
-              />
+            />
             <CustomButton
               title='Apply'
               onPress={onClose}
@@ -284,6 +285,8 @@ const SimplifiedPaymentHistory = () => {
   const { paymentsHistory, addonsHistory } = useAppSelector(
     s => s.payment.transactionHistory
   ) as { paymentsHistory: PaymentRecord[]; addonsHistory: AddonRecord[] }
+
+  const isLoading = useAppSelector(s => s.payment?.isLoading)
 
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS)
   const [filterModalVisible, setFilterModalVisible] = useState(false)
@@ -329,7 +332,9 @@ const SimplifiedPaymentHistory = () => {
   }, [])
 
   const hasActiveFilters = filters.status !== 'all' || filters.amount !== 'all'
-
+  if (isLoading) return (
+    <ActivityIndicator />
+  )
   return (
     <View style={styles.screen}>
       <CustomHeader

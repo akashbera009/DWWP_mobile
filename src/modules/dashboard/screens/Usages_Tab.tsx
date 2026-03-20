@@ -39,9 +39,11 @@ import { localImages } from '@dwwp/utils/localimages'
 import { fmt, getCurrentMonthKey } from '@dwwp/utils/commonFunctions'
 import { useAppSelector } from '@dwwp/store/hooks'
 import { CustomButton } from '@dwwp/components/CustomButton'
-import { navigationRef } from '@dwwp/utils/navigationService'
 import { screenNames } from '@dwwp/utils/screenNames'
-
+import { useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { MainStackParamList } from '@dwwp/utils/types'
+type MainStackNavigationProp =NativeStackNavigationProp<MainStackParamList>;
 // ─── Theme ────────────────────────────────────────────────────────────────────
 const C = {
     primary: '#2B6568',
@@ -260,7 +262,7 @@ const AddonCard: React.FC<AddonCardProps> = ({ addon, consumedFromAddon, index }
 // ─── Main component ───────────────────────────────────────────────────────────
 const Usages_Tab = () => {
     const monthKeyId = getCurrentMonthKey()
-
+    const navigation = useNavigation<MainStackNavigationProp>()
     const monthData = useAppSelector(s => s.usage?.months?.[monthKeyId] ?? {})
     const addons = useAppSelector(s => s.payment.addons ?? [])
     const todayUse = useAppSelector(s => s.usage.todayUsage ?? 0)
@@ -343,22 +345,8 @@ const Usages_Tab = () => {
         return consumed
     })
 
-    // Status
-    // const statusColor =
-    //     monthData.limitExceeded
-    //         ? C.error
-    //         : overallPct > 0.85
-    //             ? C.warning
-    //             : C.success
-
     // Header scroll for parallax feel
     const scrollY = useRef(new Animated.Value(0)).current
-
-    // const headerH = scrollY.interpolate({
-    //     inputRange: [0, 80],
-    //     outputRange: [normalize(160), normalize(100)],
-    //     extrapolate: 'clamp'
-    // })
     return (
         <View style={styles.screen}>
 
@@ -555,62 +543,12 @@ const Usages_Tab = () => {
                                 <CustomButton
                                     title='View all'
                                     variant='secondary'
-                                    onPress={() => navigationRef?.current?.getParent()?.navigate(screenNames.FullPaymantHistory)}
+                                    onPress={() => navigation.navigate(screenNames.FullPaymantHistory)}
                                 />
                             </>
                         )}
                     </>
                 )}
-                {/* 
-                <ScrollView
-                    horizontal
-                    pagingEnabled
-                > 
-                    <View style={{ width: screenWidth - 20 }}>
-                        <View style={styles.sectionLabel}>
-                            <Text style={styles.sectionLabelText}>Daily Breakdown</Text>
-                            <View style={styles.sectionLine} />
-                            <Text style={styles.sectionLabelMeta}>avg {fmtD(avgDay)}/day</Text>
-                        </View>
-
-                        <View style={[styles.card, { paddingBottom: normalize(10) }]}>
-                            <View style={styles.chartHeader}>
-                                <View style={styles.chartLegendRow}>
-                                    <View style={[styles.legendDot, { backgroundColor: C.cyan }]} />
-                                    <Text style={styles.legendText}>Normal</Text>
-                                    <View style={[styles.legendDot, { backgroundColor: C.warning, marginLeft: normalize(10) }]} />
-                                    <Text style={styles.legendText}>Above avg</Text>
-                                    <View style={[styles.legendDot, { backgroundColor: C.error, marginLeft: normalize(10) }]} />
-                                    <Text style={styles.legendText}>High</Text>
-                                    <View style={[styles.legendDot, { backgroundColor: C.primary, marginLeft: normalize(10) }]} />
-                                    <Text style={styles.legendText}>Today</Text>
-                                </View>
-                            </View>
-
-                            <Text style={styles.avgLineLabel}>── avg {fmtD(avgDay)}</Text>
-
-                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.dayChartScroll}>
-                                <View style={styles.dayChartInner}>
-                                    {entries.map(([dateStr, val]) => {
-                                        const day = dateStr.slice(-2)
-                                        return (
-                                            <DayBar
-                                                key={dateStr}
-                                                day={day}
-                                                value={val}
-                                                max={maxDay}
-                                                isToday={dateStr === today}
-                                                avg={avgDay}
-                                            />
-                                        )
-                                    })}
-                                </View>
-                            </ScrollView>
-                        </View>
-                    </View>
-                    <Mini_Monthly_Usage_Chart />
-
-                </ScrollView> */}
 
                 <View style={{ height: vh(30) }} />
             </Animated.ScrollView>

@@ -1,12 +1,13 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
 import colors from '@dwwp/utils/colors'
 import { useAppSelector } from '@dwwp/store/hooks'
+import { localImages } from '@dwwp/utils/localimages'
 
 type StatItem = {
-    icon: string;
+    icon: ImageSourcePropType;
     label: string;
     value: string;
     subScript?: string;
@@ -21,9 +22,9 @@ const StatGrid = () => {
     let nextBillRemainingdays
     const [statGrid, setStatGrid] = useState<StatItem[]>([
         // { icon: '⚡', label: 'Today', value: '0', subScript: 'litres', sub: '+0% vs last mo', accent: colors.activeDot, trend: 12, bg: 'rgba(50,194,202,0.08)' },
-        { icon: '🚨', label: 'Penalty', value: '₹0', sub: '2 need attention', accent: colors.warning, trend: undefined, bg: 'rgba(243,156,18,0.08)' },
+        { icon: localImages.alert, label: 'Penalty', value: '₹0', sub: '2 need attention', accent: colors.warning, trend: undefined, bg: 'rgba(243,156,18,0.08)' },
         // { icon: '📡', label: 'Regular Price', value: '₹0', sub: 'All zones active', accent: colors.success, trend: undefined, bg: 'rgba(39,174,96,0.08)' },
-        { icon: '📅', label: 'Billing Cycle', value: `0`, subScript: 'days', sub: `0 days Until next bill`, accent: colors.secondary, trend: undefined, bg: colors.primaryLight },
+        { icon: localImages.calendar2, label: 'Billing Cycle', value: `0`, subScript: 'days', sub: `0 days Until next bill`, accent: colors.secondary, trend: undefined, bg: colors.primaryLight },
     ]
     )
     const now = new Date()
@@ -34,9 +35,9 @@ const StatGrid = () => {
         nextBillRemainingdays = billingCycle - now.getDate()
         setStatGrid([
             // { icon: '⚡', label: 'Today', value: todayUse.toString(), subScript: 'litres', sub: '+12% vs last mo', accent: colors.activeDot, trend: 12, bg: 'rgba(50,194,202,0.08)' },
-            { icon: '🚨', label: 'Penalty', value: '₹0', sub: '2 need attention', accent: colors.warning, trend: undefined, bg: 'rgba(243,156,18,0.08)' },
+            { icon: localImages.alert, label: 'Penalty', value: '₹0', sub: '2 need attention', accent: colors.warning, trend: undefined, bg: 'rgba(243,156,18,0.08)' },
             // { icon: '📡', label: 'Regular Price', value: `₹0`, sub: 'All zones active', accent: colors.success, trend: undefined, bg: 'rgba(39,174,96,0.08)' },
-            { icon: '📅', label: 'Billing Cycle', value: `${billingCycle}`, subScript: 'days', sub: `${nextBillRemainingdays} days Until next bill`, accent: colors.secondary, trend: undefined, bg: colors.primaryLight },
+            { icon: localImages.calendar2, label: 'Billing Cycle', value: `${billingCycle}`, subScript: 'days', sub: `${nextBillRemainingdays} days Until next bill`, accent: colors.secondary, trend: undefined, bg: colors.primaryLight },
         ])
     }, [])
 
@@ -46,7 +47,10 @@ const StatGrid = () => {
                 <View key={i} style={[styles.statGridCard, { backgroundColor: colors.white, borderTopColor: item.accent, borderTopWidth: 3 }]}>
                     <View style={styles.oneline}>
                         <View style={[styles.statGridIconBox, { backgroundColor: item.bg }]}>
-                            <Text style={styles.statGridIcon}>{item.icon}</Text>
+                            <Image
+                            source={item.icon}
+                            style={styles.icon}
+                            />
                         </View>
                         <View>
                             <Text style={styles.statGridLabel}>{item.label}</Text>
@@ -102,6 +106,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: vh(2),
+    },
+    icon:{
+        height : vh(24),
+        width : vh(24),
+
     },
     statGridIcon: {
         fontSize: normalize(19),

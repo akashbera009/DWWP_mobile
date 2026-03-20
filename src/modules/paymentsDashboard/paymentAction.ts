@@ -4,7 +4,7 @@ import type { RootState } from '../../store/index'
 import { fetchCurrentMonth } from '@dwwp/modules/dashboard/dashboardActions'
 import { AddonRecord, FetchAllMonthsPayload, PaymentRecord } from '@dwwp/modals'
 import { getCurrentMonthKey, normalizeTimestamp, toNumber } from '@dwwp/utils/commonFunctions'
-import { NotificationService } from '../../utils/FirebaseNotificationUpdate'
+import { NotificationService } from '../../utils/firebaseNotificationUpdate'
 import { displayNotification } from '@dwwp/utils/displayNotification'
 
 /**

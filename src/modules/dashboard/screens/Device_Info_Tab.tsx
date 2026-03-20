@@ -13,6 +13,7 @@ import { normalize, vh } from '@dwwp/utils/dimensions'
 import colors from '@dwwp/utils/colors'
 import { localImages } from '@dwwp/utils/localimages'
 import { PulseDot } from '../components/PulseDot'
+import { UsageSnapshotCard } from '../components/UsageSnapshotCard'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ConnLevel = 'online' | 'recent' | 'stale' | 'offline' | 'loading'
@@ -446,9 +447,7 @@ const wStyles = StyleSheet.create({
     toggleRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent : 'center',
-        // paddingHorizontal: normalize(16),
-        // paddingVertical: normalize(14),
+        justifyContent : 'center', 
         borderTopWidth: 1,
         borderTopColor: C.border,
         gap: normalize(12),
@@ -509,118 +508,6 @@ const wStyles = StyleSheet.create({
         lineHeight: normalize(16),
     },
 })
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// 3. USAGE SNAPSHOT CARD
-// ═══════════════════════════════════════════════════════════════════════════════
-const UsageSnapshotCard: React.FC = () => {
-    const { todayUsage, allTimeDaysTotal, currentMonthId, months } = useAppSelector(s => s.usage)
-    if (currentMonthId == null) return
-    const MONTHLY_LIMIT = 2000  // replace with your per-user limit from store/config
-    const currentMonthUsage = months?.[currentMonthId]?.total ?? 0
-    const sortedKeys = Object.keys(months ?? {}).sort()
-    const prevMonthId = sortedKeys[sortedKeys.length - 2]
-    const lastMonthUsage = months?.[prevMonthId]?.total ?? 0
-    const usagePct = Math.min((currentMonthUsage / MONTHLY_LIMIT) * 100, 100)
-    const barColor = usagePct >= 90 ? C.error : usagePct >= 70 ? C.warning : C.primary
-    const avgPerDay = Math.round(currentMonthUsage / Math.max(new Date().getDate(), 1))
-
-    const barAnim = useRef(new Animated.Value(0)).current
-    useEffect(() => {
-        Animated.timing(barAnim, { toValue: usagePct, duration: 900, useNativeDriver: false }).start()
-    }, [usagePct])
-    const barWidth = barAnim.interpolate({ inputRange: [0, 100], outputRange: ['0%', '100%'] })
-
-    return (
-        <View style={uStyles.card}>
-            <View style={uStyles.topRow}>
-                <Text style={uStyles.monthText}>{formatMonthId(currentMonthId)}</Text>
-                <View style={uStyles.todayBadge}>
-                    <Text style={uStyles.todayLabel}>Today: </Text>
-                    <Text style={uStyles.todayVal}>{(todayUsage ?? 0).toLocaleString()} L</Text>
-                </View>
-            </View>
-
-            <View style={uStyles.barBg}>
-                <Animated.View style={[uStyles.barFill, { width: barWidth, backgroundColor: barColor }]} />
-            </View>
-
-            <View style={uStyles.barLabels}>
-                <Text style={uStyles.barText}>
-                    <Text style={uStyles.barBold}>{Math.round(currentMonthUsage).toLocaleString()} L</Text>
-                    {' '}used
-                </Text>
-                <Text style={uStyles.barText}>
-                    <Text style={uStyles.barBold}>{MONTHLY_LIMIT.toLocaleString()} L</Text>
-                    {' '}limit
-                </Text>
-            </View>
-
-            <View style={uStyles.statsRow}>
-                <View style={uStyles.statItem}>
-                    <Text style={uStyles.statLabel}>All time</Text>
-                    <Text style={uStyles.statVal}>{(allTimeDaysTotal / 1000).toFixed(1)}k L</Text>
-                </View>
-                <View style={uStyles.statDivider} />
-                <View style={uStyles.statItem}>
-                    <Text style={uStyles.statLabel}>Last month</Text>
-                    <Text style={uStyles.statVal}>{Math.round(lastMonthUsage).toLocaleString()} L</Text>
-                </View>
-                <View style={uStyles.statDivider} />
-                <View style={uStyles.statItem}>
-                    <Text style={uStyles.statLabel}>Avg/day</Text>
-                    <Text style={uStyles.statVal}>~{avgPerDay} L</Text>
-                </View>
-            </View>
-        </View>
-    )
-}
-
-const uStyles = StyleSheet.create({
-    card: {
-        backgroundColor: C.white,
-        borderRadius: normalize(18),
-        padding: normalize(16),
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.07,
-        shadowRadius: 12,
-        elevation: 3,
-    },
-    topRow: {
-        flexDirection: 'row', alignItems: 'center',
-        justifyContent: 'space-between', marginBottom: normalize(14),
-    },
-    monthText: { fontFamily: fonts.Bold, fontSize: normalize(14), color: C.black },
-    todayBadge: {
-        flexDirection: 'row', alignItems: 'center',
-        backgroundColor: C.primaryLight,
-        borderRadius: normalize(20),
-        paddingHorizontal: normalize(10), paddingVertical: normalize(4),
-    },
-    todayLabel: { fontFamily: fonts.Regular, fontSize: normalize(11), color: C.primary },
-    todayVal: { fontFamily: fonts.Bold, fontSize: normalize(11), color: C.primary },
-    barBg: {
-        height: normalize(6), backgroundColor: C.border,
-        borderRadius: normalize(6), overflow: 'hidden', marginBottom: normalize(8),
-    },
-    barFill: { height: '100%', borderRadius: normalize(6) },
-    barLabels: {
-        flexDirection: 'row', justifyContent: 'space-between', marginBottom: normalize(16),
-    },
-    barText: { fontFamily: fonts.Regular, fontSize: normalize(11), color: C.black },
-    barBold: { fontFamily: fonts.Bold, color: C.black },
-    statsRow: {
-        flexDirection: 'row', alignItems: 'center',
-        backgroundColor: C.bg, borderRadius: normalize(12),
-        paddingVertical: normalize(12),
-    },
-    statItem: { flex: 1, alignItems: 'center', gap: vh(4) },
-    statDivider: { width: 1, height: normalize(28), backgroundColor: C.border },
-    statLabel: { fontFamily: fonts.Regular, fontSize: normalize(10), color: C.black },
-    statVal: { fontFamily: fonts.Bold, fontSize: normalize(13), color: C.black },
-})
-
 // ═══════════════════════════════════════════════════════════════════════════════
 // DEVICE TAB SCREEN
 // ═══════════════════════════════════════════════════════════════════════════════

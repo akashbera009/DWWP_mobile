@@ -1,7 +1,8 @@
 import {
     StyleSheet, Text,
     View,
-    TouchableOpacity
+    TouchableOpacity,
+    Image
 } from 'react-native'
 import React from 'react'
 import { OnlineStatus } from './OnlineStatus'
@@ -10,12 +11,13 @@ import colors from '@dwwp/utils/colors'
 import fonts from '@dwwp/utils/fonts'
 import { normalize, vh } from '@dwwp/utils/dimensions'
 import { useAppSelector } from '@dwwp/store/hooks'
+import { localImages } from '@dwwp/utils/localimages'
 
 type DeviceSectionProp = {
     setIsSwitchModalOpen: () => void
-    handleSetActivetab: (idx : number) => void
+    handleSetActivetab: (idx: number) => void
 }
-const DeviceSection = ({ setIsSwitchModalOpen , handleSetActivetab }: DeviceSectionProp) => {
+const DeviceSection = ({ setIsSwitchModalOpen, handleSetActivetab }: DeviceSectionProp) => {
     const servoState = useAppSelector(s => s.servo.servoState)
     return (
         <View style={[styles.deviceStatusSection]}>
@@ -46,9 +48,10 @@ const DeviceSection = ({ setIsSwitchModalOpen , handleSetActivetab }: DeviceSect
                         {/* Decorative blob */}
                         <View style={styles.valveBlob} />
 
-                        <Text style={styles.valveIcon}>
-                            {servoState ? '💧' : '⏸️'}
-                        </Text>
+                        <Image
+                            source={localImages.valve_white}
+                            style={[styles.valve , !servoState && {tintColor : colors.placeholder}]}
+                        />
                         <Text style={[styles.valveStateText, {
                             color: servoState ? '#FFFFFF' : '#041617'
                         }]}>
@@ -79,7 +82,10 @@ const DeviceSection = ({ setIsSwitchModalOpen , handleSetActivetab }: DeviceSect
                     <View
                         style={styles.changeBtn}
                     >
-                        <Text style={styles.changeBtnIcon}>⚙️</Text>
+                        <Image
+                            source={localImages.convert}
+                            style={styles.changeBtnIcon}
+                        />
                         <Text style={styles.changeBtnText}>Change</Text>
                     </View>
 
@@ -145,8 +151,9 @@ const styles = StyleSheet.create({
         top: -normalize(30),
         right: -normalize(30),
     },
-    valveIcon: {
-        fontSize: normalize(26),
+    valve: {
+        width: normalize(28),
+        height: normalize(28),
     },
     valveStateText: {
         fontFamily: fonts.Bold,
@@ -190,7 +197,9 @@ const styles = StyleSheet.create({
         borderTopColor: colors.border,
     },
     changeBtnIcon: {
-        fontSize: normalize(14),
+        width: normalize(22),
+        height: normalize(22),
+        tintColor : colors.primary
     },
     changeBtnText: {
         fontFamily: fonts.Bold,

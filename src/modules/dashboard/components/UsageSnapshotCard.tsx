@@ -1,8 +1,10 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { View, Text, StyleSheet, Animated } from 'react-native'
 import { useAppSelector } from '@dwwp/store/hooks'
 import { normalize, vh } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
+import { getCurrentMonthKey } from '@dwwp/utils/commonFunctions'
+import { selectCurrentMonthLimit } from '../usageSelectors'
 
 const C = {
     primary: '#2B6568',
@@ -38,17 +40,28 @@ const C = {
  * All data from Redux usage slice.
  */
 export const UsageSnapshotCard: React.FC = () => {
-    const { todayUsage, allTimeDaysTotal, currentMonthId, months } = useAppSelector(s => s?.usage)
-
+    const currentMOnthKey = getCurrentMonthKey()
+    const { todayUsage, allTimeDaysTotal, currentMonthId, months } = useAppSelector(s => s.usage)
     // ── derive values ──────────────────────────────────────────────────────────
-    const MONTHLY_LIMIT = useAppSelector(s => s?.dashboard?.limitConfig?.regular)
-    if (currentMonthId === null) return
-    const currentMonthUsage = months?.[currentMonthId]?.total ?? 0
+    const monthLimit = useAppSelector(selectCurrentMonthLimit)
+    const [addedLimit, setAddedLimit] = useState(1)
+    const addons = useAppSelector(s => s.payment?.addons)
+    const [effectiveLimit, setEffectiveLimit] = useState<number>(monthLimit ?? 1)
+    useEffect(() => {
+        const totalAddons = addons
+            .filter(txn => txn?.forMonth === currentMOnthKey)
+            .reduce((reducer, item) => reducer + (item?.qty * item?.refill), 0)
+        setAddedLimit(totalAddons)
+        const total = (monthLimit || 0) + totalAddons
+        setEffectiveLimit(total)
+
+    }, [addedLimit, monthLimit, addedLimit])
+
+    const currentMonthUsage = months?.[currentMonthId ?? currentMOnthKey]?.total ?? 0
     const lastMonthKeys = Object.keys(months ?? {}).sort()
     const prevMonthId = lastMonthKeys[lastMonthKeys.length - 2]
     const lastMonthUsage = months?.[prevMonthId]?.total ?? 0
-    if (MONTHLY_LIMIT === undefined) return
-    const usagePct = Math.min((currentMonthUsage / MONTHLY_LIMIT) * 100, 100)
+    const usagePct = Math.min((currentMonthUsage / (effectiveLimit || 1)) * 100, 100)
     const barColor = usagePct >= 90 ? C.error : usagePct >= 70 ? C.warning : C.primary
 
     // ── bar animation ──────────────────────────────────────────────────────────
@@ -59,7 +72,7 @@ export const UsageSnapshotCard: React.FC = () => {
             duration: 800,
             useNativeDriver: false,
         }).start()
-    }, [usagePct , barAnim])
+    }, [usagePct, barAnim])
 
     const barWidth = barAnim.interpolate({
         inputRange: [0, 100],
@@ -89,7 +102,7 @@ export const UsageSnapshotCard: React.FC = () => {
                     <Text style={styles.barLabelVal}>{Math.round(currentMonthUsage).toLocaleString()} L</Text> used
                 </Text>
                 <Text style={styles.barLabelText}>
-                    <Text style={[styles.barLabelVal, { color: barColor }]}>{Math.round(usagePct)}%</Text> of {MONTHLY_LIMIT.toLocaleString()} L
+                   <Text style={[styles.barLabelVal, { color: barColor }]}>{Math.round(usagePct)}%</Text> of {effectiveLimit?.toLocaleString()} L
                 </Text>
             </View>
 
@@ -113,7 +126,7 @@ const StatItem: React.FC<{ label: string; value: string }> = ({ label, value }) 
     </View>
 )
 
-function formatMonthId(id: string): string {
+function formatMonthId(id: string | null): string {
     if (!id) return ''
     const [year, month] = id.split('-')
     const date = new Date(Number(year), Number(month) - 1)

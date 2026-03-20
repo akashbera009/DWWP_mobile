@@ -15,7 +15,8 @@ check if the the back arrow with the subheading is correct alignment
   
 
 notification panel . lets check this with a largenotifcaiton if it is scrollable or just full enrtire screen
-notoficaiton panel is not scrollable , 
+notoficaiton panel is not scrollable ,
+notification messgae  of addon's  refil qty is ideal
 
 
 in splash screen background bubble need zindex increment 
@@ -54,3 +55,8 @@ bill calculations are wrong in respect to the penalty
 add vibtration to the buttons 
 
 analytics component prediction work needed 
+
+
+edit profile page 
+
+mock data is doing iit's work , need to be removed 

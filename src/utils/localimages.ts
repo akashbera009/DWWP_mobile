@@ -24,6 +24,12 @@ export const localImages = {
     wifi_disconnected: require('../assets/images/wifi-disconnected.png'),
     wifi_new_white: require('../assets/images/wifi-new-white.png'),
     rupee_indian: require('../assets/images/rupee-indian.png'),
+    alert: require('../assets/images/alert.png'),
+    calendar2: require('../assets/images/calendar2.png'),
+    valve: require('../assets/images/valve.png'),
+    valve_2: require('../assets/images/valve_2.png'),
+    valve_white: require('../assets/images/valve_white.png'),
+    convert: require('../assets/images/convert.png'),
 
     logout: require('../assets/images/logout.png'),
     user: require('../assets/images/user.png'),
@@ -46,5 +52,7 @@ export const localImages = {
     share: require('../assets/images/share.png'),
     thunder: require('../assets/images/thunder.png'),
     salary: require('../assets/images/salary.png'),
+
+    no_internet: require('../assets/images/no_internet.png'),
     
 }

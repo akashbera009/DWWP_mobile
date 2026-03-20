@@ -27,6 +27,7 @@ import DashboardSkeleton from '@dwwp/components/DashboardSkeleton'
 import { fetchAllTimeDays, fetchAllTimeMonths, fetchTodayUsage, listenCurrentMonth, stopCurrentMonthListener } from '../usageActions'
 import Device_Info_Tab from './Device_Info_Tab'
 import { fetchAllPaymentsAndAddons } from '@dwwp/modules/paymentsDashboard/paymentAction'
+import { fetchUserNotifications } from '../Notificationslice'
 
 const SCREEN_WIDTH = screenWidth
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
@@ -48,16 +49,35 @@ const Dash_Index_Screen = () => {
         dispatch(fetchUserDetails({ email }))
         dispatch(fetchCurrentMonth({ email }))
         dispatch(fetchAdminConfig())
-
+        dispatch(fetchUserNotifications(email))
+        dispatch(fetchAllTimeDays(email))
+        dispatch(fetchAllTimeMonths(email))
     }, [email])
+    // next stage data which are auxuliary for dashboard  
+    const fetchAdditionalData = () => {
+        if (!email) return
+        dispatch(fetchTodayUsage(email))
+        dispatch(fetchServoState({ email }))
+        dispatch(listenCurrentMonth(email))
+        dispatch(fetchAllPaymentsAndAddons({ email }))
+    }
+    useEffect(() => {
+        if (!email) return
+        const timer = setTimeout(() => {
+            fetchAdditionalData()
+        }, 500);
+        return () => clearTimeout(timer)
+    }, [email, fetchAdditionalData])
+
     //refresh data
     const refreshData = useCallback(() => {
         if (!email) return
         fetchDashboardData();
         fetchAdditionalData()
-        fetchAllPaymentsAndAddons({ email })
+        dispatch(fetchAllPaymentsAndAddons({ email }))
     }, [email])
 
+    // stop listner 
     useEffect(() => {
         if (!email) return
         fetchDashboardData()
@@ -65,24 +85,6 @@ const Dash_Index_Screen = () => {
             dispatch(stopCurrentMonthListener(email))
         }
     }, [email, fetchDashboardData])
-
-    // next stage data which are auxuliary for dashboard  
-    const fetchAdditionalData = () => {
-        if (!email) return
-        dispatch(fetchTodayUsage(email))
-        dispatch(fetchServoState({ email }))
-        dispatch(fetchAllTimeMonths(email))
-        dispatch(fetchAllTimeDays(email))
-        dispatch(listenCurrentMonth(email))
-    }
-    useEffect(() => {
-        if (!email) return
-        const timer = setTimeout(() => {
-            fetchAdditionalData()
-        }, 1000);
-        return () => clearTimeout(timer)
-    }, [email, fetchAdditionalData])
-
 
     const [isSwitchOpen, setIsSwitchModalOpen] = useState<boolean>(false)
 

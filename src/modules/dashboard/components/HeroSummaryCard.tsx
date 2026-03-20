@@ -53,30 +53,18 @@ const HeroSummaryCard: React.FC = () => {
     const addons = useAppSelector(s => s.payment?.addons)
     const thisMonthKey = getCurrentMonthKey()
 
-    const [addedLimit, setAddedLimit] = useState(1)
-    const [effectiveLimit, setEffectiveLimit] = useState(monthLimit)
-    useEffect(() => {
-        const totalAddons = addons
+    const addedLimit = useMemo(() => {
+        if (!addons) return 0
+ 
+        return addons
             .filter(txn => txn?.forMonth === thisMonthKey)
-            .reduce((reducer, item) => reducer + (item?.qty * item?.refill), 0)
-        setAddedLimit(totalAddons)
-        const total = (monthLimit || 0 ) + totalAddons
-        setEffectiveLimit(total)
+            .reduce((sum, item) => sum + (item?.qty * item?.refill), 0)
+    }, [addons, thisMonthKey])
 
-    }, [addedLimit, monthLimit , addedLimit]) 
-    // const limitExceeded = useAppSelector(selectLimitExceeded)
+    const effectiveLimit = useMemo(() => {
+        return (monthLimit || 0) + addedLimit
+    }, [monthLimit, addedLimit])
 
-    // const allTimeDaysTotal = useAppSelector(selectAllTimeDaysTotal)
-    // const { todayUsage, monthTotal, monthLimit } = useAppSelector(state => {
-    //     const month = state.usage?.months?.[monthKey] || {}
-
-    //     return {
-    //         todayUsage: month?.days?.[todayKey] ?? 0,
-    //         monthTotal: month?.total ?? 0,
-    //         monthLimit: month?.limit ?? 0,
-    //         limitExceeded: month?.limitExceeded ?? false,
-    //     }
-    // })
     const billAmount = React.useMemo(() => {
         if (!price) return 0
         return (price * todayUsage).toFixed(0)
@@ -87,14 +75,10 @@ const HeroSummaryCard: React.FC = () => {
         return (price * monthTotal).toFixed(0)
     }, [price, monthTotal])
 
-    // All-time total — your existing line was correct
-    // const allTimeDaysTotal = useAppSelector(state =>
-    //     state.usage.allTimeDaysTotal
-    // ).toFixed(0)
-
-    if (effectiveLimit === null) return
-    const usagePct = monthTotal  / effectiveLimit;
-
+    // const usagePct = (monthTotal / effectiveLimit) || 0;
+    const usagePct = effectiveLimit > 0
+        ? monthTotal / effectiveLimit
+        : 0
     // const sensor = useAnimatedSensor(SensorType.GYROSCOPE, { interval: 16 })
     const sensor = useAnimatedSensor(SensorType.GRAVITY, { interval: 16 })
 
@@ -237,7 +221,7 @@ const HeroSummaryCard: React.FC = () => {
 
                         {/* Center */}
                         <View style={styles.ringInner}>
-                            <Text style={styles.ringPct}>{Math.round(usagePct * 100)}%</Text>
+                            <Text style={styles.ringPct}>{Math.round(usagePct * 100) || 0}%</Text>
                             <Text style={styles.ringPctLabel}>used</Text>
                         </View>
                     </View>

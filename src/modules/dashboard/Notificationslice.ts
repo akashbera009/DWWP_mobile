@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { UserNotification } from '@dwwp/modals'
-import { NotificationService } from '../../utils/FirebaseNotificationUpdate'
+import { NotificationService } from '@dwwp/utils/firebaseNotificationUpdate'
 
 export interface NotificationState {
     userNotifications: UserNotification[]
