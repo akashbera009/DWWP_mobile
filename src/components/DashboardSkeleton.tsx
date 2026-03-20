@@ -122,7 +122,7 @@ const DashboardSkeleton = () => {
 
       {/* ── STATS GRID ── */}
       <View style={styles.grid}>
-        {[0, 1, 2, 3].map((i) => (
+        {[0, 1].map((i) => (
           <View key={i} style={styles.gridCard}>
             {/* Icon circle */}
             <View style={styles.upperGrid}>
@@ -147,7 +147,7 @@ const DashboardSkeleton = () => {
           <View style={styles.deviceRow}>
             {[0, 1].map((i) => (
               <View key={i} style={styles.deviceItem}>
-                <Bone width={vw(150)} height={vh(80)} borderRadius={normalize(14)} shimmerValue={shimmer} />
+                <Bone width={vw(150)} height={vh(90)} borderRadius={normalize(14)} shimmerValue={shimmer} />
                 <Bone width={vw(60)} height={vh(12)} borderRadius={normalize(4)} shimmerValue={shimmer} style={{ marginTop: vh(8) }} />
                 <Bone width={vw(40)} height={vh(10)} borderRadius={normalize(4)} shimmerValue={shimmer} style={{ marginTop: vh(4) }} />
               </View>

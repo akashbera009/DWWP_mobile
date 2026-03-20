@@ -559,62 +559,62 @@ const Usages_Tab = () => {
 export default Usages_Tab
 
 // ─── Mock data for dev/preview ─────────────────────────────────────────────
-export const MOCK_MONTH_DATA: MonthData = {
-    limit: 800,
-    limitExceeded: false,
-    isMonthFinish: false,
-    dailyUsages: {
-        '2025-01-01': 22, '2025-01-02': 18, '2025-01-03': 31,
-        '2025-01-04': 27, '2025-01-05': 19, '2025-01-06': 35,
-        '2025-01-07': 24, '2025-01-08': 20, '2025-01-09': 28,
-        '2025-01-10': 42, '2025-01-11': 16, '2025-01-12': 23,
-        '2025-01-13': 38, '2025-01-14': 25, '2025-01-15': 19,
-    },
-}
-export const monthData = [
-    { day: "2026-03-01", value: 167 },
-    { day: "2026-03-02", value: 140 },
-    { day: "2026-03-03", value: 158 },
-    { day: "2026-03-04", value: 172 },
-    { day: "2026-03-05", value: 149 },
-    { day: "2026-03-06", value: 181 },
-    { day: "2026-03-07", value: 193 },
-    { day: "2026-03-08", value: 160 },
-    { day: "2026-03-09", value: 174 },
-    { day: "2026-03-10", value: 188 },
-    { day: "2026-03-11", value: 155 },
-    { day: "2026-03-12", value: 169 },
-    { day: "2026-03-13", value: 177 },
-    { day: "2026-03-14", value: 162 },
-    { day: "2026-03-15", value: 185 },
-    { day: "2026-03-16", value: 191 },
-    { day: "2026-03-17", value: 170 },
-    { day: "2026-03-18", value: 164 },
-    { day: "2026-03-19", value: 179 },
-    { day: "2026-03-20", value: 187 },
-    { day: "2026-03-21", value: 173 },
-    { day: "2026-03-22", value: 166 },
-    { day: "2026-03-23", value: 182 },
-    { day: "2026-03-24", value: 195 },
-    { day: "2026-03-25", value: 176 },
-    { day: "2026-03-26", value: 168 },
-    { day: "2026-03-27", value: 184 },
-    { day: "2026-03-28", value: 190 },
-    { day: "2026-03-29", value: 171 },
-    { day: "2026-03-30", value: 178 }
-];
-export const MOCK_ADDONS: AddonEntry[] = [
-    {
-        id: 'addon_1', qty: 200, amount: 120,
-        addon_date: '2025-01-10T14:30:00.000Z',
-        razor_pay_id: 'pay_Rdck9DTiXfX5vm', status: 'Completed',
-    },
-    {
-        id: 'addon_2', qty: 100, amount: 60,
-        addon_date: '2025-01-13T09:15:00.000Z',
-        razor_pay_id: 'pay_Xmrt4ABcYz2wqP', status: 'Completed',
-    },
-]
+// export const MOCK_MONTH_DATA: MonthData = {
+//     limit: 800,
+//     limitExceeded: false,
+//     isMonthFinish: false,
+//     dailyUsages: {
+//         '2025-01-01': 22, '2025-01-02': 18, '2025-01-03': 31,
+//         '2025-01-04': 27, '2025-01-05': 19, '2025-01-06': 35,
+//         '2025-01-07': 24, '2025-01-08': 20, '2025-01-09': 28,
+//         '2025-01-10': 42, '2025-01-11': 16, '2025-01-12': 23,
+//         '2025-01-13': 38, '2025-01-14': 25, '2025-01-15': 19,
+//     },
+// }
+// export const monthData = [
+//     { day: "2026-03-01", value: 167 },
+//     { day: "2026-03-02", value: 140 },
+//     { day: "2026-03-03", value: 158 },
+//     { day: "2026-03-04", value: 172 },
+//     { day: "2026-03-05", value: 149 },
+//     { day: "2026-03-06", value: 181 },
+//     { day: "2026-03-07", value: 193 },
+//     { day: "2026-03-08", value: 160 },
+//     { day: "2026-03-09", value: 174 },
+//     { day: "2026-03-10", value: 188 },
+//     { day: "2026-03-11", value: 155 },
+//     { day: "2026-03-12", value: 169 },
+//     { day: "2026-03-13", value: 177 },
+//     { day: "2026-03-14", value: 162 },
+//     { day: "2026-03-15", value: 185 },
+//     { day: "2026-03-16", value: 191 },
+//     { day: "2026-03-17", value: 170 },
+//     { day: "2026-03-18", value: 164 },
+//     { day: "2026-03-19", value: 179 },
+//     { day: "2026-03-20", value: 187 },
+//     { day: "2026-03-21", value: 173 },
+//     { day: "2026-03-22", value: 166 },
+//     { day: "2026-03-23", value: 182 },
+//     { day: "2026-03-24", value: 195 },
+//     { day: "2026-03-25", value: 176 },
+//     { day: "2026-03-26", value: 168 },
+//     { day: "2026-03-27", value: 184 },
+//     { day: "2026-03-28", value: 190 },
+//     { day: "2026-03-29", value: 171 },
+//     { day: "2026-03-30", value: 178 }
+// ];
+// export const MOCK_ADDONS: AddonEntry[] = [
+//     {
+//         id: 'addon_1', qty: 200, amount: 120,
+//         addon_date: '2025-01-10T14:30:00.000Z',
+//         razor_pay_id: 'pay_Rdck9DTiXfX5vm', status: 'Completed',
+//     },
+//     {
+//         id: 'addon_2', qty: 100, amount: 60,
+//         addon_date: '2025-01-13T09:15:00.000Z',
+//         razor_pay_id: 'pay_Xmrt4ABcYz2wqP', status: 'Completed',
+//     },
+// ]
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({

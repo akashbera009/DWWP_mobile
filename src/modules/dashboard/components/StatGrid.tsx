@@ -36,8 +36,8 @@ const StatGrid = () => {
         setStatGrid([
             // { icon: '⚡', label: 'Today', value: todayUse.toString(), subScript: 'litres', sub: '+12% vs last mo', accent: colors.activeDot, trend: 12, bg: 'rgba(50,194,202,0.08)' },
             { icon: localImages.alert, label: 'Penalty', value: '₹0', sub: '2 need attention', accent: colors.warning, trend: undefined, bg: 'rgba(243,156,18,0.08)' },
-            // { icon: '📡', label: 'Regular Price', value: `₹0`, sub: 'All zones active', accent: colors.success, trend: undefined, bg: 'rgba(39,174,96,0.08)' },
-            { icon: localImages.calendar2, label: 'Billing Cycle', value: `${billingCycle}`, subScript: 'days', sub: `${nextBillRemainingdays} days Until next bill`, accent: colors.secondary, trend: undefined, bg: colors.primaryLight },
+            // { icon:localImages.rupee_indian, label: 'Regular Price', value: `₹0`, sub: 'All zones active', accent: colors.secondary, trend: undefined,  bg: colors.primaryLight},
+            { icon: localImages.calendar2, label: 'Billing Cycle', value: `${billingCycle}`, subScript: 'days', sub: `${nextBillRemainingdays} days Until next bill`,accent: colors.info, trend: undefined, bg: 'rgba(39, 154, 174, 0.08)' },
         ])
     }, [])
 
@@ -48,8 +48,8 @@ const StatGrid = () => {
                     <View style={styles.oneline}>
                         <View style={[styles.statGridIconBox, { backgroundColor: item.bg }]}>
                             <Image
-                            source={item.icon}
-                            style={styles.icon}
+                                source={item.icon}
+                                style={[styles.icon, {tintColor : item.accent}]}
                             />
                         </View>
                         <View>
@@ -63,7 +63,7 @@ const StatGrid = () => {
                         </View>
                     </View>
                     <View style={styles.statGridFooter}>
-                        {item.trend !== undefined && (
+                        {item.trend && (
                             <Text style={[styles.statGridTrend, { color: item.trend >= 0 ? colors.success : colors.error }]}>
                                 {item.trend >= 0 ? '▲' : '▼'} {Math.abs(item.trend)}%{'  '}
                             </Text>
@@ -86,18 +86,20 @@ const styles = StyleSheet.create({
     statGridCard: {
         width: '47.5%',
         borderRadius: normalize(18),
-        padding: normalize(16),
+        padding: normalize(8),
         shadowColor: colors.cardShadow,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 1,
         shadowRadius: normalize(10),
         elevation: 10,
         gap: vh(4),
+        // borderWidth : 1
     },
     oneline: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: vw(10)
+        gap: vw(10),
+        // borderWidth : 1 
     },
     statGridIconBox: {
         width: normalize(40),
@@ -105,12 +107,11 @@ const styles = StyleSheet.create({
         borderRadius: normalize(13),
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: vh(2),
+        // marginBottom: vh(2),
     },
-    icon:{
-        height : vh(24),
-        width : vh(24),
-
+    icon: {
+        height: vh(24),
+        width: vh(24),
     },
     statGridIcon: {
         fontSize: normalize(19),
@@ -143,8 +144,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        flexWrap: 'wrap',
-        marginTop: vh(2),
+        // flexWrap: 'wrap',
+        // marginTop: vh(2),
+        // borderWidth : 1 
     },
     statGridTrend: {
         fontFamily: fonts.SemiBold,

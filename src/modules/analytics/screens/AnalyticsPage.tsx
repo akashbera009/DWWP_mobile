@@ -1,4 +1,4 @@
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import colors from '@dwwp/utils/colors'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -6,12 +6,14 @@ import fonts from '@dwwp/utils/fonts'
 import { normalize, screenWidth, vh, vw } from '@dwwp/utils/dimensions'
 import { strings } from '@dwwp/utils/strings'
 
-import { getDaysInMonth, getTrend } from '@dwwp/utils/commonFunctions'
+import { getCurrentMonthKey, getDaysInMonth, getTrend } from '@dwwp/utils/commonFunctions'
 import EffectiveTotal from '../components/EffectiveTotal'
 import DailyBreakDown from '../components/DailyBreakDown'
 import MonthlyBreakDown from '../components/MonthlyBreakDown'
 import { localImages } from '@dwwp/utils/localimages'
-import { MOCK_ADDONS, MOCK_MONTH_DATA } from '@dwwp/modules/dashboard/screens/Usages_Tab'
+import { useAppSelector } from '@dwwp/store/hooks'
+import { selectCurrentMonthLimit } from '@dwwp/modules/dashboard/usageSelectors'
+// import { MOCK_ADDONS, MOCK_MONTH_DATA } from '@dwwp/modules/dashboard/screens/Usages_Tab'
 
 const SCREEN_WIDTH = screenWidth;
 const MARGIN_BOTH_SIDE = vw(16)
@@ -48,20 +50,35 @@ const C = {
   purpleBg: 'rgba(123,104,238,0.10)',
 }
 
-const addons = MOCK_ADDONS
-const monthData = MOCK_MONTH_DATA
-
 const AnalyticsPage = () => {
-
   const { top } = useSafeAreaInsets()
+  const currentMOnthKey = getCurrentMonthKey()
+
+  const { todayUsage, allTimeDaysTotal, currentMonthId, months } = useAppSelector(s => s.usage)
+  const monthLimit = useAppSelector(selectCurrentMonthLimit)
+  const [addedLimit, setAddedLimit] = useState(1)
+  const addons = useAppSelector(s => s.payment?.addons)
+  const [effectiveLimit, setEffectiveLimit] = useState<number>(monthLimit ?? 1)
+  useEffect(() => {
+    const totalAddons = addons
+      .filter(txn => txn?.forMonth === currentMOnthKey)
+      .reduce((reducer, item) => reducer + (item?.qty * item?.refill), 0)
+    setAddedLimit(totalAddons)
+    const total = (monthLimit || 0) + totalAddons
+    setEffectiveLimit(total)
+
+  }, [addedLimit, monthLimit, addedLimit])
+
+  const lastMonthKeys = Object.keys(months ?? {}).sort()
+  const prevMonthId = lastMonthKeys[lastMonthKeys.length - 2]
+  const currentMonthUsage = months?.[currentMonthId ?? currentMOnthKey]?.total ?? 0
+  const lastMonthUsage = months?.[prevMonthId]?.total ?? 0
+  const totalAddonLiters = addons.reduce((s, a) => s + a.qty, 0)
+
   const daysInMonth = getDaysInMonth('This Month')
   const dayOfMonth = new Date().getDate()
 
-  const totalConsumed = Object.values(monthData.dailyUsages).reduce((s, v) => s + v, 0)
-  const totalAddonLiters = addons.reduce((s, a) => s + a.qty, 0)
-  const effectiveLimit = monthData.limit + totalAddonLiters
-
-  const trend = getTrend(totalConsumed, effectiveLimit, dayOfMonth, daysInMonth)
+  const trend = getTrend(allTimeDaysTotal, effectiveLimit, dayOfMonth, daysInMonth)
 
   const innerScrollRef = useRef<ScrollView | null>(null)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -117,28 +134,25 @@ const AnalyticsPage = () => {
           <View style={styles.page}>
             <MonthlyBreakDown />
           </View>
-          <View
-            style={{
-              height: vh(24),
-              width: vh(24),
-              borderRadius: normalize(20),
-              padding: normalize(12),
-              position: 'relative',
-              right: vw(30),
-              top: '50%',
-              backgroundColor: colors.activeDotLight,
-              transform: [{ rotate: '-90deg' }],
-            }}>
 
-            {/* <Image source={localImages.downarrow}
-            style={{
-              height: vh(22),
-              width: vh(22),
-              objectFit: 'contain',
-              
-            }} /> */}
+          <TouchableOpacity
+            hitSlop={16}
+            onPress={() => {
+              setCurrentBreakDown(currentBreaskDown === 0 ? 1 : 0)
+            }}
+            style={[styles.nextButton,
+            {
+              transform: [
+                { rotate: currentBreaskDown === 0 ? '-90deg' : '90deg' },
+                { translateY: currentBreaskDown !== 0 ? vw(-20) : 0 }
+              ],
+            }
+            ]}>
 
-          </View>
+            <Image source={localImages.downarrow}
+              style={styles.nextButtonImage} />
+          </TouchableOpacity>
+
           <View style={styles.page}>
             <DailyBreakDown />
           </View>
@@ -146,7 +160,7 @@ const AnalyticsPage = () => {
 
         <View style={styles.mainContent}>
           {/* ── Trend alert ── */}
-          {!monthData.isMonthFinish && (
+          {!months.isMonthFinish && (
             <View style={[styles.trendCard, {
               backgroundColor: `${trend.color}30`,
               borderColor: `${trend.color}30`,
@@ -189,6 +203,20 @@ const styles = StyleSheet.create({
     width: SCREEN_WIDTH - 2 * MARGIN_BOTH_SIDE,
     marginRight: MARGIN_BOTH_SIDE,
     paddingRight: vw(16),
+  },
+  nextButton: {
+    height: vh(22),
+    width: vh(22),
+    borderRadius: normalize(20),
+    position: 'relative',
+    right: vw(25),
+    top: '50%',
+    backgroundColor: colors.activeDotLight,
+  },
+  nextButtonImage: {
+    height: vh(22),
+    width: vh(22),
+    resizeMode: 'cover',
   },
   homeHeaderContainer: {
     backgroundColor: colors.primary,

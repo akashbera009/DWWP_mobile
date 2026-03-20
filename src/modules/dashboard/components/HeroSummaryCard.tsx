@@ -189,7 +189,7 @@ const HeroSummaryCard: React.FC = () => {
                         </View>
                         <View style={styles.heroStatDivider} />
                         <View style={styles.heroStatItem}>
-                            <Text style={styles.heroStatValue}>{effectiveLimit}</Text>
+                            <Text style={styles.heroStatValue}>{effectiveLimit}L</Text>
                             <Text style={styles.heroStatUnit}>Total Limit</Text>
                         </View>
                     </View>
