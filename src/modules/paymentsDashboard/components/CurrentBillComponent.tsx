@@ -246,7 +246,7 @@ const CurrentBillComponent = () => {
                 <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
                     <TouchableOpacity
                         style={[styles.button, isDisabled && styles.disabledButton]}
-                        // disabled={isDisabled}
+                        disabled={isDisabled}
                         onPress={() => setIsModalOpen(true)}
                         onPressIn={handlePressIn}
                         onPressOut={handlePressOut}

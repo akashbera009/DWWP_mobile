@@ -20,6 +20,7 @@ import paymentReducer from '@dwwp/modules/paymentsDashboard/paymentSlice'
 import servoReducer from '@dwwp/modules/dashboard/servoSlice'
 import usageReducer from '@dwwp/modules/dashboard/usageSlice'
 import  notificationReducer from '@dwwp/modules/dashboard/Notificationslice'
+import analyticsReducer from '@dwwp/modules/analytics/analyticsSlice'
 
 import {
     FLUSH,
@@ -43,7 +44,8 @@ const rootReducer = combineReducers({
     payment: paymentReducer,
     servo: servoReducer,
     usage: usageReducer,
-    notification : notificationReducer
+    notification : notificationReducer,
+    analytics: analyticsReducer
 })
 // payment: paymentReducer,
 const persistedReducer = persistReducer(persistConfig, rootReducer);

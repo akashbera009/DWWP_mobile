@@ -11,8 +11,10 @@ import EffectiveTotal from '../components/EffectiveTotal'
 import DailyBreakDown from '../components/DailyBreakDown'
 import MonthlyBreakDown from '../components/MonthlyBreakDown'
 import { localImages } from '@dwwp/utils/localimages'
-import { useAppSelector } from '@dwwp/store/hooks'
+import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks'
 import { selectCurrentMonthLimit } from '@dwwp/modules/dashboard/usageSelectors'
+import TrendCard from '../components/TrendCard'
+
 // import { MOCK_ADDONS, MOCK_MONTH_DATA } from '@dwwp/modules/dashboard/screens/Usages_Tab'
 
 const SCREEN_WIDTH = screenWidth;
@@ -52,33 +54,34 @@ const C = {
 
 const AnalyticsPage = () => {
   const { top } = useSafeAreaInsets()
+  const dispatch = useAppDispatch()
   const currentMOnthKey = getCurrentMonthKey()
 
-  const { todayUsage, allTimeDaysTotal, currentMonthId, months } = useAppSelector(s => s.usage)
+  // const { todayUsage, allTimeDaysTotal, currentMonthId, months } = useAppSelector(s => s.usage)
   const monthLimit = useAppSelector(selectCurrentMonthLimit)
   const [addedLimit, setAddedLimit] = useState(1)
   const addons = useAppSelector(s => s.payment?.addons)
-  const [effectiveLimit, setEffectiveLimit] = useState<number>(monthLimit ?? 1)
+  // const [effectiveLimit, setEffectiveLimit] = useState<number>(monthLimit ?? 1)
   useEffect(() => {
     const totalAddons = addons
       .filter(txn => txn?.forMonth === currentMOnthKey)
       .reduce((reducer, item) => reducer + (item?.qty * item?.refill), 0)
     setAddedLimit(totalAddons)
-    const total = (monthLimit || 0) + totalAddons
-    setEffectiveLimit(total)
+    // const total = (monthLimit || 0) + totalAddons
+    // setEffectiveLimit(total)
 
   }, [addedLimit, monthLimit, addedLimit])
 
-  const lastMonthKeys = Object.keys(months ?? {}).sort()
-  const prevMonthId = lastMonthKeys[lastMonthKeys.length - 2]
-  const currentMonthUsage = months?.[currentMonthId ?? currentMOnthKey]?.total ?? 0
-  const lastMonthUsage = months?.[prevMonthId]?.total ?? 0
-  const totalAddonLiters = addons.reduce((s, a) => s + a.qty, 0)
+  // const lastMonthKeys = Object.keys(months ?? {}).sort()
+  // const prevMonthId = lastMonthKeys[lastMonthKeys.length - 2]
+  // const currentMonthUsage = months?.[currentMonthId ?? currentMOnthKey]?.total ?? 0
+  // const lastMonthUsage = months?.[prevMonthId]?.total ?? 0
+  // const totalAddonLiters = addons.reduce((s, a) => s + a.qty, 0)
+  // const trend = getTrend(allTimeDaysTotal, effectiveLimit, dayOfMonth, daysInMonth)
 
-  const daysInMonth = getDaysInMonth('This Month')
-  const dayOfMonth = new Date().getDate()
+  // const daysInMonth = getDaysInMonth('This Month')
+  // const dayOfMonth = new Date().getDate()
 
-  const trend = getTrend(allTimeDaysTotal, effectiveLimit, dayOfMonth, daysInMonth)
 
   const innerScrollRef = useRef<ScrollView | null>(null)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -108,6 +111,12 @@ const AnalyticsPage = () => {
       animated: true
     })
   }, [currentBreaskDown])
+
+  // useEffect(() => {
+  //   dispatch(calculatePrediction())
+  // }, [dispatch])
+
+  // const prediction = useAppSelector(selectCurrentPrediction)
 
   return (
     <View style={[styles.container, { paddingTop: top }]}>
@@ -159,22 +168,8 @@ const AnalyticsPage = () => {
         </ScrollView>
 
         <View style={styles.mainContent}>
-          {/* ── Trend alert ── */}
-          {!months.isMonthFinish && (
-            <View style={[styles.trendCard, {
-              backgroundColor: `${trend.color}30`,
-              borderColor: `${trend.color}30`,
-            }]}>
-              <Text style={styles.trendIcon}>{trend.icon}</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.trendLabel, { color: trend.color }]}>{trend.label}</Text>
-                <Text style={styles.trendSub}>
-                  Day {dayOfMonth} of {daysInMonth}  ·  Expected {fmt((dayOfMonth / daysInMonth) * effectiveLimit)} by now
-                </Text>
-              </View>
-            </View>
-          )}
 
+          <TrendCard/>
           {/* ── Effective total summary ── */}
           <EffectiveTotal />
 
