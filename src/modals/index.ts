@@ -19,6 +19,12 @@ export interface RegisterPayload {
   mobile: string;
   password: string;
 }
+// edit profile payload 
+export interface EditProfilePayload {
+  fullName: string
+  mobileNo: string
+  address: string
+}
 
 // dashboardTypes
 export interface Broadcast {
@@ -158,7 +164,7 @@ export interface AddonRecord {
   addon_date: string | null
   razor_pay_id: string
   refill: number
-  forMonth?:string 
+  forMonth?: string
   status: string | null
 }
 
@@ -202,7 +208,7 @@ export type FetchAllMonthsPayload = {
 // User Notification Types
 export interface UserNotification {
   id: string
-  type: 'payment' | 'refill' | 'limit_exceeded' | 'addon_completed' | 'system'| string
+  type: 'payment' | 'refill' | 'limit_exceeded' | 'addon_completed' | 'system' | string
   title: string
   message: string
   amount?: number

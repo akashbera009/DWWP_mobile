@@ -6,7 +6,7 @@ import firestore from "@react-native-firebase/firestore"
 
 import { persistor } from "@dwwp/store"
 
-import { AuthUser, RegisterPayload } from '@dwwp/modals'
+import { AuthUser, EditProfilePayload, RegisterPayload } from '@dwwp/modals'
 import { clearAll } from "@dwwp/utils/mmkvStorage"
 import { showInfoSnackbar } from "@dwwp/utils/showSnackBar";
 
@@ -95,5 +95,34 @@ export const logout = createAsyncThunk(
         await persistor.purge()
         await clearAll()
         showInfoSnackbar('Logged Out successfully')
+    }
+)
+
+
+// edit profile
+
+export const updateProfile = createAsyncThunk<
+    EditProfilePayload,
+    EditProfilePayload,
+    { rejectValue: string }
+>(
+    "editProfile/updateProfile",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const uid = getAuth().currentUser?.uid
+            if (!uid) return rejectWithValue("User not authenticated.")
+ 
+            await firestore().collection("users").doc(uid).update({
+                name: payload.fullName,
+                mobile: payload.mobileNo,
+                address: payload.address,
+                updatedAt: firestore.FieldValue.serverTimestamp(),
+            })
+ 
+            showInfoSnackbar("Profile updated successfully")
+            return payload
+        } catch (e: any) {
+            return rejectWithValue(e.message ?? "Failed to update profile.")
+        }
     }
 )

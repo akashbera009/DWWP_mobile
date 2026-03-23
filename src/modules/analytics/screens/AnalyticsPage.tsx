@@ -168,8 +168,8 @@ const AnalyticsPage = () => {
         </ScrollView>
 
         <View style={styles.mainContent}>
-
-          <TrendCard/>
+          <Text style={styles.sectionLabelText}>Predicted Usages</Text>
+          <TrendCard />
           {/* ── Effective total summary ── */}
           <EffectiveTotal />
 
@@ -231,6 +231,9 @@ const styles = StyleSheet.create({
   mainContent: {
     flexGrow: 1,
     marginHorizontal: vw(16)
+  },
+  sectionLabelText: {
+    fontFamily: fonts.Bold, fontSize: normalize(14), color: C.black, flexShrink: 0,
   },
   // Trend card
   trendCard: {

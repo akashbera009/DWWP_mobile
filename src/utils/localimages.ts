@@ -1,9 +1,12 @@
 export const localImages = {
     dwwp_logo : require('../assets/images/DWWP LOGO.png'),
+    logo_with_no_bg : require('../assets/images/logo_with_no_bg.png'),
     analytics_blank : require('../assets/images/analytics_blank.png'),
     analytics_fill : require('../assets/images/analytics_fill.png'),
     analysis_blank : require('../assets/images/analysis.png'),
     analysis_fill: require('../assets/images/analysis_fill.png'),
+    pie_chart_fill: require('../assets/images/pie_chart_fill.png'),
+    pie_chart_blank: require('../assets/images/pie_chart_blank.png'),
     
     eyeSlash: require('../assets/images/eye-slash.png'),
     eye: require('../assets/images/eye.png'),

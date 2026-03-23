@@ -24,10 +24,15 @@ import Avatar from '../dashboard/components/Avatar';
 import { logout } from '../auth/authAction';
 import { LoadingPopup } from '../auth/components/LoadingPopup';
 import Pill from '../dashboard/components/Pill';
-import { useSelector } from 'react-redux';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { MainStackParamList } from '@dwwp/utils/types';
+import { useNavigation } from '@react-navigation/native';
+
+type MainStackNavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
 const ViewProfileScreen = () => {
   const { top } = useSafeAreaInsets()
+  const navigation = useNavigation<MainStackNavigationProp>();
   const dispatch = useAppDispatch()
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null)
   const userSelector = useAppSelector(state => state?.dashboard?.userDetails)
@@ -55,7 +60,7 @@ const ViewProfileScreen = () => {
         routes: [{ name: screenNames.AuthStack }],
       })
     } catch (error) {
-      console.error('logout error' , error)
+      console.error('logout error', error)
     } finally {
       setLogOutLoading(true)
     }
@@ -114,7 +119,9 @@ const ViewProfileScreen = () => {
           </View>
 
           {/* Buttons */}
-          <TouchableOpacity style={styles.editButton}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate(screenNames.EditProfileScreen)}
+            style={styles.editButton}>
             <Text style={styles.editButtonText}>Edit Profile</Text>
           </TouchableOpacity>
 

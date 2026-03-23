@@ -18,9 +18,10 @@ export type MainStackParamList = {
     FullPaymantHistory: undefined
 
     ViewProfileScreen: undefined;
+    EditProfileScreen: undefined
     SettingsScreen: undefined;
     RaiseComplaintScreen: undefined;
-    AllNotifications:undefined ; 
+    AllNotifications: undefined;
 
     PaymentSuccessScreen: {
         payment_id: string,
@@ -28,7 +29,7 @@ export type MainStackParamList = {
         qty?: number,
         refill?: number,
         type: string,
-        usage?:string 
+        usage?: string
     };
     ViewPaymentDetailsScreen: {
         transaction: TransactionForNav

@@ -60,3 +60,9 @@ analytics component prediction work needed
 edit profile page 
 
 mock data is doing iit's work , need to be removed 
+
+
+20march real device processing 
+receipt downloads are not happening in real devices 
+QtyModal bottom button is not in safearea view 
+home page switch is not  in safearea view 
