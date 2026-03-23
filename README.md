@@ -139,7 +139,7 @@ An IoT-based solution for intelligent water management with real-time monitoring
                   └── {addon_id}/ [Document] (auto-generated or razor_pay_id)
                       ├── addon_date: timestamp (ISO string)
                       ├── amount: number
-                      ├── quantityDone: number (liters purchased)
+                      ├── qty: number (liters purchased)
                       ├── refill: number (how many times refilled)
                       ├── razor_pay_id: string
                       └── status: string (always "Completed")

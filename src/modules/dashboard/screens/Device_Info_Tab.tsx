@@ -1,0 +1,576 @@
+import React, { useRef, useEffect, useState } from 'react'
+import {
+    View, Text, ScrollView, StyleSheet, Animated,
+    TouchableOpacity,
+    Image
+} from 'react-native'
+
+import ToggleSwitch from '../components/ToggleSwitch'
+import { useAppSelector } from '@dwwp/store/hooks'
+import LinearGradient from 'react-native-linear-gradient'
+import fonts from '@dwwp/utils/fonts'
+import { normalize, vh } from '@dwwp/utils/dimensions'
+import colors from '@dwwp/utils/colors'
+import { localImages } from '@dwwp/utils/localimages'
+import { PulseDot } from '../components/PulseDot'
+import { UsageSnapshotCard } from '../components/UsageSnapshotCard'
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+type ConnLevel = 'online' | 'recent' | 'stale' | 'offline' | 'loading'
+
+const C = {
+    primary: '#2B6568',
+    primaryDark: '#1e4a4d',
+    primaryLight: 'rgba(43,101,104,0.10)',
+    primaryBorder: 'rgba(43,101,104,0.18)',
+    cyan: '#32C2CA',
+    cyanBg: 'rgba(50,194,202,0.10)',
+    disabled: 'rgba(43,101,104,0.18)',
+    cyanBorder: 'rgba(50,194,202,0.22)',
+    white: '#FFFFFF',
+    black: '#041617',
+    body: '#6A7C92',
+    border: '#E1E8ED',
+    bg: '#F4F7F8',
+    card: '#FFFFFF',
+    error: '#E74C3C',
+    errorBg: 'rgba(231,76,60,0.08)',
+    errorBorder: 'rgba(231,76,60,0.20)',
+    warning: '#F39C12',
+    warningBg: 'rgba(243,156,18,0.08)',
+    warningBorder: 'rgba(243,156,18,0.22)',
+    success: '#27AE60',
+    successBg: 'rgba(39,174,96,0.08)',
+    successBorder: 'rgba(39,174,96,0.20)',
+    inputBg: '#EFF2F5',
+    shadow: 'rgba(43,101,104,0.10)',
+    purple: '#7B68EE',
+    purpleBg: 'rgba(123,104,238,0.10)',
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function calcLevel(lastSeen: number): ConnLevel {
+    if (!lastSeen) return 'loading'
+    const delta = Date.now() - lastSeen
+    if (delta < 30_000) return 'online'
+    if (delta < 5 * 60_000) return 'recent'
+    if (delta < 60 * 60_000) return 'stale'
+    return 'offline'
+}
+
+function calcRelativeTime(lastSeen: number): string {
+    if (!lastSeen) return '—'
+    const delta = Math.floor((Date.now() - lastSeen) / 1000)
+    if (delta < 10) return 'Just now'
+    if (delta < 60) return `${delta}s ago`
+    if (delta < 3600) return `${Math.floor(delta / 60)}m ago`
+    if (delta < 86400) return `${Math.floor(delta / 3600)}h ago`
+    return `${Math.floor(delta / 86400)}d ago`
+}
+
+function formatDateTime(ts: number): string {
+    if (!ts) return '—'
+    return new Date(ts).toLocaleString('en-IN', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit', hour12: true,
+    })
+}
+
+function formatMonthId(id: string): string {
+    if (!id) return ''
+    const [year, month] = id.split('-')
+    return new Date(Number(year), Number(month) - 1)
+        .toLocaleString('default', { month: 'long', year: 'numeric' })
+}
+
+// ─── Section label ────────────────────────────────────────────────────────────
+const SectionLabel: React.FC<{ title: string; style?: object }> = ({ title, style }) => (
+    <Text style={[sharedStyles.sectionLabel, style]}>{title}</Text>
+)
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 1. DEVICE STATUS CARD
+// ═══════════════════════════════════════════════════════════════════════════════
+const DeviceStatusCard: React.FC = () => {
+    const { lastSeen } = useAppSelector(s => s.servo)
+    const [, setTick] = useState(0)
+
+    // re-render every 5s to keep relative time fresh
+    useEffect(() => {
+        const id = setInterval(() => setTick(t => t + 1), 5000)
+        return () => clearInterval(id)
+    }, [])
+
+    const level = calcLevel(Number(lastSeen))
+    const relTime = calcRelativeTime(Number(lastSeen))
+    const absTime = formatDateTime(Number(lastSeen))
+    const isOnline = level === 'online' || level === 'recent'
+
+    const STATUS = {
+        online: { label: 'ONLINE', bg: 'rgba(52,211,153,0.15)', text: '#34d399', dot: '#34d399' },
+        recent: { label: 'ACTIVE', bg: 'rgba(52,211,153,0.12)', text: '#34d399', dot: '#34d399' },
+        stale: { label: 'WEAK', bg: 'rgba(245,158,11,0.15)', text: '#fbbf24', dot: '#f59e0b' },
+        offline: { label: 'OFFLINE', bg: 'rgba(239,68,68,0.15)', text: '#fca5a5', dot: '#ef4444' },
+        loading: { label: 'SYNCING', bg: 'rgba(148,163,184,0.15)', text: '#94a3b8', dot: '#64748b' },
+    }[level]
+
+    const connLabel = isOnline ? 'Wi-Fi · Active'
+        : level === 'stale' ? 'Wi-Fi · Weak'
+            : 'Wi-Fi · Lost'
+
+    return (
+        <View style={dStyles.card}>
+
+            {/* Header */}
+            <View style={dStyles.headerRow}>
+                <View style={dStyles.iconBox}>  
+                    <Image source={localImages.chip} style={dStyles.chip}/>
+                </View>
+                <View style={{ flex: 1, marginLeft: normalize(10) }}>
+                    <Text style={dStyles.titleText}>ESP32 · Servo Valve</Text>
+                    <Text style={dStyles.subText}>DWWP Node · Main Line</Text>
+                </View>
+                <View style={[dStyles.statusPill, { backgroundColor: STATUS.bg }]}>
+                    <PulseDot color={STATUS.dot} active={isOnline} />
+                    <Text style={[dStyles.statusPillText, { color: STATUS.text }]}>
+                        {STATUS.label}
+                    </Text>
+                </View>
+            </View>
+
+            {/* <View style={sharedStyles.divider} /> */}
+
+            {/* Meta grid — 2 columns */}
+            <View style={dStyles.metaGrid}>
+                <View style={dStyles.metaCell}>
+                    <Text style={dStyles.metaLabel}>Last seen</Text>
+                    <Text style={dStyles.metaValue}>{relTime}</Text>
+                </View>
+                <View style={dStyles.metaCell}>
+                    <Text style={dStyles.metaLabel}>Connection</Text>
+                    <Text style={dStyles.metaValue}>{connLabel}</Text>
+                </View>
+                <View style={dStyles.metaCell}>
+                    <Text style={dStyles.metaLabel}>Last connected</Text>
+                    <Text style={dStyles.metaValue}>{absTime}</Text>
+                </View>
+                <View style={dStyles.metaCell}>
+                    <Text style={dStyles.metaLabel}>Device ID</Text>
+                    <Text style={dStyles.metaValue}>ESP-A3F2</Text>
+                </View>
+            </View>
+
+            {/* Offline / stale strip */}
+            {!isOnline && level !== 'loading' && (
+                <View style={[
+                    dStyles.alertStrip,
+                    {
+                        backgroundColor: level === 'stale' ? C.warningBg : C.errorBg,
+                        borderTopColor: level === 'stale' ? C.warningBorder : C.errorBorder
+                    }
+                ]}>
+                    <Text style={{ fontSize: normalize(13) }}>
+                        {level === 'stale' ? '⚠️' : '📡'}
+                    </Text>
+                    <Text style={[dStyles.alertText, {
+                        color: level === 'stale' ? C.warning : C.error,
+                    }]}>
+                        {level === 'stale'
+                            ? 'Device signal is weak. Commands may be delayed.'
+                            : 'Device is offline. Commands will queue and sync on reconnect.'}
+                    </Text>
+                </View>
+            )}
+        </View>
+    )
+}
+
+const dStyles = StyleSheet.create({
+    card: {
+        backgroundColor: C.white,
+        borderRadius: normalize(18),
+        overflow: 'hidden',
+        shadowColor:colors.shadowBlack,
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 1,
+        shadowRadius: 12,
+        elevation: 10,
+        borderWidth : normalize(1),
+        borderColor : colors.border
+    },
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: normalize(14),
+        paddingTop : vh(14)
+    },
+    iconBox: {
+        width: normalize(40), height: normalize(40),
+        borderRadius: normalize(11),
+        backgroundColor: C.cyanBg,
+        alignItems: 'center', justifyContent: 'center',
+    },
+     chip:{
+        height : vh(32),
+        width : vh(32)
+    },
+    titleText: {
+        fontFamily: fonts.Bold,
+        fontSize: normalize(14),
+        color: C.black,
+    },
+    subText: {
+        fontFamily: fonts.Regular,
+        fontSize: normalize(11),
+        color: C.black,
+    },
+    statusPill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: normalize(5),
+        paddingHorizontal: normalize(10),
+        paddingVertical: normalize(5),
+        borderRadius: normalize(20),
+    },
+    statusPillText: {
+        fontFamily: fonts.Bold,
+        fontSize: normalize(10),
+        letterSpacing: 0.8,
+    },
+    metaGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        padding: normalize(10),
+        gap: normalize(8),
+    },
+    metaCell: {
+        borderWidth : normalize(1),
+        borderColor : colors.border,
+        width: '47%',
+        backgroundColor: C.bg,
+        borderRadius: normalize(10),
+        padding: normalize(7),
+    },
+    metaLabel: {
+        fontFamily: fonts.Regular,
+        fontSize: normalize(10),
+        color: C.black,
+        marginBottom: normalize(3),
+    },
+    metaValue: {
+        fontFamily: fonts.SemiBold,
+        fontSize: normalize(12),
+        color: C.black,
+    },
+    alertStrip: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: normalize(8),
+        borderTopWidth: 1,
+        padding: normalize(12),
+        paddingHorizontal: normalize(14),
+    },
+    alertText: {
+        flex: 1,
+        fontFamily: fonts.Regular,
+        fontSize: normalize(11),
+        lineHeight: normalize(16),
+    },
+})
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// 2. WATER CONTROL CARD  (ControlSwitchModal content — now inline)
+// ═══════════════════════════════════════════════════════════════════════════════
+const WaterControlCard: React.FC = () => {
+    const { servoState, lastSeen } = useAppSelector(s => s.servo)
+
+    // ── replace these with your real selectors ─────────────────────────────
+    const quotaExceeded: boolean = false
+    const deviceOffline: boolean = calcLevel(Number(lastSeen)) === 'offline'
+    // ───────────────────────────────────────────────────────────────────────
+
+    const isLocked = quotaExceeded
+
+    const stateLabel = isLocked ? 'Locked'
+        : servoState ? 'Water is ON'
+            : 'Water is OFF'
+
+    const stateDesc = isLocked ? 'Quota exceeded · valve disabled'
+        : servoState ? 'Valve open · flowing'
+            : 'Valve closed · stopped'
+
+    const liveLabel = servoState && !isLocked ? 'LIVE' : isLocked ? 'LOCKED' : 'OFF'
+    const liveDotColor = servoState && !isLocked ? C.cyan : isLocked ? C.error : C.disabled
+
+    return (
+        <View style={wStyles.card}>
+
+            {/* Quota exceeded banner */}
+            {quotaExceeded && (
+                <View style={wStyles.errorBanner}>
+                    <Text style={{ fontSize: normalize(15) }}>🔒</Text>
+                    <View style={{ flex: 1 }}>
+                        <Text style={wStyles.errorTitle}>Usage limit reached</Text>
+                        <Text style={wStyles.errorSub}>
+                            Control is disabled. Recharge your plan to regain access.
+                        </Text>
+                    </View>
+                </View>
+            )}
+
+            {/* Offline banner */}
+            {deviceOffline && !quotaExceeded && (
+                <View style={wStyles.warnBanner}>
+                    <Text style={{ fontSize: normalize(22) }}>⚠️</Text>
+                    <View style={{ flex: 1 }}>
+                        <Text style={wStyles.warnTitle}>Device not reachable</Text>
+                        <Text style={wStyles.warnSub}>
+                            Controlling available upon connected to WIFI
+                        </Text>
+                    </View>
+                </View>
+            )}
+
+            {/* State header — gradient when ON */}
+            <LinearGradient
+                colors={servoState && !isLocked ? [C.primary, C.primaryDark] : [C.bg, C.bg]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={wStyles.stateHeader}
+            >
+                <View>
+                    <Text style={[wStyles.stateLabel, {
+                        color: servoState && !isLocked ? C.white : C.black,
+                    }]}>
+                        {stateLabel}
+                    </Text>
+                    <Text style={[wStyles.stateDesc, {
+                        color: servoState && !isLocked ? 'rgba(255,255,255,0.65)' : C.black,
+                    }]}>
+                        {stateDesc}
+                    </Text>
+                </View>
+                <View style={[wStyles.liveBadge, {
+                    backgroundColor: servoState && !isLocked
+                        ? 'rgba(50,194,202,0.22)' : 'rgba(0,0,0,0.06)',
+                }]}>
+                    <PulseDot color={liveDotColor} active={servoState && !isLocked} />
+                    <Text style={[wStyles.liveText, { color: liveDotColor }]}>{liveLabel}</Text>
+                </View>
+            </LinearGradient>
+
+            {/* Toggle row OR locked row */}
+            {!isLocked ? (
+                <View style={wStyles.toggleRow}>
+                    {/* <Text style={wStyles.toggleHint}>
+                        {deviceOffline
+                            ? 'Device offline — toggle will queue and sync on reconnect'
+                            : 'Tap to toggle water supply. Changes apply instantly.'}
+                    </Text> */}
+                    <ToggleSwitch disabled={false} />
+                </View>
+            ) : (
+                <View style={wStyles.lockedRow}>
+                    <Text style={wStyles.lockedHint}>Recharge your plan to control the valve</Text>
+                    <TouchableOpacity style={wStyles.rechargeBtn} activeOpacity={0.82}>
+                        {/* navigate to Payment tab */}
+                        <Text style={wStyles.rechargeBtnText}>Recharge Plan</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+
+            {/* Info note */}
+            <View style={wStyles.infoNote}>
+                 <Image source={localImages.info} style={wStyles.info}/>
+                <Text style={wStyles.infoText}>
+                    {deviceOffline
+                        ? 'Device is offline. Showing last known state. Commands sync automatically on reconnect.'
+                        : 'Controls the servo valve on your DWWP device. The physical valve responds within 2–3 seconds.'}
+                </Text>
+            </View>
+        </View>
+    )
+}
+
+const wStyles = StyleSheet.create({
+    card: {
+        backgroundColor: C.white,
+        borderRadius: normalize(18),
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.07,
+        shadowRadius: 12,
+        elevation: 3,
+    },
+    errorBanner: {
+        flexDirection: 'row', alignItems: 'flex-start', gap: normalize(10),
+        backgroundColor: C.errorBg,
+        borderBottomWidth: 1, borderBottomColor: C.errorBorder,
+        padding: normalize(13),
+    },
+    warnBanner: {
+        flexDirection: 'row', alignItems: 'center', gap: normalize(10),
+        backgroundColor: C.warningBg,
+        borderBottomWidth: 1, borderBottomColor: C.warningBorder,
+        padding: normalize(13),
+    },
+    errorTitle: { fontFamily: fonts.SemiBold, fontSize: normalize(12), color: C.error },
+    errorSub: { fontFamily: fonts.Regular, fontSize: normalize(11), color: C.error, opacity: 0.8, marginTop: vh(2), lineHeight: normalize(16) },
+    warnTitle: { fontFamily: fonts.SemiBold, fontSize: normalize(12), color: C.warning },
+    warnSub: { fontFamily: fonts.Regular, fontSize: normalize(11), color: C.warning, opacity: 0.85, marginTop: vh(2), lineHeight: normalize(16) },
+    stateHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: normalize(16),
+        paddingVertical : vh(6)
+    },
+    stateLabel: {
+        fontFamily: fonts.Bold,
+        fontSize: normalize(16),
+    },
+    stateDesc: {
+        fontFamily: fonts.Regular,
+        fontSize: normalize(12),
+    },
+    liveBadge: {
+        flexDirection: 'row', alignItems: 'center', gap: normalize(5),
+        paddingHorizontal: normalize(10), paddingVertical: normalize(5),
+        borderRadius: normalize(20),
+    },
+    liveText: {
+        fontFamily: fonts.Bold,
+        fontSize: normalize(10),
+        letterSpacing: 0.8,
+    },
+    toggleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent : 'center', 
+        borderTopWidth: 1,
+        borderTopColor: C.border,
+        gap: normalize(12),
+    },
+    toggleHint: {
+        flex: 1,
+        fontFamily: fonts.Regular,
+        fontSize: normalize(12),
+        color: C.black,
+        lineHeight: normalize(17),
+    },
+    lockedRow: {
+        alignItems: 'center',
+        paddingVertical: normalize(18),
+        paddingHorizontal: normalize(16),
+        gap: normalize(12),
+        borderTopWidth: 1,
+        borderTopColor: C.border,
+    },
+    lockedHint: {
+        fontFamily: fonts.Regular,
+        fontSize: normalize(12),
+        color: C.black,
+        textAlign: 'center',
+    },
+    rechargeBtn: {
+        backgroundColor: C.primary,
+        borderRadius: normalize(12),
+        paddingHorizontal: normalize(28),
+        paddingVertical: normalize(11),
+        shadowColor: C.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.28,
+        shadowRadius: 8,
+        elevation: 5,
+    },
+    rechargeBtnText: {
+        fontFamily: fonts.Bold,
+        fontSize: normalize(13),
+        color: C.white,
+    },
+    info:{
+        height : vh(18),
+        width : vh(18)
+    },
+    infoNote: {
+        flexDirection: 'row', alignItems: 'center', gap: normalize(8),
+        backgroundColor: C.primaryLight,
+        margin: normalize(12),
+        borderRadius: normalize(10),
+        padding: normalize(11),
+    },
+    infoText: {
+        flex: 1,
+        fontFamily: fonts.Regular,
+        fontSize: normalize(11),
+        color: C.primary,
+        lineHeight: normalize(16),
+    },
+})
+// ═══════════════════════════════════════════════════════════════════════════════
+// DEVICE TAB SCREEN
+// ═══════════════════════════════════════════════════════════════════════════════
+const DeviceTab: React.FC = () => {
+    const fadeAnim = useRef(new Animated.Value(0)).current
+    const slideAnim = useRef(new Animated.Value(20)).current
+
+    useEffect(() => {
+        Animated.parallel([
+            Animated.timing(fadeAnim, { toValue: 1, duration: 350, useNativeDriver: true }),
+            Animated.spring(slideAnim, { toValue: 0, friction: 10, tension: 60, useNativeDriver: true }),
+        ]).start()
+    }, [])
+
+    return (
+        <ScrollView
+            style={styles.container}
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+        >
+            <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+
+                <SectionLabel title="Device Status" />
+                <DeviceStatusCard />
+
+                <SectionLabel title="Water Control" style={{ marginTop: normalize(20) }} />
+                <WaterControlCard />
+
+                <SectionLabel title="This Month's Usage" style={{ marginTop: normalize(20) }} />
+                <UsageSnapshotCard />
+
+            </Animated.View>
+        </ScrollView>
+    )
+}
+
+export default DeviceTab
+
+// ─── Shared styles ────────────────────────────────────────────────────────────
+const sharedStyles = StyleSheet.create({
+    sectionLabel: {
+        fontFamily: fonts.SemiBold,
+        fontSize: normalize(11),
+        color: C.black,
+        letterSpacing: 1,
+        textTransform: 'uppercase',
+        marginBottom: normalize(8),
+        marginLeft: normalize(2),
+    },
+    divider: {
+        height: 1,
+        backgroundColor: C.border,
+        marginHorizontal: normalize(14),
+    },
+})
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: C.bg,
+    },
+    content: {
+        padding: normalize(16),
+        paddingBottom: normalize(40),
+    },
+})
