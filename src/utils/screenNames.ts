@@ -15,6 +15,7 @@ export const screenNames = {
     AnalyticsPage: 'AnalyticsPage',
 
     ViewProfileScreen:'ViewProfileScreen',
+    EditProfileScreen: 'EditProfileScreen',
     SelectAddress : 'SelectAddress',
     RaiseComplaintScreen : 'RaiseComplaintScreen',
     AllNotifications:'AllNotifications',

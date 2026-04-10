@@ -35,6 +35,7 @@ export interface UserDetails {
   consumerNumber: string
   meterNumber: string
   supplyZone: string
+  profileImage: string
 }
 
 export interface CurrentMonth {
@@ -73,7 +74,6 @@ export const DashboardInitialState: DashboardState = {
 
   limitConfig: null,
   priceConfig: null,
-
   isLoading: true,
   error: null,
 }
@@ -158,7 +158,7 @@ export interface AddonRecord {
   addon_date: string | null
   razor_pay_id: string
   refill: number
-  forMonth?:string 
+  forMonth?: string
   status: string | null
 }
 
@@ -202,7 +202,7 @@ export type FetchAllMonthsPayload = {
 // User Notification Types
 export interface UserNotification {
   id: string
-  type: 'payment' | 'refill' | 'limit_exceeded' | 'addon_completed' | 'system'| string
+  type: 'payment' | 'refill' | 'limit_exceeded' | 'addon_completed' | 'system' | string
   title: string
   message: string
   amount?: number

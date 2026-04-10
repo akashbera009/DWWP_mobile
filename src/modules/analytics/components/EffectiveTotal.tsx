@@ -4,6 +4,7 @@ import fonts from '@dwwp/utils/fonts'
 import { normalize, vh} from '@dwwp/utils/dimensions'
 import { getCurrentMonthKey } from '@dwwp/utils/commonFunctions'
 import { useAppSelector } from '@dwwp/store/hooks'
+import { selectCurrentMonthLimit } from '@dwwp/modules/dashboard/usageSelectors'
 
 const fmt = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(2)}kL` : `${Math.round(n)}L`
 
@@ -38,7 +39,7 @@ const C = {
 
 const EffectiveTotal = () => {
     const monthKeyId = getCurrentMonthKey()
-
+    let monthLimit = useAppSelector(selectCurrentMonthLimit) ?? 0
     const monthData = useAppSelector(s => s.usage?.months?.[monthKeyId] ?? {})
     const todayUse = useAppSelector(s => s.usage.todayUsage ?? 0)
     const addons = useAppSelector(s => s.payment.addons ?? [])
@@ -53,7 +54,8 @@ const EffectiveTotal = () => {
     } = useMemo(() => {
 
         const days = monthData?.days ?? {}
-        const monthLimit = monthData?.limit ?? 0
+        // const monthLimit = monthData?.limit ?? 0
+      
 
         // daily usage sum
         const daySum = Object.values(days).reduce((sum, v) => sum + v, 0)
@@ -94,7 +96,9 @@ const EffectiveTotal = () => {
         }
 
     }, [monthData, todayUse, addons, monthKeyId])
-    const monthLimit = monthData?.limit ?? 0
+    // const monthLimit = monthData?.limit ?? 0
+    // const monthLimit = useAppSelector(selectCurrentMonthLimit) ?? 0
+
     return (
         <View style={styles.container}>
             <View style={styles.sectionLabel}>

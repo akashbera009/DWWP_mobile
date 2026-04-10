@@ -43,6 +43,7 @@ import { screenNames } from '@dwwp/utils/screenNames'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { MainStackParamList } from '@dwwp/utils/types'
+import { selectCurrentMonthLimit } from '../usageSelectors'
 type MainStackNavigationProp =NativeStackNavigationProp<MainStackParamList>;
 // ─── Theme ────────────────────────────────────────────────────────────────────
 const C = {
@@ -267,8 +268,9 @@ const Usages_Tab = () => {
     const addons = useAppSelector(s => s.payment.addons ?? [])
     const todayUse = useAppSelector(s => s.usage.todayUsage ?? 0)
 
-    const monthLimit = monthData?.limit ?? 0
-
+    // const monthLimit = monthData?.limit ?? 0
+    const monthLimit = useAppSelector(selectCurrentMonthLimit) ?? 0
+ 
     // ── Derived values ────────────────────────────────────────────────────────
     const {
         totalConsumed,

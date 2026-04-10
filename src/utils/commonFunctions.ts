@@ -155,6 +155,7 @@ export function extractDayFields(
 ): Record<string, number> {
   const dayRegex = /^\d{4}-\d{2}-\d{2}$/
   const days: Record<string, number> = {}
+  if( data === null || typeof data !== 'object') return days
   for (const [key, val] of Object.entries(data)) {
     if (dayRegex.test(key) && typeof val === 'number') {
       days[key] = val

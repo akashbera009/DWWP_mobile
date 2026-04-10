@@ -50,6 +50,7 @@ const HeroSummaryCard: React.FC = () => {
     const todayUsage = useAppSelector(selectTodayUsage)
     const monthTotal = useAppSelector(selectCurrentMonthTotal)
     const monthLimit = useAppSelector(selectCurrentMonthLimit)
+    // const monthLimit = useAppSelector(s => s.dashboard?.limitConfig?.regular)
     const addons = useAppSelector(s => s.payment?.addons)
     const thisMonthKey = getCurrentMonthKey()
 
@@ -62,6 +63,8 @@ const HeroSummaryCard: React.FC = () => {
     }, [addons, thisMonthKey])
 
     const effectiveLimit = useMemo(() => {
+        console.log(monthLimit  , addedLimit);
+        
         return (monthLimit || 0) + addedLimit
     }, [monthLimit, addedLimit])
 

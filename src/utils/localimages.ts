@@ -30,6 +30,7 @@ export const localImages = {
     valve_2: require('../assets/images/valve_2.png'),
     valve_white: require('../assets/images/valve_white.png'),
     convert: require('../assets/images/convert.png'),
+    edit: require('../assets/images/edit.png'),
 
     logout: require('../assets/images/logout.png'),
     user: require('../assets/images/user.png'),

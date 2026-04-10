@@ -9,6 +9,8 @@ import { persistor } from "@dwwp/store"
 import { AuthUser, RegisterPayload } from '@dwwp/modals'
 import { clearAll } from "@dwwp/utils/mmkvStorage"
 import { showInfoSnackbar } from "@dwwp/utils/showSnackBar";
+import { Dispatch } from 'redux';
+import { updateDashboardProfileImage } from "../dashboard/dashboardSlice";
 
 export const loginWithEmail = createAsyncThunk<
     AuthUser,
@@ -87,6 +89,28 @@ export const registerWithEmail = createAsyncThunk<
         }
     }
 );
+
+export const updateProfileImage = (imageUrl: string, userId: string) => {
+  return async (dispatch: Dispatch) => {
+    try {
+      await firestore()
+        .collection('users')
+        .doc(userId)
+        .update({
+          'userDetails.profileImage': imageUrl,
+        });
+
+    //   dispatch({
+    //     type: 'UPDATE_PROFILE_IMAGE',
+    //     payload: imageUrl,
+    //   });
+    dispatch(updateDashboardProfileImage(imageUrl));
+
+    } catch (error) {
+      console.error('Firebase update failed', error);
+    }
+  };
+};
 
 export const logout = createAsyncThunk(
     "auth/logout",

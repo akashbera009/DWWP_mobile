@@ -54,9 +54,15 @@ export const selectCurrentMonthDays = createSelector(
 )
 
 /** Current month usage limit */
+
+const selectConfig = (state: RootState) => state.dashboard
+export const selectCurrentConfig = createSelector(
+  selectConfig,
+  (config) => config?.limitConfig?.regular ?? null
+)
 export const selectCurrentMonthLimit = createSelector(
-  selectCurrentMonth,
-  (month) => month?.limit ?? null
+  selectCurrentConfig,
+  (limit) => limit ?? null
 )
 
 /** True if limit is exceeded this month */

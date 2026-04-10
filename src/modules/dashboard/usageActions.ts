@@ -34,7 +34,7 @@ function parseMonthDoc(
 ): MonthUsage {
     const days = extractDayFields(data)
     const total =
-        typeof data.totalUsage === 'number' ? data.totalUsage : sumDays(days)
+        typeof data?.totalUsage === 'number' ? data?.totalUsage : sumDays(days)
     return {
         monthId,
         days,
@@ -149,8 +149,8 @@ export const fetchAllTimeMonths = createAsyncThunk(
 
             const data = doc.data() as Record<string, unknown>
             const total =
-                typeof data.totalUsage === 'number'
-                    ? data.totalUsage
+                typeof data?.totalUsage === 'number'
+                    ? data?.totalUsage
                     : sumDays(extractDayFields(data))
 
             allTimeMonths[monthId] = total

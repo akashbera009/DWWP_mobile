@@ -28,11 +28,11 @@ export default function MainStackNavigator() {
 
       <Stack.Screen name="ViewProfileScreen" component={ViewProfileScreen} options={{ headerShown: false }} />
       <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
-      <Stack.Screen name="RaiseComplaintScreen" component={RaiseComplaintScreen}   options={{ headerShown: false }}/>
+      <Stack.Screen name="RaiseComplaintScreen" component={RaiseComplaintScreen} options={{ headerShown: false }} />
       <Stack.Screen name="AllNotifications" component={AllNotificationsScreen} options={{ headerShown: false }} />
 
-      <Stack.Screen name="PaymentSuccessScreen" component={PaymentSuccessScreen}   options={{ headerShown: false }}/>
-      <Stack.Screen name="ViewPaymentDetailsScreen" component={ViewPaymentDetailsScreen}   options={{ headerShown: false }}/>
+      <Stack.Screen name="PaymentSuccessScreen" component={PaymentSuccessScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="ViewPaymentDetailsScreen" component={ViewPaymentDetailsScreen} options={{ headerShown: false }} />
 
 
     </Stack.Navigator>

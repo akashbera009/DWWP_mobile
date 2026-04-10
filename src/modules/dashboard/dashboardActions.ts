@@ -15,7 +15,6 @@ export const fetchUserDetails = createAsyncThunk<
     try {
         const snap = await firestore().collection("users").doc(email).get()
         const data = snap.data()
-
         if (!data) throw new Error("User document not found.")
 
         return {

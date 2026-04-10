@@ -200,8 +200,8 @@ function analyzeHistoricalTrend(historicalMonths: Record<string, number>): {
     }
   }
 
-  const totalDays = values.length * 30 // Approximate
-  const totalUsage = values.reduce((a, b) => a + b, 0)
+  const totalDays = values?.length * 30 // Approximate
+  const totalUsage = values?.reduce((a, b) => a + b, 0)
   const averageDailyUsage = totalUsage / totalDays
 
   // Calculate trend (comparing recent 3 months vs previous 3 months)

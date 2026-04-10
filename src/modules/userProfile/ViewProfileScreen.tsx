@@ -21,13 +21,17 @@ import { UserDetails } from '@dwwp/modals';
 import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks';
 // components 
 import Avatar from '../dashboard/components/Avatar';
-import { logout } from '../auth/authAction';
+import { logout, updateProfileImage } from '../auth/authAction';
 import { LoadingPopup } from '../auth/components/LoadingPopup';
 import Pill from '../dashboard/components/Pill';
+import { uploadToImgBB } from '@dwwp/utils/uploadToImgBB';
 import { useSelector } from 'react-redux';
+import ImagePicker from 'react-native-image-crop-picker';
+
 
 const ViewProfileScreen = () => {
   const { top } = useSafeAreaInsets()
+  const userId = useSelector((s: any) => s.auth?.user?.email);
   const dispatch = useAppDispatch()
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null)
   const userSelector = useAppSelector(state => state?.dashboard?.userDetails)
@@ -42,6 +46,7 @@ const ViewProfileScreen = () => {
       consumerNumber: userSelector?.consumerNumber,
       meterNumber: userSelector?.meterNumber,
       supplyZone: userSelector?.supplyZone,
+      profileImage: userSelector?.profileImage
     })
   }, [userSelector?.emailId]);
 
@@ -55,11 +60,45 @@ const ViewProfileScreen = () => {
         routes: [{ name: screenNames.AuthStack }],
       })
     } catch (error) {
-      console.error('logout error' , error)
+      console.error('logout error', error)
     } finally {
       setLogOutLoading(true)
     }
   }
+  const editProfile = async () => {
+    try {
+      // 📸 Open gallery directly
+      const res = await ImagePicker.openPicker({
+        width: 400,
+        height: 400,
+        cropping: true,
+        compressImageQuality: 0.8,
+      });
+
+      console.log('Picked:', res.path);
+
+      // ☁️ Upload to ImgBB
+      const uploadedUrl = await uploadToImgBB({
+        path: res.path,
+        mime: res.mime,
+        filename: res.filename,
+      });
+
+      if (!uploadedUrl) {
+        console.log('Upload failed');
+        return;
+      }
+
+      console.log('Uploaded URL:', uploadedUrl);
+
+      // 🔥 Update Firebase
+      dispatch(updateProfileImage(uploadedUrl, userId));
+
+    } catch (error) {
+      console.log('Error:', error);
+    }
+  };
+
 
   return (
     <View style={[styles.containerWrapper, { paddingTop: top }]}>
@@ -85,6 +124,14 @@ const ViewProfileScreen = () => {
               {userDetails && (
                 <Avatar name={userDetails?.fullName} size={80} />
               )}
+              <TouchableOpacity
+                onPress={editProfile}
+                style={styles.editIconContainer}>
+                <Image
+                  source={localImages.edit}
+                  style={styles.editIcon}
+                />
+              </TouchableOpacity>
             </View>
             <Text style={styles.name}>{userDetails?.fullName}</Text>
             {userDetails?.emailId && (
@@ -193,7 +240,27 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Bold,
     color: colors.primaryBlack,
   },
-
+  editIconContainer: {
+    position: 'absolute',
+    bottom: vh(8),
+    right: vw(2),
+    backgroundColor: colors.primary,
+    width: normalize(24),
+    height: normalize(24),
+    borderRadius: normalize(18),
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+    shadowColor: colors.black,
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    padding: vh(16)
+  },
+  editIcon: {
+    width: normalize(16),
+    height: normalize(16),
+    tintColor: colors.white,
+  },
 
   card: {
     backgroundColor: colors.white,

@@ -19,15 +19,21 @@ const dashboardSlice = createSlice({
         addBroadcast(state, action: PayloadAction<Broadcast>) {
             state.broadcasts.unshift(action.payload)
         },
+        updateDashboardProfileImage(state, action) {
+            if (state.userDetails) {
+                state.userDetails.profileImage = action.payload;
+            }
+        },
         resetDashboard: () => DashboardInitialState,
     },
 
     extraReducers: (builder) => {
 
         // fetchUserDetails
-        builder.addCase(fetchUserDetails.pending, (state) => {
-            state.isLoading = true
-        })
+        builder
+            .addCase(fetchUserDetails.pending, (state) => {
+                state.isLoading = true
+            })
             .addCase(fetchUserDetails.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.userDetails = action.payload.userDetails
@@ -102,6 +108,7 @@ export const {
     clearDashboardError,
     addBroadcast,
     resetDashboard,
+    updateDashboardProfileImage
 } = dashboardSlice.actions
 
 export default dashboardSlice.reducer
