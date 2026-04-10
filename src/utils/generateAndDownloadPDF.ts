@@ -9,7 +9,7 @@ export const generateAndShareReceiptPDF = async (html: string, filename: string)
         html,
         fileName: filename,          // e.g. 'DWWP_Receipt_pay_XXXXX'
         directory: 'Documents',      // iOS: Documents, Android: internal storage
-        base64: true,
+        base64: false,               // Disable base64 to save memory
     }
     try {
         const file = await generatePDF(options)

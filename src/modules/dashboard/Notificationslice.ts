@@ -93,10 +93,21 @@ const notificationSlice = createSlice({
          * Add a new notification to the state (for real-time updates)
          */
         addNotification: (state, action: PayloadAction<UserNotification>) => {
-            state.userNotifications.unshift(action.payload)
-            if (!action.payload.read) {
-                state.unreadCount += 1
+            const exists = state.userNotifications.some(n => n.id === action.payload.id)
+            if (!exists) {
+                state.userNotifications.unshift(action.payload)
+                if (!action.payload.read) {
+                    state.unreadCount += 1
+                }
             }
+        },
+
+        /**
+         * Set the entire notification list (e.g. from real-time snapshot)
+         */
+        setNotifications: (state, action: PayloadAction<UserNotification[]>) => {
+            state.userNotifications = action.payload
+            state.unreadCount = action.payload.filter(n => !n.read).length
         },
 
         /**
@@ -192,6 +203,7 @@ const notificationSlice = createSlice({
 
 export const {
     addNotification,
+    setNotifications,
     updateNotification,
     clearNotifications,
     setUnreadCount,

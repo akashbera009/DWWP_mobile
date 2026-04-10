@@ -1,7 +1,7 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks'
 import { NotificationService } from '@dwwp/utils/firebaseNotificationUpdate'
-import { addNotification, setUnreadCount } from './Notificationslice'
+import { setNotifications } from './Notificationslice'
 
 /**
  * Custom hook to set up real-time notification listener
@@ -23,17 +23,9 @@ export const useNotificationListener = (email?: string) => {
             unsubscribe = NotificationService.listenToUserNotifications(
                 userEmail,
                 notifications => {
-                    // Update the entire notification list
-                    notifications.forEach((notification, index) => {
-                        if (index === 0) {
-                            // For the first (newest) notification, add it
-                            dispatch(addNotification(notification))
-                        }
-                    })
-
-                    // Update unread count
-                    const unreadCount = notifications.filter(n => !n.read).length
-                    dispatch(setUnreadCount(unreadCount))
+                    // Replace the entire notification list at once
+                    // This prevents duplicate accumulation and memory leaks
+                    dispatch(setNotifications(notifications))
                 },
                 error => {
                     console.error('Notification listener error:', error)
