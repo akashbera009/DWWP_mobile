@@ -1,4 +1,4 @@
-import React, { useEffect, useRef} from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import {
     View,
     StyleSheet,
@@ -17,6 +17,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@dwwp/store";
 import { updateServoState } from "../servoActions";
 import { showSuccessSnackbar, showWarningSnackbar } from "@dwwp/utils/showSnackBar";
+import { useAppSelector } from "@dwwp/store/hooks";
+import { selectCurrentMonthLimit, selectCurrentMonthTotal, selectTodayUsage } from "../usageSelectors";
+import { getCurrentMonthKey } from "@dwwp/utils/commonFunctions";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const SWITCH_WIDTH = 240;
@@ -35,10 +38,27 @@ interface ToggleSwitchProps {
 // ─── Component ────────────────────────────────────────────────────────────────
 const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
     const dispatch = useDispatch<AppDispatch>();
+    const userId = useAppSelector(s => s.auth?.user?.email) ?? ''
+    const monthLimit = useAppSelector(selectCurrentMonthLimit)
+    const addons = useAppSelector(s => s.payment?.addons)
+    const thisMonthKey = getCurrentMonthKey()
+    const addedLimit = useMemo(() => {
+        if (!addons) return 0
 
+        return addons
+            .filter(txn => txn?.forMonth === thisMonthKey)
+            .reduce((sum, item) => sum + (item?.qty * item?.refill), 0)
+    }, [addons, thisMonthKey])
+    const effectiveLimit = useMemo(() => {
+        return (monthLimit || 0) + addedLimit
+    }, [monthLimit, addedLimit])
+
+    const todayUsage = useAppSelector(selectTodayUsage)
+    const monthTotal = useAppSelector(selectCurrentMonthTotal)
+    const totalUsage = todayUsage + monthTotal
     // ── Redux state ────────────────────────────────────────────────────────────
     const { servoState, isLoading } = useSelector((state: RootState) => state?.servo);
-    const email = useSelector((state: RootState) => state?.dashboard?.userDetails?.emailId);
+    // const email = useSelector((state: RootState) => state?.dashboard?.userDetails?.emailId);
 
     // ── Animation ──────────────────────────────────────────────────────────────
     const progress = useSharedValue(servoState ? 1 : 0);
@@ -81,9 +101,50 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
         servoStateRef.current = servoState
     }, [servoState])
 
+    const hasShownLimitWarningRef = useRef(false)
+    const showLimitWarning = () => {
+        if (!hasShownLimitWarningRef.current) {
+            showWarningSnackbar("Usage limit exceeded. Please increase limit to continue.")
+            hasShownLimitWarningRef.current = true
+        }
+    }
+    useEffect(() => {
+        if (effectiveLimit > totalUsage) {
+            hasShownLimitWarningRef.current = false
+        }
+    }, [effectiveLimit, totalUsage])
+
+    useEffect(() => {
+        console.log('Usage limit reached. Water supply', totalUsage, effectiveLimit);
+        if (effectiveLimit <= totalUsage && servoStateRef.current) {
+            // Turn OFF automatically
+            dispatch(updateServoState({ email: userId, newState: false }))
+
+            // Animate UI immediately
+            progress.value = withTiming(0, {
+                duration: DURATION,
+                easing: EASING,
+            })
+
+            showWarningSnackbar("Usage limit reached. Water supply turned off.")
+        }
+    }, [effectiveLimit, totalUsage, todayUsage, userId])
+    const isBlocked = disabled || effectiveLimit <= totalUsage
+
+
     // ── Shared toggle logic (refs only, no closure issues) ─────────────────────
     const executeToggle = () => {
-        if (disabled || !email) return
+        // if (disabled || !userId) return
+        if (!userId) return
+
+        if (isBlocked) {
+            showLimitWarning()
+            progress.value = withTiming(servoStateRef.current ? 1 : 0, {
+                duration: DURATION,
+                easing: EASING,
+            })
+            return
+        }
 
         if (!isEligibleRef.current) {
             showWarningSnackbar('Too many requests in short time')
@@ -101,7 +162,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
         }, 1500)
 
         const newState = !servoStateRef.current
-        dispatch(updateServoState({ email, newState }))
+        dispatch(updateServoState({ email: userId, newState }))
         showSuccessSnackbar(`Water Supply ${newState ? 'Activated' : 'De-Activated'}`)
     }
 
@@ -117,6 +178,14 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
             progress.value = (clamped - buttonLeft_OFF) / (buttonLeft_ON - buttonLeft_OFF)
         })
         .onEnd((e) => {
+            if (isBlocked) {
+                showLimitWarning()
+                progress.value = withTiming(servoStateRef.current ? 1 : 0, {
+                    duration: DURATION,
+                    easing: EASING,
+                })
+                return
+            }
             const draggedRight = e.translationX > PAN_THRESHOLD
             const draggedLeft = e.translationX < -PAN_THRESHOLD
             const wasTap = Math.abs(e.translationX) < 10 && Math.abs(e.translationY) < 10
@@ -136,7 +205,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
             }
         })
 
-    if (!email) return null;
+    if (!userId) return null;
     if (isLoading) {
         return (
             <View style={styles.loadingContainer}>
@@ -144,6 +213,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
             </View>
         );
     }
+
     return (
         <View style={styles.wrapper}>
             <Pressable onPress={executeToggle}>

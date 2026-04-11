@@ -63,8 +63,6 @@ const HeroSummaryCard: React.FC = () => {
     }, [addons, thisMonthKey])
 
     const effectiveLimit = useMemo(() => {
-        console.log(monthLimit  , addedLimit);
-        
         return (monthLimit || 0) + addedLimit
     }, [monthLimit, addedLimit])
 

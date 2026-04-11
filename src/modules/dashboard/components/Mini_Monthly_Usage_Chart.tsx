@@ -51,6 +51,10 @@ const Mini_Monthly_Usage_Chart = () => {
     const MAX_VAL = finalObjectArray.length
         ? Math.max(...finalObjectArray.map(d => d.value))
         : 1
+
+    const MAX_VAL_MONTH = finalObjectArray.reduce((max, item) =>
+        item.value > max.value ? item : max
+    );
     // const AVG_VAL = Math.floor(finalObjectArray?.reduce((prev, d, _) => (d.value + prev), 0) / finalObjectArray?.length)
     const AVG_VAL = finalObjectArray.length
         ? Math.floor(
@@ -64,7 +68,14 @@ const Mini_Monthly_Usage_Chart = () => {
             <View style={styles.cardHeaderRow}>
                 <View>
                     <Text style={styles.cardTitle}>Monthly Usage {activeBar}</Text>
-                    <Text style={styles.cardSubtitle}>Kilowatt hours · Jan 2025</Text>
+                    <View style={styles.usagesHeading}>
+                        <Text style={styles.cardSubtitle}>{currenMonthKey}</Text>
+                        <Pill
+                            label={`${thisMonthUsages.toFixed(0).toString()} L `}
+                            color={colors.primary}
+                            bg={colors.primaryLight}
+                        />
+                    </View>
                 </View>
                 <Pill label="This Year" color={colors.primary} bg={colors.primaryLight} />
             </View>
@@ -110,11 +121,11 @@ const Mini_Monthly_Usage_Chart = () => {
             <View style={styles.chartSummaryRow}>
                 <View style={styles.chartSummaryItem}>
                     <View style={[styles.chartSummaryDot, { backgroundColor: colors.activeDot }]} />
-                    <Text style={styles.chartSummaryLabel}>Peak: <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>Nov__: ·{MAX_VAL} Litres</Text></Text>
+                    <Text style={styles.chartSummaryLabel}>Peak: <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>{MAX_VAL_MONTH?.month}: ·{MAX_VAL} L</Text></Text>
                 </View>
                 <View style={styles.chartSummaryItem}>
                     <View style={[styles.chartSummaryDot, { backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border }]} />
-                    <Text style={styles.chartSummaryLabel}>Avg: <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>{AVG_VAL} Litres/Month</Text></Text>
+                    <Text style={styles.chartSummaryLabel}>Avg: <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>{AVG_VAL} L/Month</Text></Text>
                 </View>
             </View>
         </View>
@@ -145,6 +156,12 @@ const styles = StyleSheet.create({
         fontFamily: fonts.Bold,
         fontSize: normalize(16),
         color: colors.neutralBlack,
+    },
+    usagesHeading:{
+        flexDirection : 'row',
+        justifyContent : 'flex-start',
+        alignItems:'center',
+        gap: vw(4)
     },
     cardSubtitle: {
         fontFamily: fonts.Regular,

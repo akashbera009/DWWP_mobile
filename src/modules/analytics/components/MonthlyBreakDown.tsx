@@ -70,6 +70,11 @@ const MonthlyBreakDown = () => {
   }, [finalObjectArray.length])
 
   const MAX_VAL = Math.floor(Math.max(...finalObjectArray.map((d) => d.value)))
+
+  const MAX_VAL_MONTH = finalObjectArray.reduce((max, item) =>
+    item.value > max.value ? item : max
+  );
+
   const AVG_VAL = Math.floor(finalObjectArray.reduce((prev, d, _) => (d.value + prev), 0) / finalObjectArray.length)
 
   return (
@@ -78,7 +83,7 @@ const MonthlyBreakDown = () => {
         <Text style={styles.sectionLabelText}>Monthly Breakdown</Text>
         <View style={styles.sectionLine} />
         <Pill
-          label='This Year'
+          label='Last 7 Months'
           color={colors.primary}
           bg={colors.primaryLight}
         />
@@ -90,7 +95,7 @@ const MonthlyBreakDown = () => {
           <View style={styles.chartLegendRow}>
             <View style={[styles.legendDot, { backgroundColor: C.error, marginLeft: normalize(10) }]} />
             <Text style={styles.legendText}>Peak:
-              <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>NOv: {MAX_VAL} L</Text>
+              <Text style={{ fontFamily: fonts.Bold, color: colors.neutralBlack }}>{MAX_VAL_MONTH?.month}: {MAX_VAL_MONTH?.value} L</Text>
             </Text>
             <View style={[styles.legendDot, { backgroundColor: C.cyan }]} />
             <Text style={styles.legendText}>
@@ -126,7 +131,7 @@ const MonthlyBreakDown = () => {
                 ) : (
                   <View style={[styles.bar, { height: barH, backgroundColor: i < activeBar ? colors.disabledBorder : colors.inputBackground }]} />
                 )}
-                <Text style={[styles.barLabel, isActive && { color: colors.primary, fontFamily: fonts.Bold }]}>
+                <Text style={[styles.barLabel, isActive && { color: colors.primary, fontFamily: fonts.Bold }]} numberOfLines={1}>
                   {d.month}
                 </Text>
               </TouchableOpacity>
@@ -226,7 +231,8 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: C.card, borderRadius: normalize(20),
+    backgroundColor : C.card , 
+    borderRadius: normalize(20),
     padding: normalize(18), marginBottom: normalize(12),
     shadowColor: 'rgba(43,101,104,0.08)',
     shadowOffset: { width: 0, height: 2 },
@@ -260,7 +266,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     height: normalize(130),
     gap: vw(6),
-    marginTop: vh(4),
+    marginTop: vh(12),
   },
   barWrapper: {
     flex: 1,

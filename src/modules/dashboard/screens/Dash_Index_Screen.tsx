@@ -4,6 +4,7 @@ import {
     Pressable,
     StatusBar,
 } from 'react-native'
+import  Animated,{ useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 
 import { Portal } from '@gorhom/portal'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -42,6 +43,16 @@ const Dash_Index_Screen = () => {
     const { isLoading: dashboardIsLoading } = useAppSelector(
         state => state.dashboard
     )
+
+    // In your component:
+    const scrollX = useSharedValue(0);
+
+    const scrollHandler = useAnimatedScrollHandler({
+        onScroll: (event) => {
+            'worklet';  // ← runs entirely on UI thread, never touches JS
+            scrollX.value = event.contentOffset.x;
+        },
+    });
 
     // fetching the important data first 
     const fetchDashboardData = useCallback(() => {
@@ -112,6 +123,7 @@ const Dash_Index_Screen = () => {
             {/* ── Header ── */}
             <Header
                 activeTab={activeTab}
+                scrollX={scrollX}
                 handleSetActivetab={handleSetActivetab}
                 handleProfileOpen={handleProfileOpen}
                 handleProfileClose={handleProfileClose}
@@ -147,14 +159,15 @@ const Dash_Index_Screen = () => {
             )}
             {dashboardIsLoading ?
                 <DashboardSkeleton />
-                :
-                <ScrollView
+                : 
+                <Animated.ScrollView
                     ref={scrolRef}
                     horizontal
                     pagingEnabled
                     scrollEventThrottle={16}
                     showsHorizontalScrollIndicator={false}
                     style={styles.scrollView}
+                    onScroll={scrollHandler} 
                     onMomentumScrollEnd={(e) => {
                         const nextIdx = Math.round(e.nativeEvent.contentOffset.x / screenWidth)
                         setActiveTab(nextIdx)
@@ -178,7 +191,7 @@ const Dash_Index_Screen = () => {
                         </ScrollView>
                     </View>
 
-                </ScrollView>
+                </Animated.ScrollView>
 
             }
         </View >
