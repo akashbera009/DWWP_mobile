@@ -1,15 +1,15 @@
 import { Image, LayoutChangeEvent, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Animated, {
+    SharedValue,
     useAnimatedStyle,
     useSharedValue,
-    withSpring,
 } from 'react-native-reanimated'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import LinearGradient from 'react-native-linear-gradient';
 // utils 
 import fonts from '@dwwp/utils/fonts'
 import { strings } from '@dwwp/utils/strings';
-import { normalize, vh, vw } from '@dwwp/utils/dimensions'
+import { normalize, screenWidth, vh, vw } from '@dwwp/utils/dimensions'
 import { localImages } from '@dwwp/utils/localimages';
 import colors from '@dwwp/utils/colors'
 // component 
@@ -17,6 +17,7 @@ import Avatar from './Avatar';
 
 type HeaderProps = {
     activeTab: number,
+    scrollX: SharedValue<number>,
     handleSetActivetab: (tab: number) => void,
     handleProfileOpen: () => void
     handleProfileClose: () => void
@@ -24,13 +25,10 @@ type HeaderProps = {
     handleNotifClose: () => void
 }
 const tabs = ['overview', 'device', 'usages']
-const springConfig = {
-    damping: 5,      // lower = more oscillation
-    stiffness: 90,
-    mass: .5,
-}
+
 const Header = ({
     activeTab,
+    scrollX,
     handleSetActivetab,
     handleProfileOpen,
     handleProfileClose,
@@ -38,39 +36,31 @@ const Header = ({
     handleNotifClose
 }: HeaderProps) => {
     const [tabBarWidth, setTabBarWidth] = useState<number>(0)
-    const indicatorTranslateX = useSharedValue(0)
 
-    // update indicator when activeTab or tabBarWidth changes
-    useEffect(() => {
-        if (!tabBarWidth) return
-        const indicatorWidth = tabBarWidth / tabs.length
-        const to = indicatorWidth * activeTab
-        // animate with spring for bounce
-        indicatorTranslateX.value =  
-        withSpring(to, springConfig)
-        // withTiming(indicatorWidth * activeTab , {duration: 100})
-    }, [activeTab, tabBarWidth, indicatorTranslateX])
+    const tabBarWidthSV = useSharedValue(0);
 
     const onTabBarLayout = (e: LayoutChangeEvent) => {
         const w = e.nativeEvent.layout.width
         // we want to set it only once (or when orientation changes)
         setTabBarWidth(w)
         // ensure indicator snaps to current tab if width was previously 0
-        const indicatorWidth = w / tabs.length
-        indicatorTranslateX.value =
-        withSpring(indicatorWidth * activeTab, springConfig)
-        //  withTiming(indicatorWidth * activeTab , {duration: 100})
+        tabBarWidthSV.value = w;
     }
 
     const indicatorWidth = tabBarWidth ? tabBarWidth / tabs.length : 0
 
     const indicatorAnimStyle = useAnimatedStyle(() => {
+        if (!tabBarWidthSV.value) return { transform: [{ translateX: 0 }] };
+
+        const indicatorW = tabBarWidthSV.value / tabs.length;
+        // Map scrollX (0 → screenWidth → 2*screenWidth) to indicator X
+        const progress = scrollX.value / screenWidth;  // 0, 1, 2...
+        const translateX = progress * indicatorW;
+
         return {
-            transform: [
-                { translateX: indicatorTranslateX.value }
-            ]
-        }
-    })
+            transform: [{ translateX }],
+        };
+    });
 
     const handleProfileTap = () => {
         handleProfileOpen()

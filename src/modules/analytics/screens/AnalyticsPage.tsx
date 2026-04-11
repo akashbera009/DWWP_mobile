@@ -1,5 +1,5 @@
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import colors from '@dwwp/utils/colors'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import fonts from '@dwwp/utils/fonts'
@@ -11,16 +11,10 @@ import EffectiveTotal from '../components/EffectiveTotal'
 import DailyBreakDown from '../components/DailyBreakDown'
 import MonthlyBreakDown from '../components/MonthlyBreakDown'
 import { localImages } from '@dwwp/utils/localimages'
-import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks'
-import { selectCurrentMonthLimit } from '@dwwp/modules/dashboard/usageSelectors'
 import TrendCard from '../components/TrendCard'
-
-// import { MOCK_ADDONS, MOCK_MONTH_DATA } from '@dwwp/modules/dashboard/screens/Usages_Tab'
 
 const SCREEN_WIDTH = screenWidth;
 const MARGIN_BOTH_SIDE = vw(16)
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-const fmt = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(2)}kL` : `${Math.round(n)}L`
 
 // ─── Theme ────────────────────────────────────────────────────────────────────
 const C = {
@@ -54,23 +48,19 @@ const C = {
 
 const AnalyticsPage = () => {
   const { top } = useSafeAreaInsets()
-  const dispatch = useAppDispatch()
-  const currentMOnthKey = getCurrentMonthKey()
+  // const dispatch = useAppDispatch()
+  // const currentMOnthKey = getCurrentMonthKey()
 
   // const { todayUsage, allTimeDaysTotal, currentMonthId, months } = useAppSelector(s => s.usage)
-  const monthLimit = useAppSelector(selectCurrentMonthLimit)
-  const [addedLimit, setAddedLimit] = useState(1)
-  const addons = useAppSelector(s => s.payment?.addons)
-  // const [effectiveLimit, setEffectiveLimit] = useState<number>(monthLimit ?? 1)
-  useEffect(() => {
-    const totalAddons = addons
-      .filter(txn => txn?.forMonth === currentMOnthKey)
-      .reduce((reducer, item) => reducer + (item?.qty * item?.refill), 0)
-    setAddedLimit(totalAddons)
-    // const total = (monthLimit || 0) + totalAddons
-    // setEffectiveLimit(total)
+  // const monthLimit = useAppSelector(selectCurrentMonthLimit)
+  // const addons = useAppSelector(s => s.payment?.addons)
 
-  }, [addedLimit, monthLimit, addedLimit])
+  // const addedLimit = useMemo(() => {
+  //   if (!addons) return 0
+  //   return addons
+  //     .filter(txn => txn?.forMonth === currentMOnthKey)
+  //     .reduce((reducer, item) => reducer + (item?.qty * (item?.refill || 0)), 0)
+  // }, [addons, currentMOnthKey])
 
   // const lastMonthKeys = Object.keys(months ?? {}).sort()
   // const prevMonthId = lastMonthKeys[lastMonthKeys.length - 2]

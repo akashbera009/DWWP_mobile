@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
     View, StyleSheet, ScrollView,
     Pressable,
     StatusBar,
 } from 'react-native'
+import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 
 import { Portal } from '@gorhom/portal'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -22,12 +23,17 @@ import Usages_Tab from './Usages_Tab'
 // redux
 import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks'
 import { fetchAdminConfig, fetchCurrentMonth, fetchUserDetails } from '../dashboardActions'
-import { fetchServoState } from '../servoActions'
+import { fetchServoState, updateServoState } from '../servoActions'
 import DashboardSkeleton from '@dwwp/components/DashboardSkeleton'
 import { fetchAllTimeDays, fetchAllTimeMonths, fetchTodayUsage, listenCurrentMonth, stopCurrentMonthListener } from '../usageActions'
 import Device_Info_Tab from './Device_Info_Tab'
 import { fetchAllPaymentsAndAddons } from '@dwwp/modules/paymentsDashboard/paymentAction'
 import { fetchUserNotifications } from '../Notificationslice'
+
+
+import { selectCurrentMonthLimit, selectCurrentMonthTotal } from '../usageSelectors';
+import { getCurrentMonthKey } from '@dwwp/utils/commonFunctions';
+import LimitWarningBanner from '@dwwp/modules/analytics/components/LimitWarningBanner';
 
 const SCREEN_WIDTH = screenWidth
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
@@ -43,6 +49,16 @@ const Dash_Index_Screen = () => {
         state => state.dashboard
     )
 
+    // In your component:
+    const scrollX = useSharedValue(0);
+
+    const scrollHandler = useAnimatedScrollHandler({
+        onScroll: (event) => {
+            'worklet';  // ← runs entirely on UI thread, never touches JS
+            scrollX.value = event.contentOffset.x;
+        },
+    });
+
     // fetching the important data first 
     const fetchDashboardData = useCallback(() => {
         if (!email) return
@@ -50,41 +66,31 @@ const Dash_Index_Screen = () => {
         dispatch(fetchCurrentMonth({ email }))
         dispatch(fetchAdminConfig())
         dispatch(fetchUserNotifications(email))
-        dispatch(fetchAllTimeDays(email))
-        dispatch(fetchAllTimeMonths(email))
-    }, [email])
-    // next stage data which are auxuliary for dashboard  
-    const fetchAdditionalData = () => {
-        if (!email) return
         dispatch(fetchTodayUsage(email))
         dispatch(fetchServoState({ email }))
+        dispatch(fetchAllTimeDays(email))
+        dispatch(fetchAllTimeMonths(email))
+        dispatch(fetchAllPaymentsAndAddons({ email }))
+    }, [email, dispatch])
+
+    // Set up real-time listener
+    useEffect(() => {
+        if (!email) return
         dispatch(listenCurrentMonth(email))
-        dispatch(fetchAllPaymentsAndAddons({ email }))
-    }
-    useEffect(() => {
-        if (!email) return
-        const timer = setTimeout(() => {
-            fetchAdditionalData()
-        }, 500);
-        return () => clearTimeout(timer)
-    }, [email, fetchAdditionalData])
-
-    //refresh data
-    const refreshData = useCallback(() => {
-        if (!email) return
-        fetchDashboardData();
-        fetchAdditionalData()
-        dispatch(fetchAllPaymentsAndAddons({ email }))
-    }, [email])
-
-    // stop listner 
-    useEffect(() => {
-        if (!email) return
-        fetchDashboardData()
         return () => {
             dispatch(stopCurrentMonthListener(email))
         }
-    }, [email, fetchDashboardData])
+    }, [email, dispatch])
+
+    // Initial data fetch
+    useEffect(() => {
+        fetchDashboardData()
+    }, [fetchDashboardData])
+
+    // Refresh data function
+    const refreshData = useCallback(() => {
+        fetchDashboardData()
+    }, [fetchDashboardData])
 
     const [isSwitchOpen, setIsSwitchModalOpen] = useState<boolean>(false)
 
@@ -106,19 +112,55 @@ const Dash_Index_Screen = () => {
         }, []
     )
 
+    // home screen message showing for limitd exceeded
+    const userId = useAppSelector(s => s.auth?.user?.email) ?? ''
+    const monthLimit = useAppSelector(selectCurrentMonthLimit)
+    const addons = useAppSelector(s => s.payment?.addons)
+    const thisMonthKey = getCurrentMonthKey()
+    const addedLimit = useMemo(() => {
+        if (!addons) return 0
+
+        return addons
+            .filter(txn => txn?.forMonth === thisMonthKey)
+            .reduce((sum, item) => sum + (item?.qty * item?.refill), 0)
+    }, [addons, thisMonthKey])
+    const effectiveLimit = useMemo(() => {
+        return (monthLimit || 0) + addedLimit
+    }, [monthLimit, addedLimit])
+
+    const monthTotal = useAppSelector(selectCurrentMonthTotal)
+    const currentServoState = useAppSelector(state => state.servo.servoState)
+    
+    useEffect(() => {
+        if (effectiveLimit <= monthTotal && currentServoState !== false) {
+            console.log('Usage limit reached. Water supply', monthTotal, effectiveLimit);
+            dispatch(updateServoState({ email: userId, newState: false }))
+        }
+    }, [effectiveLimit, monthTotal, currentServoState, userId, dispatch])
+    // Add this state
+    const [bannerDismissed, setBannerDismissed] = useState(false)
+    const showLimitBanner = monthTotal  > effectiveLimit && !bannerDismissed
+
     return (
         <View style={[styles.safeArea, { paddingTop: top, }]} >
             <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
             {/* ── Header ── */}
             <Header
                 activeTab={activeTab}
+                scrollX={scrollX}
                 handleSetActivetab={handleSetActivetab}
                 handleProfileOpen={handleProfileOpen}
                 handleProfileClose={handleProfileClose}
                 handleNotifOpen={handleNotifOpen}
                 handleNotifClose={handleNotifClose}
-            />
+                />
 
+                {/* ── Limit Warning Banner ── */}
+                {showLimitBanner && (
+                    <LimitWarningBanner
+                        onClose={() => setBannerDismissed(true)}
+                    />
+                )}
             {/* ── Dropdowns ── */}
             {notifOpen && (
                 <Portal hostName="safe">
@@ -148,13 +190,14 @@ const Dash_Index_Screen = () => {
             {dashboardIsLoading ?
                 <DashboardSkeleton />
                 :
-                <ScrollView
+                <Animated.ScrollView
                     ref={scrolRef}
                     horizontal
                     pagingEnabled
                     scrollEventThrottle={16}
                     showsHorizontalScrollIndicator={false}
                     style={styles.scrollView}
+                    onScroll={scrollHandler}
                     onMomentumScrollEnd={(e) => {
                         const nextIdx = Math.round(e.nativeEvent.contentOffset.x / screenWidth)
                         setActiveTab(nextIdx)
@@ -178,7 +221,7 @@ const Dash_Index_Screen = () => {
                         </ScrollView>
                     </View>
 
-                </ScrollView>
+                </Animated.ScrollView>
 
             }
         </View >

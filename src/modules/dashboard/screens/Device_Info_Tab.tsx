@@ -123,8 +123,8 @@ const DeviceStatusCard: React.FC = () => {
 
             {/* Header */}
             <View style={dStyles.headerRow}>
-                <View style={dStyles.iconBox}>  
-                    <Image source={localImages.chip} style={dStyles.chip}/>
+                <View style={dStyles.iconBox}>
+                    <Image source={localImages.chip} style={dStyles.chip} />
                 </View>
                 <View style={{ flex: 1, marginLeft: normalize(10) }}>
                     <Text style={dStyles.titleText}>ESP32 · Servo Valve</Text>
@@ -190,19 +190,19 @@ const dStyles = StyleSheet.create({
         backgroundColor: C.white,
         borderRadius: normalize(18),
         overflow: 'hidden',
-        shadowColor:colors.shadowBlack,
+        shadowColor: colors.shadowBlack,
         shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 1,
         shadowRadius: 12,
         elevation: 10,
-        borderWidth : normalize(1),
-        borderColor : colors.border
+        borderWidth: normalize(1),
+        borderColor: colors.border
     },
     headerRow: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: normalize(14),
-        paddingTop : vh(14)
+        paddingTop: vh(14)
     },
     iconBox: {
         width: normalize(40), height: normalize(40),
@@ -210,9 +210,9 @@ const dStyles = StyleSheet.create({
         backgroundColor: C.cyanBg,
         alignItems: 'center', justifyContent: 'center',
     },
-     chip:{
-        height : vh(32),
-        width : vh(32)
+    chip: {
+        height: vh(32),
+        width: vh(32)
     },
     titleText: {
         fontFamily: fonts.Bold,
@@ -244,8 +244,8 @@ const dStyles = StyleSheet.create({
         gap: normalize(8),
     },
     metaCell: {
-        borderWidth : normalize(1),
-        borderColor : colors.border,
+        borderWidth: normalize(1),
+        borderColor: colors.border,
         width: '47%',
         backgroundColor: C.bg,
         borderRadius: normalize(10),
@@ -361,14 +361,7 @@ const WaterControlCard: React.FC = () => {
 
             {/* Toggle row OR locked row */}
             {!isLocked ? (
-                <View style={wStyles.toggleRow}>
-                    {/* <Text style={wStyles.toggleHint}>
-                        {deviceOffline
-                            ? 'Device offline — toggle will queue and sync on reconnect'
-                            : 'Tap to toggle water supply. Changes apply instantly.'}
-                    </Text> */}
-                    <ToggleSwitch disabled={false} />
-                </View>
+                <ToggleSwitch disabled={false} />
             ) : (
                 <View style={wStyles.lockedRow}>
                     <Text style={wStyles.lockedHint}>Recharge your plan to control the valve</Text>
@@ -381,7 +374,7 @@ const WaterControlCard: React.FC = () => {
 
             {/* Info note */}
             <View style={wStyles.infoNote}>
-                 <Image source={localImages.info} style={wStyles.info}/>
+                <Image source={localImages.info} style={wStyles.info} />
                 <Text style={wStyles.infoText}>
                     {deviceOffline
                         ? 'Device is offline. Showing last known state. Commands sync automatically on reconnect.'
@@ -424,7 +417,7 @@ const wStyles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: normalize(16),
-        paddingVertical : vh(6)
+        paddingVertical: vh(6)
     },
     stateLabel: {
         fontFamily: fonts.Bold,
@@ -447,7 +440,7 @@ const wStyles = StyleSheet.create({
     toggleRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent : 'center', 
+        justifyContent: 'center',
         borderTopWidth: 1,
         borderTopColor: C.border,
         gap: normalize(12),
@@ -489,9 +482,9 @@ const wStyles = StyleSheet.create({
         fontSize: normalize(13),
         color: C.white,
     },
-    info:{
-        height : vh(18),
-        width : vh(18)
+    info: {
+        height: vh(18),
+        width: vh(18)
     },
     infoNote: {
         flexDirection: 'row', alignItems: 'center', gap: normalize(8),

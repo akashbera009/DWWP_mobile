@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import type { RootState } from '@dwwp/store'
-import { UsagePrediction } from './engine/Predictionengine '
+import { UsagePrediction } from './engine/PredictionEngine'
 import { calculatePrediction, recalculateHistoricalPredictions } from './analyticsActions'
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface AnalyticsState {

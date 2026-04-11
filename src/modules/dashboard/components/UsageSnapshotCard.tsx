@@ -58,9 +58,12 @@ export const UsageSnapshotCard: React.FC = () => {
     }, [addedLimit, monthLimit, addedLimit])
 
     const currentMonthUsage = months?.[currentMonthId ?? currentMOnthKey]?.total ?? 0
-    const lastMonthKeys = Object.keys(months ?? {}).sort()
-    const prevMonthId = lastMonthKeys[lastMonthKeys.length - 2]
-    const lastMonthUsage = months?.[prevMonthId]?.total ?? 0
+
+    const monthWiseHistoryData = useAppSelector(s => s.usage?.allTimeMonths)
+    const lastMonthKeys = Object.keys(monthWiseHistoryData ?? {}).sort()
+    const prevMonthId = lastMonthKeys[lastMonthKeys.length - 1] 
+    const lastMonthUsage = monthWiseHistoryData?.[prevMonthId] ?? 0
+
     const usagePct = Math.min((currentMonthUsage / (effectiveLimit || 1)) * 100, 100)
     const barColor = usagePct >= 90 ? C.error : usagePct >= 70 ? C.warning : C.primary
 

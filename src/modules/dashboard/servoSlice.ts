@@ -27,6 +27,10 @@ const servoSlice = createSlice({
     extraReducers: (builder) => {
         //  updateServoState
         builder
+            .addCase(updateServoState.fulfilled, (state, action) => {
+                state.servoState = action.meta.arg.newState
+                state.error = null
+            })
             .addCase(updateServoState.rejected, (state, action) => {
                 state.error = action.payload ?? "Servo update failed."
             })

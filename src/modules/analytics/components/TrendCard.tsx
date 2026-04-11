@@ -40,15 +40,16 @@ export const TrendCard: React.FC<{ onDetailPress?: () => void }> = ({ onDetailPr
     const dispatch = useAppDispatch()
     const prediction = useAppSelector(selectCurrentPrediction)
     const shouldRecalculate = useAppSelector(selectShouldRecalculatePrediction)
+    const isLoading = useAppSelector(state => state.analytics.isLoading)
 
     const slideAnim = useRef(new Animated.Value(20)).current
     const opacityAnim = useRef(new Animated.Value(0)).current
 
     useEffect(() => {
-        if (shouldRecalculate || !prediction) {
+        if (!isLoading && (shouldRecalculate || !prediction)) {
             dispatch(calculatePrediction())
         }
-    }, [dispatch, shouldRecalculate, prediction])
+    }, [dispatch, shouldRecalculate, prediction, isLoading])
 
     useEffect(() => {
         if (prediction) {
