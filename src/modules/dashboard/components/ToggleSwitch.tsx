@@ -53,9 +53,8 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
         return (monthLimit || 0) + addedLimit
     }, [monthLimit, addedLimit])
 
-    const todayUsage = useAppSelector(selectTodayUsage)
-    const monthTotal = useAppSelector(selectCurrentMonthTotal)
-    const totalUsage = todayUsage + monthTotal
+    const totalUsage = useAppSelector(selectCurrentMonthTotal)
+
     // ── Redux state ────────────────────────────────────────────────────────────
     const { servoState, isLoading } = useSelector((state: RootState) => state?.servo);
     // const email = useSelector((state: RootState) => state?.dashboard?.userDetails?.emailId);
@@ -128,10 +127,10 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
 
             showWarningSnackbar("Usage limit reached. Water supply turned off.")
         }
-    }, [effectiveLimit, totalUsage, todayUsage, userId])
+    }, [effectiveLimit, totalUsage, userId])
     const isBlocked = disabled || effectiveLimit <= totalUsage
 
-
+ 
     // ── Shared toggle logic (refs only, no closure issues) ─────────────────────
     const executeToggle = () => {
         // if (disabled || !userId) return

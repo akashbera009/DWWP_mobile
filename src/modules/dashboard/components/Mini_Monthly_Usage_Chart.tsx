@@ -11,8 +11,6 @@ import { getCurrentMonthKey, getShortMonthNameByMonthKey } from '@dwwp/utils/com
 
 const Mini_Monthly_Usage_Chart = () => {
     const usedHistoryObject = useAppSelector(s => s.usage?.allTimeMonths)
-    console.log('ALL TIME MONTHS →', usedHistoryObject)
-
     let currenMonthKey = getCurrentMonthKey()
     const thisMonthUsages = useAppSelector(s => s.usage?.months[currenMonthKey]?.total)
     currenMonthKey = getShortMonthNameByMonthKey(currenMonthKey)

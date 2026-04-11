@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { calculateUsagePrediction, UsagePrediction } from "./engine/Predictionengine ";
+import { calculateUsagePrediction, UsagePrediction } from "./engine/PredictionEngine";
 import { RootState } from '@dwwp/store';
 
 // ─── Helper: Convert usage months to { monthKey: total } ─────────────────────
@@ -24,13 +24,34 @@ export const calculatePrediction = createAsyncThunk<
 
             // Current month data
             const currentMonthId = state.usage.currentMonthId
-            if (!currentMonthId) {
-                throw new Error('No current month selected')
+            const currentMonth = currentMonthId ? state.usage.months?.[currentMonthId] : null
+            
+            // If we don't have current month data, we can't calculate a real prediction
+            // Return a "loading/empty" prediction instead of throwing to avoid infinite loops
+            if (!currentMonthId || !currentMonth) {
+                return {
+                    projectedMonthlyUsage: 0,
+                    projectedEndOfMonth: 0,
+                    riskLevel: 'safe',
+                    riskPercentage: 0,
+                    currentUsage: 0,
+                    expectedByNow: 0,
+                    paceRatio: 0,
+                    daysRemaining: 30,
+                    projectedDailyAverage: 0,
+                    seasonalFactor: 1,
+                    season: 'Unknown',
+                    isFestiveDay: false,
+                    averageDailyUsage: 0,
+                    trend: 'stable',
+                    trendMagnitude: 0,
+                    alerts: [],
+                    confidence: 0,
+                    lastUpdated: new Date().toISOString(),
+                } as UsagePrediction
             }
 
-            const currentMonth = state.usage.months?.[currentMonthId]
             const currentUsage = currentMonth?.total ?? 0
-
             const monthlyLimit = state.dashboard?.currentMonth?.limit ?? 2000
 
             // Historical months (convert objects to totals)

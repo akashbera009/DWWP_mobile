@@ -109,23 +109,31 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     const shimAnim = useRef(new Animated.Value(0)).current
 
     useEffect(() => {
-        Animated.timing(anim, {
+        const barAnim = Animated.timing(anim, {
             toValue: Math.min(pct, 1),
             duration: 900,
             delay,
             easing: Easing.out(Easing.cubic),
             useNativeDriver: false,
-        }).start()
+        })
+        barAnim.start()
 
+        let shimLoop: Animated.CompositeAnimation | null = null
         if (shimmer) {
-            Animated.loop(
+            shimLoop = Animated.loop(
                 Animated.timing(shimAnim, {
                     toValue: 1, duration: 1800,
                     easing: Easing.linear, useNativeDriver: false,
                 })
-            ).start()
+            )
+            shimLoop.start()
         }
-    }, [shimAnim,pct])
+
+        return () => {
+            barAnim.stop()
+            if (shimLoop) shimLoop.stop()
+        }
+    }, [anim, shimAnim, pct, delay, shimmer])
 
     const barWidth = anim.interpolate({
         inputRange: [0, 1],
