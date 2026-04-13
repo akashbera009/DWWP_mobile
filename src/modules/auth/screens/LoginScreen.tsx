@@ -229,10 +229,6 @@ export default function LoginScreen() {
           <Text style={styles.linkPrimary}>{strings.signUp}</Text>
         </TouchableOpacity>
 
-        {/* unnecessary  */}
-        <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-          <Text style={styles.skipText}>Skip for now</Text>
-        </TouchableOpacity>
       </Animated.View>
 
       <LoadingPopup visible={isLoading} message="Signing you in…" />
@@ -402,12 +398,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.primary,
     fontWeight: "600",
-  },
-  skipButton: {
-    alignItems: "center",
-  },
-  skipText: {
-    fontSize: 13,
-    color: colors.placeholderText,
-  },
+  }
 });

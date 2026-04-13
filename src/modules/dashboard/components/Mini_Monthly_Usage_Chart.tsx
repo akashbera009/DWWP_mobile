@@ -40,24 +40,24 @@ const Mini_Monthly_Usage_Chart = () => {
     const [activeBar, setActiveBar] = useState(0)
 
     useEffect(() => {
-        if (finalObjectArray.length > 0) {
-            setActiveBar(finalObjectArray.length - 1)
+        if (finalObjectArray?.length > 0) {
+            setActiveBar(finalObjectArray?.length - 1)
         }
-    }, [finalObjectArray.length])
+    }, [finalObjectArray?.length])
 
     // const MAX_VAL = Math.floor(Math.max(...finalObjectArray?.map((d) => d.value)))
-    const MAX_VAL = finalObjectArray.length
-        ? Math.max(...finalObjectArray.map(d => d.value))
+    const MAX_VAL = finalObjectArray?.length
+        ? Math.max(...finalObjectArray?.map(d => d.value))
         : 1
 
-    const MAX_VAL_MONTH = finalObjectArray.reduce((max, item) =>
+    const MAX_VAL_MONTH = finalObjectArray?.reduce((max, item) =>
         item.value > max.value ? item : max
     );
     // const AVG_VAL = Math.floor(finalObjectArray?.reduce((prev, d, _) => (d.value + prev), 0) / finalObjectArray?.length)
-    const AVG_VAL = finalObjectArray.length
+    const AVG_VAL = finalObjectArray?.length
         ? Math.floor(
-            finalObjectArray.reduce((sum, d) => sum + d.value, 0) /
-            finalObjectArray.length
+            finalObjectArray?.reduce((sum, d) => sum + d.value, 0) /
+            finalObjectArray?.length
         )
         : 0
     return (
@@ -69,7 +69,7 @@ const Mini_Monthly_Usage_Chart = () => {
                     <View style={styles.usagesHeading}>
                         <Text style={styles.cardSubtitle}>{currenMonthKey}</Text>
                         <Pill
-                            label={`${thisMonthUsages.toFixed(0).toString()} L `}
+                            label={`${thisMonthUsages?.toFixed(0)?.toString()} L `}
                             color={colors.primary}
                             bg={colors.primaryLight}
                         />
@@ -80,7 +80,7 @@ const Mini_Monthly_Usage_Chart = () => {
 
             {/* Bars */}
             <View style={styles.chartContainer}>
-                {finalObjectArray.map((d, i) => {
+                {finalObjectArray?.map((d, i) => {
                     const isActive = i === activeBar
                     const barH = MAX_VAL > 0
                         ? Math.round((d.value / MAX_VAL) * 100)

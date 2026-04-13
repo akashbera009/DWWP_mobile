@@ -18,6 +18,7 @@ export type MainStackParamList = {
     FullPaymantHistory: undefined
 
     ViewProfileScreen: undefined;
+    EditProfileScreen: undefined
     SettingsScreen: undefined;
     RaiseComplaintScreen: undefined;
     AllNotifications:undefined ; 

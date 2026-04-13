@@ -44,7 +44,7 @@ const MonthlyBreakDown = () => {
     return getShortMonthNameByMonthKey(e)
   })
   const usedInLitres: number[] = Object.values(usedHistoryObject).map((e) => {
-    return Number(e.toFixed(0))
+    return Number(e?.toFixed(0) ?? 0 )
   })
 
   const [finalObjectArray, setFinalObjectArray] = useState<{ month: string, value: number }[]>([{ month: '', value: 0 }])
@@ -52,7 +52,7 @@ const MonthlyBreakDown = () => {
   const thisMonthUsages = useAppSelector(s => s.usage.months[currenMonthKey]?.total)
   currenMonthKey = getShortMonthNameByMonthKey(currenMonthKey)
 
-  const [activeBar, setActiveBar] = useState(finalObjectArray.length - 1)
+  const [activeBar, setActiveBar] = useState(finalObjectArray?.length - 1)
   useEffect(() => {
     let temp = monthKeys.map((month, i) => {
       return {
@@ -65,17 +65,17 @@ const MonthlyBreakDown = () => {
     setFinalObjectArray(temp);
   }, [])
   useEffect(() => {
-    if (finalObjectArray.length === 0) return
-    setActiveBar(finalObjectArray.length - 1)
-  }, [finalObjectArray.length])
+    if (finalObjectArray?.length === 0) return
+    setActiveBar(finalObjectArray?.length - 1)
+  }, [finalObjectArray?.length])
 
-  const MAX_VAL = Math.floor(Math.max(...finalObjectArray.map((d) => d.value)))
+  const MAX_VAL = Math.floor(Math.max(...finalObjectArray?.map((d) => d.value)))
 
-  const MAX_VAL_MONTH = finalObjectArray.reduce((max, item) =>
+  const MAX_VAL_MONTH = finalObjectArray?.reduce((max, item) =>
     item.value > max.value ? item : max
   );
 
-  const AVG_VAL = Math.floor(finalObjectArray.reduce((prev, d, _) => (d.value + prev), 0) / finalObjectArray.length)
+  const AVG_VAL = Math.floor(finalObjectArray?.reduce((prev, d, _) => (d.value + prev), 0) / finalObjectArray?.length)
 
   return (
     <>
@@ -106,7 +106,7 @@ const MonthlyBreakDown = () => {
         </View>
 
         <View style={styles.chartContainer}>
-          {finalObjectArray.map((d, i) => {
+          {finalObjectArray?.map((d, i) => {
             const isActive = i === activeBar
             const barH = Math.round((d.value / MAX_VAL) * 100)
             return (

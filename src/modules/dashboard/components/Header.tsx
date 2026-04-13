@@ -177,9 +177,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     logo: {
-        width: normalize(22),
-        height: normalize(22),
+        width: normalize(34),
+        height: normalize(34),
         resizeMode: 'contain',
+         borderRadius:normalize(8)
     },
     logoText: {
         fontFamily: fonts.Bold,

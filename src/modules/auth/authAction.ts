@@ -6,7 +6,7 @@ import firestore from "@react-native-firebase/firestore"
 
 import { persistor } from "@dwwp/store"
 
-import { AuthUser, RegisterPayload } from '@dwwp/modals'
+import { AuthUser, EditProfilePayload, RegisterPayload } from '@dwwp/modals'
 import { clearAll } from "@dwwp/utils/mmkvStorage"
 import { showInfoSnackbar } from "@dwwp/utils/showSnackBar";
 import { Dispatch } from 'redux';
@@ -90,26 +90,55 @@ export const registerWithEmail = createAsyncThunk<
     }
 );
 
-export const updateProfileImage = (imageUrl: string, userId: string) => {
-  return async (dispatch: Dispatch) => {
-    try {
-      await firestore()
-        .collection('users')
-        .doc(userId)
-        .update({
-          'userDetails.profileImage': imageUrl,
-        });
 
-    //   dispatch({
-    //     type: 'UPDATE_PROFILE_IMAGE',
-    //     payload: imageUrl,
-    //   });
-    dispatch(updateDashboardProfileImage(imageUrl));
+// edit profile
+export const updateProfile = createAsyncThunk<
+    EditProfilePayload,
+    EditProfilePayload,
+    { rejectValue: string }
+>(
+    "editProfile/updateProfile",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const uid = getAuth().currentUser?.uid
+            if (!uid) return rejectWithValue("User not authenticated.")
 
-    } catch (error) {
-      console.error('Firebase update failed', error);
+            await firestore().collection("users").doc(uid).update({
+                name: payload.fullName,
+                mobile: payload.mobileNo,
+                address: payload.address,
+                updatedAt: firestore.FieldValue.serverTimestamp(),
+            })
+
+            showInfoSnackbar("Profile updated successfully")
+            return payload
+        } catch (e: any) {
+            return rejectWithValue(e.message ?? "Failed to update profile.")
+        }
     }
-  };
+)
+
+// update profile 
+export const updateProfileImage = (imageUrl: string, userId: string) => {
+    return async (dispatch: Dispatch) => {
+        try {
+            await firestore()
+                .collection('users')
+                .doc(userId)
+                .update({
+                    'userDetails.profileImage': imageUrl,
+                });
+
+            //   dispatch({
+            //     type: 'UPDATE_PROFILE_IMAGE',
+            //     payload: imageUrl,
+            //   });
+            dispatch(updateDashboardProfileImage(imageUrl));
+
+        } catch (error) {
+            console.error('Firebase update failed', error);
+        }
+    };
 };
 
 export const logout = createAsyncThunk(
