@@ -1,12 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit"
 import { AuthState } from "@dwwp/modals/index"
-import { loginWithEmail, logout, registerWithEmail } from "./authAction"
+import { loginWithEmail, updateProfile, logout, registerWithEmail } from "./authAction"
 
-const initialState: AuthState = {
+const initialState: AuthState & { success?: boolean } = {
   user: null,
   isAuthenticated: false,
   isLoading: false,
   error: null,
+  success: false
 }
 
 const authSlice = createSlice({
@@ -18,7 +19,13 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null
     },
-
+    clearSuccess: (state) => {
+      state.success = false
+    },
+    clearEditProfileState: (state) => {
+      state.error = null
+      state.success = false
+    },
     sessionExpired: (state) => {
       state.user = null
       state.isAuthenticated = false
@@ -64,18 +71,35 @@ const authSlice = createSlice({
         state.error = action.payload ?? "Registration failed.";
       })
 
+    // edit profile 
+    builder
+      .addCase(updateProfile.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+        state.success = false
+      })
+      .addCase(updateProfile.fulfilled, (state) => {
+        state.isLoading = false
+        state.success = true
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload ?? "Update failed."
+      })
 
-      // logout
+    // logout
+    builder
       .addCase(logout.fulfilled, state => {
         state.user = null
         state.isAuthenticated = false
         state.isLoading = false
         state.error = null
+        state.success = false
       })
 
   },
 })
 
-export const { clearError, sessionExpired } = authSlice.actions
+export const { clearError, sessionExpired, clearSuccess, clearEditProfileState } = authSlice.actions
 
 export default authSlice.reducer

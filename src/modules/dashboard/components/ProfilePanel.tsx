@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     individualContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: vh(6),
+        marginVertical: vh(8),
         marginLeft: vw(8)
     },
     borderTop: {

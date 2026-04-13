@@ -26,11 +26,18 @@ import { LoadingPopup } from '../auth/components/LoadingPopup';
 import Pill from '../dashboard/components/Pill';
 import { uploadToImgBB } from '@dwwp/utils/uploadToImgBB';
 import { useSelector } from 'react-redux';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { MainStackParamList } from '@dwwp/utils/types';
+import { useNavigation } from '@react-navigation/native';
+
+type MainStackNavigationProp = NativeStackNavigationProp<MainStackParamList>;
+
 import ImagePicker from 'react-native-image-crop-picker';
 
 
 const ViewProfileScreen = () => {
   const { top } = useSafeAreaInsets()
+  const navigation = useNavigation<MainStackNavigationProp>();
   const userId = useSelector((s: any) => s.auth?.user?.email);
   const dispatch = useAppDispatch()
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null)
@@ -161,7 +168,10 @@ const ViewProfileScreen = () => {
           </View>
 
           {/* Buttons */}
-          <TouchableOpacity style={styles.editButton}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate(screenNames.EditProfileScreen)}
+            style={styles.editButton}
+          >
             <Text style={styles.editButtonText}>Edit Profile</Text>
           </TouchableOpacity>
 

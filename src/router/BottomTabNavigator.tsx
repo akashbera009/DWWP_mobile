@@ -49,7 +49,7 @@ const TabIcon = ({ routeName, focused }: TabIconProps) => {
         return (
           <Image
             source={
-              focused ? localImages.analysis_fill : localImages.analysis_blank
+              focused ? localImages.pie_chart_fill : localImages. pie_chart_blank
             }
             style={[styles.iconImage]}
           />

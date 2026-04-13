@@ -20,6 +20,13 @@ export interface RegisterPayload {
   password: string;
 }
 
+// edit profile payload 
+export interface EditProfilePayload {
+  fullName: string
+  mobileNo: string
+  address: string
+}
+
 // dashboardTypes
 export interface Broadcast {
   icon: string
