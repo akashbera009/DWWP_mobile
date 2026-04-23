@@ -69,13 +69,17 @@ const MonthlyBreakDown = () => {
     setActiveBar(finalObjectArray?.length - 1)
   }, [finalObjectArray?.length])
 
-  const MAX_VAL = Math.floor(Math.max(...finalObjectArray?.map((d) => d.value)))
+  const MAX_VAL = finalObjectArray?.length
+    ? Math.max(...finalObjectArray?.map((d) => d.value), 1)
+    : 1
 
-  const MAX_VAL_MONTH = finalObjectArray?.reduce((max, item) =>
-    item.value > max.value ? item : max
-  );
+  const MAX_VAL_MONTH = finalObjectArray?.length > 0 
+    ? finalObjectArray.reduce((max, item) => item.value > max.value ? item : max)
+    : { month: 'N/A', value: 0 };
 
-  const AVG_VAL = Math.floor(finalObjectArray?.reduce((prev, d, _) => (d.value + prev), 0) / finalObjectArray?.length)
+  const AVG_VAL = finalObjectArray?.length > 0
+    ? Math.floor(finalObjectArray.reduce((prev, d) => (d.value + prev), 0) / finalObjectArray.length)
+    : 0
 
   return (
     <>

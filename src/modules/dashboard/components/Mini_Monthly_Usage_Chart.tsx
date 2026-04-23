@@ -50,10 +50,10 @@ const Mini_Monthly_Usage_Chart = () => {
         ? Math.max(...finalObjectArray?.map(d => d.value))
         : 1
 
-    const MAX_VAL_MONTH = finalObjectArray?.reduce((max, item) =>
-        item.value > max.value ? item : max
-    );
-    // const AVG_VAL = Math.floor(finalObjectArray?.reduce((prev, d, _) => (d.value + prev), 0) / finalObjectArray?.length)
+    const MAX_VAL_MONTH = finalObjectArray?.length > 0 
+        ? finalObjectArray.reduce((max, item) => item.value > max.value ? item : max)
+        : { month: 'N/A', value: 0 };
+
     const AVG_VAL = finalObjectArray?.length
         ? Math.floor(
             finalObjectArray?.reduce((sum, d) => sum + d.value, 0) /

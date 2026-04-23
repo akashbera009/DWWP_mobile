@@ -132,11 +132,13 @@ const Dash_Index_Screen = () => {
     const currentServoState = useAppSelector(state => state.servo.servoState)
     
     useEffect(() => {
-        if (effectiveLimit <= monthTotal && currentServoState !== false) {
+        // ONLY trigger cutoff if the limit has actually loaded (is not null)
+        // and usage has exceeded it.
+        if (monthLimit !== null && effectiveLimit <= monthTotal && currentServoState !== false) {
             console.log('Usage limit reached. Water supply', monthTotal, effectiveLimit);
             dispatch(updateServoState({ email: userId, newState: false }))
         }
-    }, [effectiveLimit, monthTotal, currentServoState, userId, dispatch])
+    }, [effectiveLimit, monthTotal, currentServoState, userId, monthLimit, dispatch])
     // Add this state
     const [bannerDismissed, setBannerDismissed] = useState(false)
     const showLimitBanner = monthTotal  > effectiveLimit && !bannerDismissed
