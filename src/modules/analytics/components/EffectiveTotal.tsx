@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import React, { useMemo } from 'react'
 import fonts from '@dwwp/utils/fonts'
 import { normalize, vh} from '@dwwp/utils/dimensions'
-import { getCurrentMonthKey } from '@dwwp/utils/commonFunctions'
+import { getCurrentMonthKey, getTodayKey } from '@dwwp/utils/commonFunctions'
 import { useAppSelector } from '@dwwp/store/hooks'
 import { selectCurrentMonthLimit } from '@dwwp/modules/dashboard/usageSelectors'
 
@@ -54,21 +54,28 @@ const EffectiveTotal = () => {
     } = useMemo(() => {
 
         const days = monthData?.days ?? {}
-        // const monthLimit = monthData?.limit ?? 0
-      
+        const todayKey = getTodayKey()
 
-        // daily usage sum
-        const daySum = Object.values(days).reduce((sum, v) => sum + v, 0)
+        // Sum all days EXCEPT today to avoid double-counting
+        // (todayUse from the usage slice is the live value for today)
+        const pastDaysSum = Object.entries(days)
+            .filter(([key]) => key !== todayKey)
+            .reduce((sum, [, v]) => sum + v, 0)
 
-        const totalConsumed = daySum + todayUse
+        const totalConsumed = pastDaysSum + todayUse
 
         // filter addons for current month
+        // Only count Completed addons with qty > 0
+        // `refill` is already the total liters for that transaction (not qty × refill)
         const currentMonthAddons = addons.filter(
-            (addon: any) => addon?.forMonth === monthKeyId
+            (addon: any) =>
+                addon?.forMonth === monthKeyId &&
+                addon?.status === 'Completed' &&
+                (addon?.qty ?? 0) > 0
         )
-        // addon liters
+        // addon liters — refill IS the total liters, not qty * refill
         const totalAddonLiters = currentMonthAddons.reduce(
-            (sum, addon) => sum + (addon.qty ?? 0) * (addon.refill ?? 0),
+            (sum, addon) => sum + (addon.refill ?? 0),
             0
         )
 

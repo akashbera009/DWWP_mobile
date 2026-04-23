@@ -118,7 +118,7 @@ const MonthlyBreakDown = () => {
               >
                 {isActive && (
                   <View style={styles.barTooltip}>
-                    <Text style={styles.barTooltipText}>{d.value}</Text>
+                    <Text style={styles.barTooltipText}>{d.value.toFixed(0)}</Text>
                     <View style={styles.barTooltipArrow} />
                   </View>
                 )}

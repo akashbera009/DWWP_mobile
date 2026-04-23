@@ -180,17 +180,17 @@ const HeroSummaryCard: React.FC = () => {
 
                     <View style={styles.heroStats}>
                         <View style={styles.heroStatItem}>
-                            <Text style={styles.heroStatValue}>{todayUsage}L</Text>
+                            <Text style={styles.heroStatValue}>{todayUsage.toFixed(0)}L</Text>
                             <Text style={styles.heroStatUnit}>Today</Text>
                         </View>
                         <View style={styles.heroStatDivider} />
                         <View style={styles.heroStatItem}>
-                            <Text style={styles.heroStatValue}>{monthTotal}L</Text>
+                            <Text style={styles.heroStatValue}>{monthTotal.toFixed(0)}L</Text>
                             <Text style={styles.heroStatUnit}>This month</Text>
                         </View>
                         <View style={styles.heroStatDivider} />
                         <View style={styles.heroStatItem}>
-                            <Text style={styles.heroStatValue}>{effectiveLimit}L</Text>
+                            <Text style={styles.heroStatValue}>{effectiveLimit.toFixed(0)}L</Text>
                             <Text style={styles.heroStatUnit}>Total Limit</Text>
                         </View>
                     </View>

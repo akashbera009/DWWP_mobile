@@ -1,17 +1,18 @@
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
 import colors from '@dwwp/utils/colors'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import fonts from '@dwwp/utils/fonts'
 import { normalize, screenWidth, vh, vw } from '@dwwp/utils/dimensions'
 import { strings } from '@dwwp/utils/strings'
 
-import { getCurrentMonthKey, getDaysInMonth, getTrend } from '@dwwp/utils/commonFunctions'
 import EffectiveTotal from '../components/EffectiveTotal'
 import DailyBreakDown from '../components/DailyBreakDown'
 import MonthlyBreakDown from '../components/MonthlyBreakDown'
 import { localImages } from '@dwwp/utils/localimages'
 import TrendCard from '../components/TrendCard'
+import AIInsightCard from '../components/AIInsightCard'
+import AIChatSheet from '../components/AIChatSheet'
 
 const SCREEN_WIDTH = screenWidth;
 const MARGIN_BOTH_SIDE = vw(16)
@@ -48,30 +49,6 @@ const C = {
 
 const AnalyticsPage = () => {
   const { top } = useSafeAreaInsets()
-  // const dispatch = useAppDispatch()
-  // const currentMOnthKey = getCurrentMonthKey()
-
-  // const { todayUsage, allTimeDaysTotal, currentMonthId, months } = useAppSelector(s => s.usage)
-  // const monthLimit = useAppSelector(selectCurrentMonthLimit)
-  // const addons = useAppSelector(s => s.payment?.addons)
-
-  // const addedLimit = useMemo(() => {
-  //   if (!addons) return 0
-  //   return addons
-  //     .filter(txn => txn?.forMonth === currentMOnthKey)
-  //     .reduce((reducer, item) => reducer + (item?.qty * (item?.refill || 0)), 0)
-  // }, [addons, currentMOnthKey])
-
-  // const lastMonthKeys = Object.keys(months ?? {}).sort()
-  // const prevMonthId = lastMonthKeys[lastMonthKeys.length - 2]
-  // const currentMonthUsage = months?.[currentMonthId ?? currentMOnthKey]?.total ?? 0
-  // const lastMonthUsage = months?.[prevMonthId]?.total ?? 0
-  // const totalAddonLiters = addons.reduce((s, a) => s + a.qty, 0)
-  // const trend = getTrend(allTimeDaysTotal, effectiveLimit, dayOfMonth, daysInMonth)
-
-  // const daysInMonth = getDaysInMonth('This Month')
-  // const dayOfMonth = new Date().getDate()
-
 
   const innerScrollRef = useRef<ScrollView | null>(null)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -101,12 +78,6 @@ const AnalyticsPage = () => {
       animated: true
     })
   }, [currentBreaskDown])
-
-  // useEffect(() => {
-  //   dispatch(calculatePrediction())
-  // }, [dispatch])
-
-  // const prediction = useAppSelector(selectCurrentPrediction)
 
   return (
     <View style={[styles.container, { paddingTop: top }]}>
@@ -160,11 +131,17 @@ const AnalyticsPage = () => {
         <View style={styles.mainContent}>
           <Text style={styles.sectionLabelText}>Predicted Usages</Text>
           <TrendCard />
+
+          {/* ── AI Insight Card ── */}
+          <AIInsightCard />
+
           {/* ── Effective total summary ── */}
           <EffectiveTotal />
-
         </View>
       </ScrollView>
+
+      {/* ── AI Chat Bottom Sheet (rendered above everything) ── */}
+      <AIChatSheet />
     </View>
   )
 }

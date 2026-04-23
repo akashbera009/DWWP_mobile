@@ -101,7 +101,7 @@ const BottomTabNavigator = () => {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        animation: 'shift',
+        animation: 'fade',
         tabBarStyle: {
           height: vh(55) + bottom,
           backgroundColor: colors.white,
