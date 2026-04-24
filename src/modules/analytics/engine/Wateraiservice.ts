@@ -18,7 +18,7 @@ const GEMINI_MODEL = 'gemini-3-flash-preview'
 
 function getApiKey(): string {
   // Use env key first, then your hardcoded fallback
-  const key = Config.GEMINI_API_KEY || 'AIzaSyDZrC3INsXmJRQMcmG4d-5Knw4jqwkk5LM'
+  const key = Config.GEMINI_API_KEY
 
   if (!key || key === 'YOUR_GEMINI_API_KEY_HERE') {
     throw new Error('GEMINI_API_KEY is not set')
