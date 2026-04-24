@@ -141,7 +141,7 @@ const AIInsightCard: React.FC = () => {
           </Text>
         </View>
         <View style={[styles.aiBadge, { backgroundColor: tone.accent }]}>
-          <Text style={styles.aiBadgeText}>Gemini</Text>
+          <Text style={styles.aiBadgeText}>DWWP AI</Text>
         </View>
       </View>
 
