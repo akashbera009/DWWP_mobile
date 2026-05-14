@@ -47,7 +47,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
 
         return addons
             .filter(txn => txn?.forMonth === thisMonthKey)
-            .reduce((sum, item) => sum + (item?.qty * item?.refill), 0)
+            .reduce((sum, item) => sum + (item?.refill), 0)
     }, [addons, thisMonthKey])
     const effectiveLimit = useMemo(() => {
         return (monthLimit || 0) + addedLimit
@@ -130,7 +130,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
     }, [effectiveLimit, totalUsage, userId])
     const isBlocked = disabled || effectiveLimit <= totalUsage
 
- 
+
     // ── Shared toggle logic (refs only, no closure issues) ─────────────────────
     const executeToggle = () => {
         // if (disabled || !userId) return

@@ -56,10 +56,10 @@ const HeroSummaryCard: React.FC = () => {
 
     const addedLimit = useMemo(() => {
         if (!addons) return 0
- 
+
         return addons
             .filter(txn => txn?.forMonth === thisMonthKey)
-            .reduce((sum, item) => sum + (item?.qty * item?.refill), 0)
+            .reduce((sum, item) => sum + (item?.refill), 0)
     }, [addons, thisMonthKey])
 
     const effectiveLimit = useMemo(() => {

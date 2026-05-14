@@ -227,7 +227,7 @@ const CurrentBillComponent = () => {
                         <Image source={localImages.usages}
                             style={styles.Stateicon} />
                         <View>
-                            <Text style={styles.statValue}>{billObject.usage} L</Text>
+                            <Text style={styles.statValue}>{billObject.usage?.toFixed(0)} L</Text>
                             <Text style={styles.statLabel}>Used</Text>
                         </View>
                     </View>
@@ -253,7 +253,7 @@ const CurrentBillComponent = () => {
                         activeOpacity={1}
                     >
                         {!isDisabled && <Text style={styles.buttonIcon}>⚡</Text>}
-                        <Text style={styles.buttonText}>
+                        <Text style={[styles.buttonText, !isDisabled && { color: colors.white }]}>
                             {isPaid ? 'Already Paid' : !isMonthEnd ? 'Available on Month End' : 'Pay Now'}
                         </Text>
                     </TouchableOpacity>
@@ -436,6 +436,7 @@ const styles = StyleSheet.create({
     button: {
         flexDirection: 'row',
         backgroundColor: colors.primary,
+        color: colors.white,
         marginHorizontal: vw(20),
         marginBottom: vh(20),
         paddingVertical: vh(15),

@@ -50,7 +50,7 @@ export const UsageSnapshotCard: React.FC = () => {
     useEffect(() => {
         const totalAddons = addons
             .filter(txn => txn?.forMonth === currentMOnthKey)
-            .reduce((reducer, item) => reducer + (item?.qty * item?.refill), 0)
+            .reduce((reducer, item) => reducer + (item?.refill), 0)
         setAddedLimit(totalAddons)
         const total = (monthLimit || 0) + totalAddons
         setEffectiveLimit(total)
@@ -61,7 +61,7 @@ export const UsageSnapshotCard: React.FC = () => {
 
     const monthWiseHistoryData = useAppSelector(s => s.usage?.allTimeMonths)
     const lastMonthKeys = Object.keys(monthWiseHistoryData ?? {}).sort()
-    const prevMonthId = lastMonthKeys[lastMonthKeys.length - 1] 
+    const prevMonthId = lastMonthKeys[lastMonthKeys.length - 1]
     const lastMonthUsage = monthWiseHistoryData?.[prevMonthId] ?? 0
 
     const usagePct = Math.min((currentMonthUsage / (effectiveLimit || 1)) * 100, 100)
@@ -105,7 +105,7 @@ export const UsageSnapshotCard: React.FC = () => {
                     <Text style={styles.barLabelVal}>{Math.round(currentMonthUsage).toLocaleString()} L</Text> used
                 </Text>
                 <Text style={styles.barLabelText}>
-                   <Text style={[styles.barLabelVal, { color: barColor }]}>{Math.round(usagePct)}%</Text> of {effectiveLimit?.toLocaleString()} L
+                    <Text style={[styles.barLabelVal, { color: barColor }]}>{Math.round(usagePct)}%</Text> of {effectiveLimit?.toLocaleString()} L
                 </Text>
             </View>
 

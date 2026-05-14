@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
-    View, StyleSheet, ScrollView,
+    View, Text, StyleSheet, ScrollView,
     Pressable,
     StatusBar,
+    TouchableOpacity,
 } from 'react-native'
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 
@@ -34,11 +35,16 @@ import { fetchUserNotifications } from '../Notificationslice'
 import { selectCurrentMonthLimit, selectCurrentMonthTotal } from '../usageSelectors';
 import { getCurrentMonthKey } from '@dwwp/utils/commonFunctions';
 import LimitWarningBanner from '@dwwp/modules/analytics/components/LimitWarningBanner';
+import { openChat, selectIsChatOpen, selectCurrentPrediction, selectShouldRecalculatePrediction } from '@dwwp/modules/analytics/analyticsSlice';
+import { calculatePrediction } from '@dwwp/modules/analytics/analyticsActions';
+import AIChatSheet from '@dwwp/modules/analytics/components/AIChatSheet';
+import { normalize, vh } from '@dwwp/utils/dimensions';
 
 const SCREEN_WIDTH = screenWidth
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 const Dash_Index_Screen = () => {
     const dispatch = useAppDispatch()
+    const isChatOpen = useAppSelector(selectIsChatOpen)
     // loading state 
     const [notifOpen, setNotifOpen] = useState(false)
     const [profileOpen, setProfileOpen] = useState(false)
@@ -48,6 +54,9 @@ const Dash_Index_Screen = () => {
     const { isLoading: dashboardIsLoading } = useAppSelector(
         state => state.dashboard
     )
+    const prediction = useAppSelector(selectCurrentPrediction)
+    const shouldRecalculate = useAppSelector(selectShouldRecalculatePrediction)
+    const isPredictionLoading = useAppSelector(state => state.analytics.isLoading)
 
     // In your component:
     const scrollX = useSharedValue(0);
@@ -92,6 +101,13 @@ const Dash_Index_Screen = () => {
         fetchDashboardData()
     }, [fetchDashboardData])
 
+    // Initialize AI Context automatically in background
+    useEffect(() => {
+        if (!dashboardIsLoading && !isPredictionLoading && (shouldRecalculate || !prediction)) {
+            dispatch(calculatePrediction())
+        }
+    }, [dispatch, dashboardIsLoading, isPredictionLoading, shouldRecalculate, prediction])
+
     const [isSwitchOpen, setIsSwitchModalOpen] = useState<boolean>(false)
 
     const scrolRef = useRef<ScrollView | null>(null)
@@ -122,7 +138,7 @@ const Dash_Index_Screen = () => {
 
         return addons
             .filter(txn => txn?.forMonth === thisMonthKey)
-            .reduce((sum, item) => sum + (item?.qty * item?.refill), 0)
+            .reduce((sum, item) => sum + (item?.refill), 0)
     }, [addons, thisMonthKey])
     const effectiveLimit = useMemo(() => {
         return (monthLimit || 0) + addedLimit
@@ -130,7 +146,7 @@ const Dash_Index_Screen = () => {
 
     const monthTotal = useAppSelector(selectCurrentMonthTotal)
     const currentServoState = useAppSelector(state => state.servo.servoState)
-    
+
     useEffect(() => {
         // ONLY trigger cutoff if the limit has actually loaded (is not null)
         // and usage has exceeded it.
@@ -141,7 +157,7 @@ const Dash_Index_Screen = () => {
     }, [effectiveLimit, monthTotal, currentServoState, userId, monthLimit, dispatch])
     // Add this state
     const [bannerDismissed, setBannerDismissed] = useState(false)
-    const showLimitBanner = monthTotal  > effectiveLimit && !bannerDismissed
+    const showLimitBanner = monthTotal > effectiveLimit && !bannerDismissed
 
     return (
         <View style={[styles.safeArea, { paddingTop: top, }]} >
@@ -155,14 +171,14 @@ const Dash_Index_Screen = () => {
                 handleProfileClose={handleProfileClose}
                 handleNotifOpen={handleNotifOpen}
                 handleNotifClose={handleNotifClose}
-                />
+            />
 
-                {/* ── Limit Warning Banner ── */}
-                {showLimitBanner && (
-                    <LimitWarningBanner
-                        onClose={() => setBannerDismissed(true)}
-                    />
-                )}
+            {/* ── Limit Warning Banner ── */}
+            {showLimitBanner && (
+                <LimitWarningBanner
+                    onClose={() => setBannerDismissed(true)}
+                />
+            )}
             {/* ── Dropdowns ── */}
             {notifOpen && (
                 <Portal hostName="safe">
@@ -226,6 +242,20 @@ const Dash_Index_Screen = () => {
                 </Animated.ScrollView>
 
             }
+
+            {/* Floating Chatbot Button */}
+            {!dashboardIsLoading && !isChatOpen && (
+                <TouchableOpacity
+                    style={styles.fabContainer}
+                    onPress={() => dispatch(openChat())}
+                    activeOpacity={0.8}
+                >
+                    <Text style={styles.fabIcon}>✨</Text>
+                </TouchableOpacity>
+            )}
+
+            {/* AI Chat Bottom Sheet */}
+            <AIChatSheet />
         </View >
     )
 }
@@ -254,5 +284,26 @@ const styles = StyleSheet.create({
         width: SCREEN_WIDTH,
         // paddingTop: vh(16),
         paddingHorizontal: vw(8),
+    },
+    fabContainer: {
+        position: 'absolute',
+        bottom: vh(20),
+        right: vw(20),
+        width: normalize(56),
+        height: normalize(56),
+        borderRadius: normalize(28),
+        backgroundColor: colors.primary,
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 6,
+        zIndex: 100,
+    },
+    fabIcon: {
+        fontSize: normalize(24),
+        color: '#FFFFFF',
     },
 })

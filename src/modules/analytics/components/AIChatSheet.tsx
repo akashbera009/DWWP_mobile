@@ -6,11 +6,10 @@ import {
   TextInput,
   TouchableOpacity,
   FlatList,
-  KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
 } from 'react-native'
-import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet'
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView, BottomSheetTextInput } from '@gorhom/bottom-sheet'
 import { Portal } from '@gorhom/portal'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
@@ -25,19 +24,23 @@ import {
   selectCurrentPrediction,
   closeChat,
   clearChatHistory,
+  selectPredictionIsLoading,
 } from '../analyticsSlice'
 import { getSuggestedQuestions } from '../engine/Wateraiservice'
 import type { ChatMessage } from '../engine/Wateraiservice'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const AIChatSheet: React.FC = () => {
   const dispatch = useAppDispatch()
+  const insets = useSafeAreaInsets()
   const isOpen = useAppSelector(selectIsChatOpen)
   const chatHistory = useAppSelector(selectChatHistory)
   const isLoading = useAppSelector(selectChatLoading)
   const chatError = useAppSelector(selectChatError)
   const prediction = useAppSelector(selectCurrentPrediction)
+  const isPredictionLoading = useAppSelector(selectPredictionIsLoading)
 
   const bottomSheetRef = useRef<BottomSheet>(null)
   const flatListRef = useRef<FlatList>(null)
@@ -51,7 +54,7 @@ const AIChatSheet: React.FC = () => {
     return getSuggestedQuestions(prediction)
   }, [prediction])
 
-  // Open/close sheet based on Redux state
+  // Open/close sheet based on Redux state 
   useEffect(() => {
     console.log('[AIChatSheet] isOpen:', isOpen, '| ref ready:', !!bottomSheetRef.current)
 
@@ -84,12 +87,12 @@ const AIChatSheet: React.FC = () => {
   const handleSend = useCallback(
     (message?: string) => {
       const text = (message ?? inputText).trim()
-      if (!text || isLoading) return
+      if (!text || isLoading || isPredictionLoading) return
 
       dispatch(sendAIChatMessage(text))
       setInputText('')
     },
-    [inputText, isLoading, dispatch]
+    [inputText, isLoading, isPredictionLoading, dispatch]
   )
 
   const handleSheetChange = useCallback(
@@ -156,12 +159,13 @@ const AIChatSheet: React.FC = () => {
         backdropComponent={renderBackdrop}
         backgroundStyle={styles.sheetBackground}
         handleIndicatorStyle={styles.handleIndicator}
+        keyboardBehavior="extend"
+        keyboardBlurBehavior="restore"
+        android_keyboardInputMode="adjustPan"
       >
         <BottomSheetView style={{ flex: 1 }}>
-          <KeyboardAvoidingView
+          <View
             style={styles.container}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            keyboardVerticalOffset={20}
           >
             {/* Header */}
             <View style={styles.header}>
@@ -201,16 +205,28 @@ const AIChatSheet: React.FC = () => {
               contentContainerStyle={styles.messagesList}
               showsVerticalScrollIndicator={false}
               ListEmptyComponent={
-                <View style={styles.emptyState}>
-                  <Text style={styles.emptyIcon}>🤖</Text>
-                  <Text style={styles.emptyTitle}>
-                    Hi! I'm your DWWP AI assistant
-                  </Text>
-                  <Text style={styles.emptyBody}>
-                    I can answer questions about your water usage, give tips to save
-                    water, and explain your predictions. Try a question below!
-                  </Text>
-                </View>
+                isPredictionLoading ? (
+                  <View style={styles.emptyState}>
+                    <ActivityIndicator size="large" color={colors.primary} style={{ marginBottom: vh(12) }} />
+                    <Text style={styles.emptyTitle}>
+                      Initializing DWWP AI...
+                    </Text>
+                    <Text style={styles.emptyBody}>
+                      Please wait while we gather your water usage insights and prepare your assistant.
+                    </Text>
+                  </View>
+                ) : (
+                  <View style={styles.emptyState}>
+                    <Text style={styles.emptyIcon}>🤖</Text>
+                    <Text style={styles.emptyTitle}>
+                      Hi! I'm your DWWP AI assistant
+                    </Text>
+                    <Text style={styles.emptyBody}>
+                      I can answer questions about your water usage, give tips to save
+                      water, and explain your predictions. Try a question below!
+                    </Text>
+                  </View>
+                )
               }
               ListFooterComponent={
                 <>
@@ -258,31 +274,31 @@ const AIChatSheet: React.FC = () => {
 
             {/* Input */}
             <View style={styles.inputRow}>
-              <TextInput
-                style={styles.input}
+              <BottomSheetTextInput
+                style={[styles.input, { marginBottom: insets.bottom }]}
                 value={inputText}
                 onChangeText={setInputText}
-                placeholder="Ask about your water usage..."
+                placeholder={isPredictionLoading ? "Initializing AI..." : "Ask about your water usage..."}
                 placeholderTextColor={colors.placeholderText}
                 multiline
                 maxLength={500}
-                editable={!isLoading}
+                editable={!isLoading && !isPredictionLoading}
                 onSubmitEditing={() => handleSend()}
                 returnKeyType="send"
               />
               <TouchableOpacity
                 style={[
                   styles.sendButton,
-                  (!inputText.trim() || isLoading) && styles.sendButtonDisabled,
+                  (!inputText.trim() || isLoading || isPredictionLoading) && styles.sendButtonDisabled,
                 ]}
                 onPress={() => handleSend()}
-                disabled={!inputText.trim() || isLoading}
+                disabled={!inputText.trim() || isLoading || isPredictionLoading}
                 activeOpacity={0.8}
               >
                 <Text style={styles.sendIcon}>↑</Text>
               </TouchableOpacity>
             </View>
-          </KeyboardAvoidingView>
+          </View>
         </BottomSheetView>
       </BottomSheet>
     </Portal>
