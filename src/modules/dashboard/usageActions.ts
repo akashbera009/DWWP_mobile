@@ -60,7 +60,7 @@ function parseMonthDoc(
  */
 export const listenCurrentMonth = createAsyncThunk(
     'usage/listenCurrentMonth',
-    async (userEmail: string, { dispatch }) => {
+    async (userEmail: string, { dispatch, getState }) => {
         if (hasListener(userEmail)) return // already listening
 
         const monthId = getCurrentMonthKey()
@@ -75,10 +75,19 @@ export const listenCurrentMonth = createAsyncThunk(
                     const data = snapshot.data() as Record<string, unknown>
                     const month = parseMonthDoc(monthId, data)
 
-                    dispatch(setMonth(month))
-
+                    // Only dispatch if data has actually changed to avoid
+                    // spurious re-renders on Firestore heartbeat / no-op snapshots.
+                    const state = (getState() as any).usage
+                    const cached = state.months[monthId]
                     const todayKey = getTodayKey()
-                    dispatch(setTodayUsage(month.days[todayKey] ?? 0))
+                    const incomingToday = month.days[todayKey] ?? 0
+
+                    if (!cached || cached.total !== month.total) {
+                        dispatch(setMonth(month))
+                    }
+                    if (!cached || (state.todayUsage ?? -1) !== incomingToday) {
+                        dispatch(setTodayUsage(incomingToday))
+                    }
                 },
                 (error) => {
                     console.error('[listenCurrentMonth] snapshot error:', error)

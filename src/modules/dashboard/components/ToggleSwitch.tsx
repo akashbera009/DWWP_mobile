@@ -80,7 +80,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
         backgroundColor: interpolateColor(
             progress.value,
             [0, 1],
-            ["hsl(22, 20%, 75%)", "hsl(22, 90%, 55%)"]
+            ["#BCA899", "#E67E22"]
         ),
     }));
 
@@ -88,7 +88,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ disabled = false }) => {
         backgroundColor: interpolateColor(
             progress.value,
             [0, 1],
-            ["hsl(220, 20%, 70%)", "hsl(220, 20%, 85%)"]
+            ["#A3A9B5", "#CED4DE"]
         ),
     }));
     // ── Refs ───────────────────────────────────────────────────────────────────

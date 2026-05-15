@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
@@ -11,11 +11,11 @@ import { MainStackParamList } from '@dwwp/utils/types'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 import { screenNames } from '@dwwp/utils/screenNames'
-type MainStackNavigationProp =NativeStackNavigationProp<MainStackParamList>;
+type MainStackNavigationProp = NativeStackNavigationProp<MainStackParamList>;
 
 const NotificationPanel = ({ onClose }: { onClose: () => void }) => {
-  const dispatch = useAppDispatch()
-  const navigation = useNavigation<MainStackNavigationProp>();
+    const dispatch = useAppDispatch()
+    const navigation = useNavigation<MainStackNavigationProp>();
 
     // Admin broadcasts
     const [broadcasts, setBroadcasts] = useState<BroadcastMsg[] | null>([])
@@ -120,9 +120,11 @@ const NotificationPanel = ({ onClose }: { onClose: () => void }) => {
             </View>
 
             <View style={styles.scrollviewWrapper}>
-                <ScrollView
+                {/* <ScrollView
                     nestedScrollEnabled
                     showsVerticalScrollIndicator={false}
+                    style={{ maxHeight: vh(300) }}
+                    contentContainerStyle={{ paddingBottom: vh(12) }}
                 >
                     {filteredNotifications?.map((n: BroadcastMsg, id: number) => (
                         <View key={id} style={styles.notifRow}>
@@ -141,10 +143,40 @@ const NotificationPanel = ({ onClose }: { onClose: () => void }) => {
                             </View>
                         </View>
                     ))}
-                </ScrollView>
+                </ScrollView> */}
+                <FlatList
+                    data={filteredNotifications}
+                    keyExtractor={(item, index) => `${index}`}
+                    showsVerticalScrollIndicator={false}
+                    style={{ maxHeight: vh(300) }}
+                    contentContainerStyle={{ paddingBottom: vh(12) }}
+                    renderItem={({ item, index }) => (
+                        <View style={styles.notifRow}>
+                            <View
+                                style={[
+                                    styles.notifIconBox,
+                                    { backgroundColor: `${getNotificationColor(item)}18` },
+                                ]}
+                            >
+                                <Text style={{ fontSize: 15 }}>{item.icon}</Text>
+                            </View>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.notifTitle}>{item.message}</Text>
+                                <Text style={styles.notifTime}>{formatTimestamp(item.timestamp)}</Text>
+                            </View>
+                        </View>
+                    )}
+                    ListEmptyComponent={
+                        <View style={{ alignItems: 'center', paddingVertical: vh(20) }}>
+                            <Text style={{ color: colors.calendarDayDisabled, fontStyle: 'italic' }}>
+                                No notifications
+                            </Text>
+                        </View>
+                    }
+                />
             </View>
 
-            <TouchableOpacity onPress={()=>{
+            <TouchableOpacity onPress={() => {
                 onClose?.()
                 navigation.navigate(screenNames.AllNotifications)
             }} style={styles.dropdownFooter}>
@@ -159,7 +191,7 @@ export default NotificationPanel
 const styles = StyleSheet.create({
     dropdownPanel: {
         position: 'absolute',
-        top: normalize(90),
+        top: normalize(50),
         right: vw(12),
         width: vw(270),
         backgroundColor: colors.white,
@@ -197,8 +229,7 @@ const styles = StyleSheet.create({
         color: colors.primary,
     },
     scrollviewWrapper: {
-        flex: 1,
-        maxHeight: vh(200)
+        maxHeight: vh(300)
     },
     notifBadge: {
         width: normalize(20),

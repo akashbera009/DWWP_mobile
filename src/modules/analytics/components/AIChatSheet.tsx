@@ -161,7 +161,7 @@ const AIChatSheet: React.FC = () => {
         handleIndicatorStyle={styles.handleIndicator}
         keyboardBehavior="extend"
         keyboardBlurBehavior="restore"
-        android_keyboardInputMode="adjustPan"
+        android_keyboardInputMode="adjustResize"
       >
         <BottomSheetView style={{ flex: 1 }}>
           <View

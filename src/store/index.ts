@@ -19,7 +19,7 @@ import dashboardReducer from '@dwwp/modules/dashboard/dashboardSlice'
 import paymentReducer from '@dwwp/modules/paymentsDashboard/paymentSlice'
 import servoReducer from '@dwwp/modules/dashboard/servoSlice'
 import usageReducer from '@dwwp/modules/dashboard/usageSlice'
-import  notificationReducer from '@dwwp/modules/dashboard/Notificationslice'
+import notificationReducer from '@dwwp/modules/dashboard/Notificationslice'
 import analyticsReducer from '@dwwp/modules/analytics/analyticsSlice'
 
 import {
@@ -35,7 +35,7 @@ import {
 const persistConfig = {
     key: 'root',
     storage: mmkvStorage,
-    whitelist: ['auth', 'usage' ,'dashboard'],
+    whitelist: ['auth', 'usage', 'dashboard'],
 }
 
 const rootReducer = combineReducers({
@@ -44,7 +44,7 @@ const rootReducer = combineReducers({
     payment: paymentReducer,
     servo: servoReducer,
     usage: usageReducer,
-    notification : notificationReducer,
+    notification: notificationReducer,
     analytics: analyticsReducer
 })
 // payment: paymentReducer,
@@ -59,11 +59,11 @@ export const store = configureStore({
                 ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
             },
         })
-        
+
         if (__DEV__) {
             middleware.push(logger as any)
         }
-        
+
         return middleware
     }
 })

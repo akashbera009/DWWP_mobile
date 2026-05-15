@@ -16,15 +16,18 @@ export const useNotificationListener = (email?: string) => {
     useEffect(() => {
         if (!userEmail) return
 
+        // Guard: prevents the snapshot callback from dispatching into Redux
+        // after this hook has unmounted (stale closure protection).
+        let active = true
         let unsubscribe: (() => void) | null = null
 
         try {
-            // Set up real-time listener
             unsubscribe = NotificationService.listenToUserNotifications(
                 userEmail,
                 notifications => {
-                    // Replace the entire notification list at once
-                    // This prevents duplicate accumulation and memory leaks
+                    if (!active) return
+                    // Replace the entire notification list at once.
+                    // This prevents duplicate accumulation.
                     dispatch(setNotifications(notifications))
                 },
                 error => {
@@ -35,11 +38,11 @@ export const useNotificationListener = (email?: string) => {
             console.error('Failed to set up notification listener:', error)
         }
 
-        // Cleanup on unmount
+        // Cleanup on unmount: disable the guard first, then unsubscribe
+        // so any in-flight snapshot callback is a no-op.
         return () => {
-            if (unsubscribe) {
-                unsubscribe()
-            }
+            active = false
+            unsubscribe?.()
         }
     }, [userEmail, dispatch])
 }

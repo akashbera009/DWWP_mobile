@@ -31,11 +31,12 @@ type DashBoardPagePropsType = {
     setIsSwitchModalOpen: () => void
     refreshDashboard: () => void
     handleSetActivetab: (idx: number) => void
+    isActive: boolean
 }
 
 type BottomStackNavigation = NativeStackNavigationProp<BottomTabParamList>;
 
-const DashBoardPage = ({ setIsSwitchModalOpen, refreshDashboard, handleSetActivetab }: DashBoardPagePropsType) => {
+const DashBoardPage = ({ setIsSwitchModalOpen, refreshDashboard, handleSetActivetab, isActive }: DashBoardPagePropsType) => {
     const [refreshing, setRefreshing] = React.useState(false);
     const bottomStackNavigation = useNavigation<BottomStackNavigation>()
 
@@ -80,6 +81,7 @@ const DashBoardPage = ({ setIsSwitchModalOpen, refreshDashboard, handleSetActive
                 <DeviceSection
                     setIsSwitchModalOpen={() => setIsSwitchModalOpen()}
                     handleSetActivetab={handleSetActivetab}
+                    isActive={isActive}
                 />
 
                 {/* Usage Chart */}

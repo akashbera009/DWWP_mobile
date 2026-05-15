@@ -4,6 +4,7 @@ import {
     Pressable,
     StatusBar,
     TouchableOpacity,
+    Modal
 } from 'react-native'
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 
@@ -26,13 +27,13 @@ import { useAppDispatch, useAppSelector } from '@dwwp/store/hooks'
 import { fetchAdminConfig, fetchCurrentMonth, fetchUserDetails } from '../dashboardActions'
 import { fetchServoState, updateServoState } from '../servoActions'
 import DashboardSkeleton from '@dwwp/components/DashboardSkeleton'
-import { fetchAllTimeDays, fetchAllTimeMonths, fetchTodayUsage, listenCurrentMonth, stopCurrentMonthListener } from '../usageActions'
+import { fetchAllTimeDays, fetchAllTimeMonths, listenCurrentMonth, stopCurrentMonthListener } from '../usageActions'
 import Device_Info_Tab from './Device_Info_Tab'
 import { fetchAllPaymentsAndAddons } from '@dwwp/modules/paymentsDashboard/paymentAction'
 import { fetchUserNotifications } from '../Notificationslice'
 
 
-import { selectCurrentMonthLimit, selectCurrentMonthTotal } from '../usageSelectors';
+import { selectCurrentMonthLimit, selectCurrentMonthTotal, selectHistoryLoaded } from '../usageSelectors';
 import { getCurrentMonthKey } from '@dwwp/utils/commonFunctions';
 import LimitWarningBanner from '@dwwp/modules/analytics/components/LimitWarningBanner';
 import { openChat, selectIsChatOpen, selectCurrentPrediction, selectShouldRecalculatePrediction } from '@dwwp/modules/analytics/analyticsSlice';
@@ -57,6 +58,9 @@ const Dash_Index_Screen = () => {
     const prediction = useAppSelector(selectCurrentPrediction)
     const shouldRecalculate = useAppSelector(selectShouldRecalculatePrediction)
     const isPredictionLoading = useAppSelector(state => state.analytics.isLoading)
+    const predictionError = useAppSelector(state => state.analytics.error)
+    // Guard expensive history fetches — only run once per session
+    const historyLoaded = useAppSelector(selectHistoryLoaded)
 
     // In your component:
     const scrollX = useSharedValue(0);
@@ -68,19 +72,25 @@ const Dash_Index_Screen = () => {
         },
     });
 
-    // fetching the important data first 
+    // fetching the important data first
     const fetchDashboardData = useCallback(() => {
         if (!email) return
         dispatch(fetchUserDetails({ email }))
         dispatch(fetchCurrentMonth({ email }))
         dispatch(fetchAdminConfig())
         dispatch(fetchUserNotifications(email))
-        dispatch(fetchTodayUsage(email))
+        // NOTE: fetchTodayUsage removed — listenCurrentMonth fires immediately
+        // on attachment and dispatches setTodayUsage, making a separate .get()
+        // call redundant and wasteful.
         dispatch(fetchServoState({ email }))
-        dispatch(fetchAllTimeDays(email))
-        dispatch(fetchAllTimeMonths(email))
+        // Guard these heavy full-collection scans so they only run once per
+        // session. historyLoaded is reset if the user triggers a manual refresh.
+        if (!historyLoaded) {
+            dispatch(fetchAllTimeDays(email))
+            dispatch(fetchAllTimeMonths(email))
+        }
         dispatch(fetchAllPaymentsAndAddons({ email }))
-    }, [email, dispatch])
+    }, [email, dispatch, historyLoaded])
 
     // Set up real-time listener
     useEffect(() => {
@@ -103,10 +113,10 @@ const Dash_Index_Screen = () => {
 
     // Initialize AI Context automatically in background
     useEffect(() => {
-        if (!dashboardIsLoading && !isPredictionLoading && (shouldRecalculate || !prediction)) {
+        if (!dashboardIsLoading && !isPredictionLoading && !predictionError && (shouldRecalculate || !prediction)) {
             dispatch(calculatePrediction())
         }
-    }, [dispatch, dashboardIsLoading, isPredictionLoading, shouldRecalculate, prediction])
+    }, [dispatch, dashboardIsLoading, isPredictionLoading, shouldRecalculate, prediction, predictionError])
 
     const [isSwitchOpen, setIsSwitchModalOpen] = useState<boolean>(false)
 
@@ -180,25 +190,24 @@ const Dash_Index_Screen = () => {
                 />
             )}
             {/* ── Dropdowns ── */}
-            {notifOpen && (
-                <Portal hostName="safe">
-                    <Pressable style={styles.dropdownBackdrop} onPress={closeDropdowns}>
-
-                        {/* This prevents closing when touching inside */}
-                        <Pressable onPress={() => { }}>
-                            <NotificationPanel onClose={closeDropdowns} />
-                        </Pressable>
-
-                    </Pressable>
-                </Portal>
-            )}
-            {profileOpen && (
-                <Portal hostName="safe">
-                    <Pressable style={styles.dropdownBackdrop} onPress={closeDropdowns}>
-                        <ProfilePanel onClose={closeDropdowns} />
-                    </Pressable>
-                </Portal>
-            )}
+            <Modal
+                visible={notifOpen}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={closeDropdowns}
+            >
+                <Pressable style={styles.dropdownBackdrop} onPress={closeDropdowns} />
+                <NotificationPanel onClose={closeDropdowns} />
+            </Modal>
+            <Modal
+                visible={profileOpen}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={closeDropdowns}
+            >
+                <Pressable style={styles.dropdownBackdrop} onPress={closeDropdowns} />
+                <ProfilePanel onClose={closeDropdowns} />
+            </Modal>
             {/* ── Switch Modal ── */}
             {isSwitchOpen && (
                 <ControlSwitchModal
@@ -226,6 +235,7 @@ const Dash_Index_Screen = () => {
                             setIsSwitchModalOpen={() => setIsSwitchModalOpen(true)}
                             refreshDashboard={refreshData}
                             handleSetActivetab={handleSetActivetab}
+                            isActive={activeTab === 0 || activeTab == 1}
                         />
                     </View>
 

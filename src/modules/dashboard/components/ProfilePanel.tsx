@@ -1,4 +1,4 @@
-import { Image,  StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image, StyleSheet, Text, TouchableOpacity, View, Pressable } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { normalize, vh, vw } from '@dwwp/utils/dimensions'
 import colors from '@dwwp/utils/colors'
@@ -41,14 +41,14 @@ const ProfilePanel = ({ onClose }: { onClose: () => void }) => {
             }
         },
         // { title: strings.settings, imageUrl: localImages.settings },
-        { 
+        {
             title: strings.raiseComplaint,
-             imageUrl: localImages.report,
-              onClickEvent:()=>{
-                 navigation.navigate(screenNames.RaiseComplaintScreen)
-                 onClose?.()
-              }
-             },
+            imageUrl: localImages.report,
+            onClickEvent: () => {
+                navigation.navigate(screenNames.RaiseComplaintScreen)
+                onClose?.()
+            }
+        },
         {
             title: strings.logout,
             imageUrl: localImages.logout,
@@ -82,7 +82,7 @@ const ProfilePanel = ({ onClose }: { onClose: () => void }) => {
         )
     }, []);
     return (
-        <View style={[styles.dropdownPanel, { right: vw(12), width: vw(200) }]}>
+        <Pressable style={[styles.dropdownPanel, { right: vw(12), width: vw(200) }]}>
             <View style={styles.profileSection}>
                 <View style={styles.profileSectionImage}>
                     {userDetails?.fullName &&
@@ -96,7 +96,7 @@ const ProfilePanel = ({ onClose }: { onClose: () => void }) => {
                     <Text style={styles.profileSectionEmail}>
                         {userDetails?.emailId}
                     </Text>
-                </View> 
+                </View>
             </View>
             <LoadingPopup visible={logouLoading} message="Logging Out.." />
             {useProfileMenuItem.map((item, idx) => (
@@ -109,7 +109,7 @@ const ProfilePanel = ({ onClose }: { onClose: () => void }) => {
                     <Text style={styles.clickText}>{item?.title}</Text>
                 </TouchableOpacity>
             ))}
-        </View>
+        </Pressable>
     )
 }
 export default ProfilePanel
@@ -117,7 +117,7 @@ export default ProfilePanel
 const styles = StyleSheet.create({
     dropdownPanel: {
         position: 'absolute',
-        top: normalize(90),
+        top: normalize(50),
         right: vw(30),
         backgroundColor: colors.white,
         padding: vh(12),
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
         minHeight: vh(100),
         borderRadius: normalize(10),
         elevation: 10,
-
+        zIndex: 400,
     },
     dropdownHeader: {
         flexDirection: 'row',

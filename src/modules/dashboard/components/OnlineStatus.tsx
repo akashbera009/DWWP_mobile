@@ -10,12 +10,13 @@
  *   onPress   – optional callback when card is tapped
  */
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react'
+import { useFocusEffect } from '@react-navigation/native'
 import {
     View, Text, StyleSheet, Animated, Pressable, Easing,
 } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
-import { normalize} from '@dwwp/utils/dimensions'
+import { normalize } from '@dwwp/utils/dimensions'
 import fonts from '@dwwp/utils/fonts'
 import { useAppSelector, useAppDispatch } from '@dwwp/store/hooks'
 import { fetchServoState } from '../servoActions'
@@ -123,27 +124,31 @@ function usePulse(active: boolean) {
 }
 type OnlineStatusPropType = {
     handleSetActivetab: (idx: number) => void
+    isActive: boolean
 }
 // ─── Component ────────────────────────────────────────────────────────────────
-export const OnlineStatus = ({ handleSetActivetab }: OnlineStatusPropType) => {
+export const OnlineStatus = ({ handleSetActivetab, isActive }: OnlineStatusPropType) => {
     const dispatch = useAppDispatch()
     const email = useAppSelector(state => state.auth?.user?.email)
     const lastSeen = useAppSelector(state => state?.servo?.lastSeen)
 
     const [_, setTick] = useState(0)
 
-    // trigger re-render every 1 second, and fetch newest data every 5 seconds
-    useEffect(() => {
-        let count = 0
-        const id = setInterval(() => {
-            count++
-            setTick(count)
-            if (count % 5 === 0 && email) {
-                dispatch(fetchServoState({ email }))
-            }
-        }, 1000)
-        return () => clearInterval(id)
-    }, [dispatch, email])
+    // trigger re-render every 1 second, and fetch newest data every 5 seconds only when focused
+    useFocusEffect(
+        useCallback(() => {
+            if (!isActive) return;
+            let count = 0
+            const id = setInterval(() => {
+                count++
+                setTick(count)
+                if (count % 5 === 0 && email) {
+                    dispatch(fetchServoState({ email }))
+                }
+            }, 1000)
+            return () => clearInterval(id)
+        }, [dispatch, email, isActive])
+    )
 
     const level = calcLevel(Number(lastSeen))
     const label = calcLabel(Number(lastSeen))

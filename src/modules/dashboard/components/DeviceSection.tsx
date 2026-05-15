@@ -16,8 +16,9 @@ import { localImages } from '@dwwp/utils/localimages'
 type DeviceSectionProp = {
     setIsSwitchModalOpen: () => void
     handleSetActivetab: (idx: number) => void
+    isActive: boolean
 }
-const DeviceSection = ({ setIsSwitchModalOpen, handleSetActivetab }: DeviceSectionProp) => {
+const DeviceSection = ({ setIsSwitchModalOpen, handleSetActivetab, isActive }: DeviceSectionProp) => {
     const servoState = useAppSelector(s => s.servo.servoState)
     return (
         <View style={[styles.deviceStatusSection]}>
@@ -30,6 +31,7 @@ const DeviceSection = ({ setIsSwitchModalOpen, handleSetActivetab }: DeviceSecti
                 {/* Left – animated WiFi / online status */}
                 <OnlineStatus
                     handleSetActivetab={handleSetActivetab}
+                    isActive={isActive}
                 />
 
                 {/* Right – valve state + open sheet button */}

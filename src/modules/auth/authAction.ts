@@ -11,6 +11,7 @@ import { clearAll } from "@dwwp/utils/mmkvStorage"
 import { showInfoSnackbar } from "@dwwp/utils/showSnackBar";
 import { Dispatch } from 'redux';
 import { updateDashboardProfileImage } from "../dashboard/dashboardSlice";
+import { stopAllListeners } from "../dashboard/usageListener";
 
 export const loginWithEmail = createAsyncThunk<
     AuthUser,
@@ -144,6 +145,11 @@ export const updateProfileImage = (imageUrl: string, userId: string) => {
 export const logout = createAsyncThunk(
     "auth/logout",
     async () => {
+        // Stop all active Firestore listeners BEFORE signing out.
+        // Without this the onSnapshot callbacks continue firing on a
+        // de-authenticated connection, causing permission errors and
+        // stale dispatches into a cleared store.
+        stopAllListeners()
         await getAuth().signOut()
         await persistor.purge()
         await clearAll()
